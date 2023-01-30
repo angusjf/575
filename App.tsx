@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { FiveSevenFive } from './src/FiveSevenFive';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,10 +23,8 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
-      <Text style={styles.number}>5</Text>
-      <Text style={styles.number}>7</Text>
-      <Text style={styles.number}>5</Text>
+    <View onLayout={onLayoutRootView} style={styles.container}>
+      <FiveSevenFive />
     </View>
   );
 }
@@ -36,9 +35,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  number: {
-    fontSize: 36,
-    fontFamily: 'PlexSerifRegular'
-  }
+  } 
 });
