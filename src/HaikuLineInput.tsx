@@ -8,12 +8,13 @@ import {
 } from "react-native";
 import { Validity } from "./Validity";
 import { syllable } from "syllable";
+import { fonts } from "./font";
 
 const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: "grey",
-    fontFamily: "PlexSerifRegular",
+    fontFamily: fonts.PlexSerifRegular,
     paddingHorizontal: 7,
     paddingVertical: 5,
     marginVertical: 7,
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const HaikuBox = (
+export const HaikuLineInput = (
   props: TextInputProps & { long?: boolean; validity: Validity }
 ) => {
   const invalid =
@@ -29,13 +30,16 @@ export const HaikuBox = (
     syllable(props.value || "") !== (props.long ? 7 : 5);
 
   return (
-    <TextInput
-      style={{
-        ...styles.input,
-        ...(invalid ? { borderColor: "red" } : {}),
-        width: props.long ? 330 : 250,
-      }}
-      {...props}
-    />
+    <View style={{ flexDirection: "row" }}>
+      <TextInput
+        style={{
+          ...styles.input,
+          ...(invalid ? { borderColor: "red" } : {}),
+          width: props.long ? 330 : 250,
+        }}
+        {...props}
+      />
+      {invalid && <Text>{syllable(props.value || "")}</Text>}
+    </View>
   );
 };
