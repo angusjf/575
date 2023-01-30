@@ -34,7 +34,7 @@ export default function App() {
 
   return (
     <View onLayout={onLayoutRootView} style={styles.container}>
-      {username != null ? (
+      {username !== null ? (
         <HaikuForm username={username} />
       ) : (
         <RegisterForm

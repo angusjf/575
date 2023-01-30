@@ -17,7 +17,7 @@ export const Feed = ({ posts }: { posts: Post[] }) => {
     <View>
       {posts.map((post) => (
         <PostBox
-          key={post.haiku.join() + post.author}
+          key={post.haiku.join("") + post.author}
           author={post.author}
           haiku={post.haiku}
         />

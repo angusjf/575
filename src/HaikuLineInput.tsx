@@ -32,6 +32,7 @@ export const HaikuLineInput = (
   return (
     <View style={{ flexDirection: "row" }}>
       <TextInput
+        autoCapitalize="none"
         style={{
           ...styles.input,
           ...(invalid ? { borderColor: "red" } : {}),

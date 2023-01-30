@@ -133,8 +133,6 @@ const styles = StyleSheet.create({
 
 const now = new Date();
 
-const date = new Intl.DateTimeFormat();
-
 const InputScreen = ({
   haiku,
   changed,
@@ -148,7 +146,7 @@ const InputScreen = ({
 }) => {
   return (
     <View>
-      <Text>{date.format(now)}</Text>
+      <Text>{JSON.stringify(now)}</Text>
       <Text style={styles.intro}>Compose today's haiku</Text>
       <HaikuLineInput
         placeholder="In the twilight rain"
