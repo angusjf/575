@@ -16,7 +16,8 @@ type State = {
 
 type Action =
   | { type: "change_line"; line: 0 | 1 | 2; newLine: string }
-  | { type: "submit" };
+  | { type: "submit" }
+  | { type: "invalid" };
 
 const defaultHaiku: Haiku = [
   "one two three four five",
@@ -50,6 +51,8 @@ const reducer = (state: State, action: Action): State => {
       };
     case "submit":
       return { ...state, validity: "loading" };
+    case "invalid":
+      return { ...state, validity: "invalid" };
   }
 };
 
@@ -76,10 +79,7 @@ export const HaikuForm = ({ publish }: { publish: (haiku: Haiku) => void }) => {
           if (valid(syllables)) {
             publish(state.haiku);
           } else {
-            return {
-              ...state,
-              validity: "invalid",
-            };
+            dispatch({ type: "invalid" });
           }
         }, AI_WAIT_TIME);
       }}
