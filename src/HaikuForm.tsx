@@ -15,6 +15,7 @@ import { Haiku, Post } from "./haiku";
 import { Feed } from "./Feed";
 import { post } from "../firebaseClient";
 import { Button } from "./Button";
+import { format } from "date-fns";
 
 type State =
   | {
@@ -137,6 +138,8 @@ const styles = StyleSheet.create({
 
 const now = new Date();
 
+const DateToday = () => <Text>{format(now, "MMM do ''yy")}</Text>;
+
 const InputScreen = ({
   haiku,
   changed,
@@ -150,7 +153,7 @@ const InputScreen = ({
 }) => {
   return (
     <View>
-      <Text>{JSON.stringify(now)}</Text>
+      <DateToday />
       <Text style={styles.intro}>Compose today's haiku</Text>
       <HaikuLineInput
         placeholder="In the twilight rain"
