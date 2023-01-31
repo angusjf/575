@@ -2,7 +2,7 @@ import { StyleSheet, TextInput, View } from "react-native";
 import { fonts } from "./font";
 import { useCallback, useState } from "react";
 import { registerUser } from "../firebaseClient";
-import { storeUsername, USERNAME_KEY } from "./storage";
+import { storeUsername } from "./storage";
 import { Button } from "./Button";
 
 const styles = StyleSheet.create({
@@ -40,7 +40,7 @@ export const RegisterForm = ({
   return (
     <View>
       <TextInput
-        placeholder="what should we call you"
+        placeholder="how do you sign your poems?"
         value={input || ""}
         onChangeText={setInput}
       />
