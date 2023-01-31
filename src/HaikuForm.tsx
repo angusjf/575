@@ -7,6 +7,7 @@ import { fonts } from "./font";
 import { Haiku } from "./types";
 import { Button } from "./Button";
 import { format } from "date-fns";
+import { valid } from "./valid";
 
 type State = {
   haiku: Haiku;
@@ -51,9 +52,6 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, validity: "loading" };
   }
 };
-
-const valid = (syllables: readonly [number, number, number]): boolean =>
-  syllables[0] === 5 && syllables[1] === 7 && syllables[2] === 5;
 
 export const HaikuForm = ({ publish }: { publish: (haiku: Haiku) => void }) => {
   const [state, dispatch] = useReducer(reducer, {
