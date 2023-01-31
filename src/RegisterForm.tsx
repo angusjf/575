@@ -2,8 +2,7 @@ import { StyleSheet, TextInput, View } from "react-native";
 import { fonts } from "./font";
 import { useCallback, useState } from "react";
 import { registerUser } from "../firebaseClient";
-import { USERNAME_KEY } from "./consts";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storeUsername, USERNAME_KEY } from "./storage";
 import { Button } from "./Button";
 
 const styles = StyleSheet.create({
@@ -29,7 +28,7 @@ export const RegisterForm = ({
     try {
       setLoading(true);
       await registerUser(username);
-      AsyncStorage.setItem(USERNAME_KEY, username);
+      await storeUsername(username);
       setUsername(username);
     } catch (error: unknown) {
       console.log("couldn't log in");

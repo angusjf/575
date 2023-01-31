@@ -1,13 +1,20 @@
 import { useCallback, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { FiveSevenFive } from "./src/FiveSevenFive";
 import { fonts } from "./src/font";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { HaikuForm } from "./src/HaikuForm";
 import { RegisterForm } from "./src/RegisterForm";
-import { USERNAME_KEY } from "./src/consts";
+import {
+  getUsernameFromStorage,
+  getTodaysHaikuFromStorage,
+  storeTodaysHaiku,
+  clear,
+} from "./src/storage";
+import { Haiku } from "./src/haiku";
+import { Feed } from "./src/Feed";
+import { post } from "./firebaseClient";
+import { Button } from "./src/Button";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,11 +25,19 @@ export default function App() {
   });
 
   const [username, setUsername] = useState<string | null>(null);
+  const [todaysHaiku, setTodaysHaiku] = useState<Haiku | null>(null);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      const username = await AsyncStorage.getItem(USERNAME_KEY);
-      setUsername(username);
+      const usernameFromStorage = await getUsernameFromStorage();
+      if (usernameFromStorage) {
+        setUsername(usernameFromStorage);
+
+        const haikuFromStorage = await getTodaysHaikuFromStorage();
+        if (haikuFromStorage) {
+          setTodaysHaiku(haikuFromStorage);
+        }
+      }
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
@@ -33,15 +48,20 @@ export default function App() {
 
   return (
     <View onLayout={onLayoutRootView} style={styles.container}>
-      {username !== null ? (
-        <HaikuForm username={username} />
-      ) : (
-        <RegisterForm
-          setUsername={async (newUsername) => {
-            setUsername(newUsername);
+      {username === null ? (
+        <RegisterForm setUsername={setUsername} />
+      ) : todaysHaiku === null ? (
+        <HaikuForm
+          publish={(haiku) => {
+            setTodaysHaiku(haiku);
+            post(username, haiku);
+            storeTodaysHaiku(haiku);
           }}
         />
+      ) : (
+        <Feed posts={[{ haiku: todaysHaiku, author: username }]} />
       )}
+      <Button title="clear storage" onPress={() => clear()} />
     </View>
   );
 }

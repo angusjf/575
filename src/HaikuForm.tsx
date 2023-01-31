@@ -1,34 +1,21 @@
 import { useReducer } from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { syllable } from "syllable";
 import { Validity } from "./Validity";
 import { fonts } from "./font";
-import { Haiku, Post } from "./haiku";
-import { Feed } from "./Feed";
-import { post } from "../firebaseClient";
+import { Haiku } from "./haiku";
 import { Button } from "./Button";
 import { format } from "date-fns";
 
-type State =
-  | {
-      screen: "input";
-      haiku: Haiku;
-      validity: Validity;
-    }
-  | { screen: "feed"; haikus: Post[] };
+type State = {
+  haiku: Haiku;
+  validity: Validity;
+};
 
 type Action =
   | { type: "change_line"; line: 0 | 1 | 2; newLine: string }
-  | { type: "start_analysis" }
-  | { type: "finish_analysis"; username: string };
+  | { type: "submit" };
 
 const defaultHaiku: Haiku = [
   "one two three four five",
@@ -55,78 +42,51 @@ const setAt = <T extends unknown>(
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "change_line":
-      if (state.screen == "input") {
-        return {
-          ...state,
-          haiku: setAt(state.haiku, action.line, action.newLine),
-          validity: "unchecked",
-        };
-      } else {
-        return state;
-      }
-    case "start_analysis":
-      if (state.screen == "input") {
-        return { ...state, validity: "loading" };
-      } else {
-        return state;
-      }
-    case "finish_analysis":
-      if (state.screen == "input") {
-        const syllables = [
-          syllable(state.haiku[0]),
-          syllable(state.haiku[1]),
-          syllable(state.haiku[2]),
-        ] as const;
-
-        if (valid(syllables)) {
-          post(action.username, state.haiku);
-          return {
-            screen: "feed",
-            haikus: [{ haiku: state.haiku, author: action.username }],
-          };
-        } else {
-          return {
-            ...state,
-            validity: "invalid",
-          };
-        }
-      } else {
-        return state;
-      }
+      return {
+        ...state,
+        haiku: setAt(state.haiku, action.line, action.newLine),
+        validity: "unchecked",
+      };
+    case "submit":
+      return { ...state, validity: "loading" };
   }
 };
 
 const valid = (syllables: readonly [number, number, number]): boolean =>
   syllables[0] === 5 && syllables[1] === 7 && syllables[2] === 5;
 
-export const HaikuForm = ({ username }: { username: string }) => {
+export const HaikuForm = ({ publish }: { publish: (haiku: Haiku) => void }) => {
   const [state, dispatch] = useReducer(reducer, {
-    screen: "input",
     haiku: defaultHaiku,
     validity: "unchecked",
   });
 
-  switch (state.screen) {
-    case "input":
-      return (
-        <InputScreen
-          validity={state.validity}
-          haiku={state.haiku}
-          changed={(n, l) =>
-            dispatch({ type: "change_line", line: n, newLine: l })
+  return (
+    <InputScreen
+      validity={state.validity}
+      haiku={state.haiku}
+      changed={(n, l) => dispatch({ type: "change_line", line: n, newLine: l })}
+      done={() => {
+        dispatch({ type: "submit" });
+        setTimeout(() => {
+          const syllables = [
+            syllable(state.haiku[0]),
+            syllable(state.haiku[1]),
+            syllable(state.haiku[2]),
+          ] as const;
+
+          if (valid(syllables)) {
+            publish(state.haiku);
+          } else {
+            return {
+              ...state,
+              validity: "invalid",
+            };
           }
-          done={() => {
-            dispatch({ type: "start_analysis" });
-            setTimeout(
-              () => dispatch({ type: "finish_analysis", username }),
-              AI_WAIT_TIME
-            );
-          }}
-        />
-      );
-    case "feed":
-      return <Feed posts={state.haikus} />;
-  }
+        }, AI_WAIT_TIME);
+      }}
+    />
+  );
 };
 
 const styles = StyleSheet.create({
