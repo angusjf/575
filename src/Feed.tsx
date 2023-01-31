@@ -1,19 +1,18 @@
 import {
   ActivityIndicator,
+  FlatList,
+  SafeAreaView,
   StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { Validity } from "./Validity";
-import { syllable } from "syllable";
-import { fonts } from "./font";
-import { Day, Post } from "./types";
+import { Day } from "./types";
 import { PostBox } from "./Post";
-import { useEffect, useState } from "react";
-import { getDays } from "../firebaseClient";
+
+const styles = StyleSheet.create({
+  wrapper: {
+    marginTop: 147,
+  },
+});
 
 export const Feed = ({ days }: { days: Day[] | null }) => {
   return (
@@ -21,15 +20,18 @@ export const Feed = ({ days }: { days: Day[] | null }) => {
       {days === null ? (
         <ActivityIndicator />
       ) : (
-        days.map((day) =>
-          day.posts.map((post) => (
-            <PostBox
-              key={post.haiku.join("") + post.author}
-              author={post.author}
-              haiku={post.haiku}
-            />
-          ))
-        )
+        <SafeAreaView style={styles.wrapper}>
+          <FlatList
+            data={days[days.length - 1].posts}
+            renderItem={({ item }) => (
+              <PostBox
+                key={item.haiku.join("") + item.author}
+                author={item.author}
+                haiku={item.haiku}
+              />
+            )}
+          />
+        </SafeAreaView>
       )}
     </View>
   );

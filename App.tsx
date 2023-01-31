@@ -52,7 +52,10 @@ export default function App() {
   return (
     <View onLayout={onLayoutRootView} style={styles.container}>
       {username === null ? (
-        <RegisterForm setUsername={setUsername} />
+        <>
+          <RegisterForm setUsername={setUsername} />
+          <Button title="clear storage" onPress={() => clear()} />
+        </>
       ) : todaysHaiku === null ? (
         <HaikuForm
           publish={(haiku) => {
@@ -65,7 +68,6 @@ export default function App() {
       ) : (
         <Feed days={days} />
       )}
-      <Button title="clear storage" onPress={() => clear()} />
     </View>
   );
 }

@@ -21,11 +21,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: "right",
   },
+  container: {
+    marginBottom: 49,
+  },
 });
 
 export const PostBox = ({ haiku, author }: Post) => {
   return (
-    <View>
+    <View style={styles.container}>
       <Text style={styles.line}>{haiku[0]}</Text>
       <Text style={styles.line}>{haiku[1]}</Text>
       <Text style={styles.line}>{haiku[2]}</Text>
