@@ -12,7 +12,7 @@ import { fonts } from "./font";
 
 const styles = StyleSheet.create({
   input: {
-    borderWidth: 1,
+    borderBottomWidth: 1,
     borderColor: "grey",
     fontFamily: fonts.PlexSerifRegular,
     paddingHorizontal: 7,
