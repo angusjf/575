@@ -32,6 +32,7 @@ export const HaikuLineInput = (
   return (
     <View style={{ flexDirection: "row" }}>
       <TextInput
+        editable={props.validity !== "loading"}
         autoCapitalize="none"
         style={{
           ...styles.input,

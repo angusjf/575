@@ -35,13 +35,27 @@ const defaultHaiku: Haiku = [
 
 const AI_WAIT_TIME = 2000;
 
+const setAt = <T extends unknown>(
+  [a, b, c]: [T, T, T],
+  n: number,
+  x: T
+): [T, T, T] => {
+  if (n === 0) {
+    return [x, b, c];
+  }
+  if (n == 1) {
+    return [a, x, c];
+  }
+  return [a, b, x];
+};
+
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "change_line":
       if (state.screen == "input") {
         return {
           ...state,
-          haiku: { ...state.haiku, [action.line]: action.newLine },
+          haiku: setAt(state.haiku, action.line, action.newLine),
           validity: "unchecked",
         };
       } else {
