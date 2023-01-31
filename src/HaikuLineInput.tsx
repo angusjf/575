@@ -36,8 +36,8 @@ export const HaikuLineInput = (
         autoCapitalize="none"
         style={{
           ...styles.input,
-          ...(invalid ? { borderColor: "red" } : {}),
           ...(isFocused ? { borderBottomWidth: 1, borderColor: "grey" } : {}),
+          ...(invalid ? { borderBottomWidth: 1, borderColor: "red" } : {}),
           width: props.long ? 330 : 250,
         }}
         {...props}
