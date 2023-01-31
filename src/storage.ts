@@ -14,7 +14,7 @@ export const storeUsername = async (username: string) => {
 };
 
 export const getTodaysHaikuFromStorage = async (): Promise<Haiku | null> => {
-  const haiku = await AsyncStorage.getItem(USERNAME_KEY);
+  const haiku = await AsyncStorage.getItem(TODAYS_HAIKU_KEY);
   if (haiku === null) {
     return null;
   }
