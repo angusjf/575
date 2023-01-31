@@ -7,10 +7,9 @@ import { fonts } from "./src/font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { HaikuForm } from "./src/HaikuForm";
 import { RegisterForm } from "./src/RegisterForm";
+import { USERNAME_KEY } from "./src/consts";
 
 SplashScreen.preventAutoHideAsync();
-
-const USERNAME_KEY = "575_username";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -38,9 +37,8 @@ export default function App() {
         <HaikuForm username={username} />
       ) : (
         <RegisterForm
-          setUsername={(newUsername) => {
+          setUsername={async (newUsername) => {
             setUsername(newUsername);
-            AsyncStorage.setItem(USERNAME_KEY, newUsername);
           }}
         />
       )}

@@ -1,7 +1,6 @@
 import { useReducer } from "react";
 import {
   ActivityIndicator,
-  Button,
   StyleSheet,
   Text,
   TextInput,
@@ -15,6 +14,7 @@ import { fonts } from "./font";
 import { Haiku, Post } from "./haiku";
 import { Feed } from "./Feed";
 import { post } from "../firebaseClient";
+import { Button } from "./Button";
 
 type State =
   | {
@@ -133,19 +133,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: fonts.PlexSerifBoldItalic,
   },
-
-  submit: {
-    marginTop: 15,
-    borderWidth: 1,
-    borderColor: "grey",
-    paddingHorizontal: 7,
-    alignSelf: "center",
-  },
-  submitText: {
-    fontSize: 20,
-    fontFamily: fonts.PlexSerifRegular,
-    alignSelf: "center",
-  },
 });
 
 const now = new Date();
@@ -184,23 +171,11 @@ const InputScreen = ({
         validity={validity}
         onChangeText={(l) => changed(2, l)}
       />
-      <SubmitButton done={done} loading={validity === "loading"} />
+      <Button
+        title="check & share"
+        isLoading={validity === "loading"}
+        onPress={done}
+      />
     </View>
   );
 };
-
-const SubmitButton = ({
-  done,
-  loading,
-}: {
-  done: () => void;
-  loading: boolean;
-}) => (
-  <TouchableOpacity style={styles.submit} onPress={done}>
-    {loading ? (
-      <ActivityIndicator />
-    ) : (
-      <Text style={styles.submitText}>check & share</Text>
-    )}
-  </TouchableOpacity>
-);

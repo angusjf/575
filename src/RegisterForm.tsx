@@ -1,16 +1,10 @@
-import {
-  Button,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Validity } from "./Validity";
-import { syllable } from "syllable";
+import { StyleSheet, TextInput, View } from "react-native";
 import { fonts } from "./font";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { registerUser } from "../firebaseClient";
+import { USERNAME_KEY } from "./consts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Button } from "./Button";
 
 const styles = StyleSheet.create({
   input: {
@@ -30,6 +24,20 @@ export const RegisterForm = ({
   setUsername: (username: string) => void;
 }) => {
   const [input, setInput] = useState("");
+  const [isLoading, setLoading] = useState(false);
+  const handleLogin = useCallback(async (username: string) => {
+    try {
+      setLoading(true);
+      await registerUser(username);
+      AsyncStorage.setItem(USERNAME_KEY, username);
+      setUsername(username);
+    } catch (error: unknown) {
+      console.log("couldn't log in");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return (
     <View>
       <TextInput
@@ -37,7 +45,11 @@ export const RegisterForm = ({
         value={input || ""}
         onChangeText={setInput}
       />
-      <Button title="continue" onPress={() => setUsername(input)} />
+      <Button
+        title="continue"
+        onPress={() => handleLogin(input)}
+        isLoading={isLoading}
+      />
     </View>
   );
 };
