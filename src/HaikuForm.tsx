@@ -14,6 +14,7 @@ import { Validity } from "./Validity";
 import { fonts } from "./font";
 import { Haiku, Post } from "./haiku";
 import { Feed } from "./Feed";
+import { post } from "../firebaseClient";
 
 type State =
   | {
@@ -77,6 +78,7 @@ const reducer = (state: State, action: Action): State => {
         ] as const;
 
         if (valid(syllables)) {
+          post(action.username, state.haiku);
           return {
             screen: "feed",
             haikus: [{ haiku: state.haiku, author: action.username }],
