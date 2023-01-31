@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
@@ -13,6 +14,7 @@ import { Post } from "./haiku";
 import { PostBox } from "./Post";
 
 export const Feed = ({ posts }: { posts: Post[] }) => {
+  const loading = true;
   return (
     <View>
       {posts.map((post) => (
@@ -22,6 +24,7 @@ export const Feed = ({ posts }: { posts: Post[] }) => {
           haiku={post.haiku}
         />
       ))}
+      {loading && <ActivityIndicator />}
     </View>
   );
 };

@@ -1,5 +1,6 @@
 import { useReducer } from "react";
 import {
+  ActivityIndicator,
   Button,
   StyleSheet,
   Text,
@@ -194,8 +195,10 @@ const SubmitButton = ({
   loading: boolean;
 }) => (
   <TouchableOpacity style={styles.submit} onPress={done}>
-    <Text style={styles.submitText}>
-      {loading ? "loading" : "check & share"}
-    </Text>
+    {loading ? (
+      <ActivityIndicator />
+    ) : (
+      <Text style={styles.submitText}>check & share</Text>
+    )}
   </TouchableOpacity>
 );
