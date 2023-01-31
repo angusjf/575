@@ -27,7 +27,7 @@ export const post = (userId: string, haiku: Haiku) => {
 
 export const registerUser = async (userId: string) => {
   const userUniqueness = await isUserUnique(userId);
-  console.log(userUniqueness);
+
   if (!userUniqueness) throw Error("Not unique");
 
   const db = getDatabase(firebaseApp);
