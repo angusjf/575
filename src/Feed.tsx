@@ -1,30 +1,20 @@
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Validity } from "./Validity";
-import { syllable } from "syllable";
-import { fonts } from "./font";
+import { FlatList, SafeAreaView } from "react-native";
 import { Post } from "./haiku";
 import { PostBox } from "./Post";
 
 export const Feed = ({ posts }: { posts: Post[] }) => {
-  const loading = true;
   return (
-    <View>
-      {posts.map((post) => (
-        <PostBox
-          key={post.haiku.join("") + post.author}
-          author={post.author}
-          haiku={post.haiku}
-        />
-      ))}
-      {loading && <ActivityIndicator />}
-    </View>
+    <SafeAreaView>
+      <FlatList
+        data={posts}
+        renderItem={({ item }) => (
+          <PostBox
+            key={item.haiku.join("") + item.author}
+            author={item.author}
+            haiku={item.haiku}
+          />
+        )}
+      />
+    </SafeAreaView>
   );
 };
