@@ -11,9 +11,9 @@ import {
   storeTodaysHaiku,
   clear,
 } from "./src/storage";
-import { Haiku } from "./src/haiku";
+import { Day, Haiku } from "./src/types";
 import { Feed } from "./src/Feed";
-import { post } from "./firebaseClient";
+import { getDays, post } from "./firebaseClient";
 import { Button } from "./src/Button";
 
 SplashScreen.preventAutoHideAsync();
@@ -26,6 +26,7 @@ export default function App() {
 
   const [username, setUsername] = useState<string | null>(null);
   const [todaysHaiku, setTodaysHaiku] = useState<Haiku | null>(null);
+  const [days, setDays] = useState<Day[] | null>(null);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
@@ -36,6 +37,11 @@ export default function App() {
         const haikuFromStorage = await getTodaysHaikuFromStorage();
         if (haikuFromStorage) {
           setTodaysHaiku(haikuFromStorage);
+
+          getDays().then((days) => {
+            console.log(days[0].posts);
+            setDays(days);
+          });
         }
       }
       await SplashScreen.hideAsync();
@@ -56,10 +62,15 @@ export default function App() {
             setTodaysHaiku(haiku);
             post(username, haiku);
             storeTodaysHaiku(haiku);
+            // [{ date: new Date(), {haiku: todaysHaiku, author: username } }]
+            getDays().then((days) => {
+              console.log(days);
+              setDays(days);
+            });
           }}
         />
       ) : (
-        <Feed posts={[{ haiku: todaysHaiku, author: username }]} />
+        <Feed days={days} />
       )}
       <Button title="clear storage" onPress={() => clear()} />
     </View>

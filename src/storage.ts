@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Haiku } from "./haiku";
+import { Haiku } from "./types";
 
 const USERNAME_KEY = "575_username";
 const TODAYS_HAIKU_KEY = "575_todays_haiku";

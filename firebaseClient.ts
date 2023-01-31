@@ -1,6 +1,6 @@
 import { getDatabase, ref, set, get, child } from "firebase/database";
 import { firebaseApp } from "./firebase";
-import { Haiku } from "./src/haiku";
+import { Haiku, Day, Post } from "./src/types";
 import { dateDbKey } from "./utils/date";
 
 export const writeUserData = (userId: string, name: string) => {
@@ -20,7 +20,7 @@ export const isUserUnique = async (userId: string) => {
 
 export const post = (userId: string, haiku: Haiku) => {
   const db = getDatabase(firebaseApp);
-  set(ref(db, `haikus/${userId}/${dateDbKey(new Date())}`), {
+  set(ref(db, `days/${dateDbKey(new Date())}/${userId}`), {
     haiku,
   });
 };
@@ -34,4 +34,19 @@ export const registerUser = async (userId: string) => {
   set(ref(db, "users/" + userId), {
     userId,
   });
+};
+
+export const getDays = async (): Promise<Day[]> => {
+  const db = getDatabase(firebaseApp);
+  const days = await get(ref(db, "days/"));
+
+  return Object.entries(days.val()).map(([date, posts]) => ({
+    date: new Date(date),
+    posts: Object.entries(posts as Record<string, { haiku: Haiku }>).map(
+      ([user, data]) => ({
+        author: user,
+        haiku: data.haiku,
+      })
+    ),
+  }));
 };

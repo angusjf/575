@@ -17,10 +17,8 @@ import {
   storeTodaysHaiku,
   clear,
 } from "./src/storage";
-import { Haiku } from "./src/haiku";
-import { Feed } from "./src/Feed";
+import { Haiku } from "./src/types";
 import { post } from "./firebaseClient";
-import { Button } from "./src/Button";
 
 SplashScreen.preventAutoHideAsync();
 

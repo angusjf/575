@@ -4,7 +4,7 @@ import { HaikuLineInput } from "./HaikuLineInput";
 import { syllable } from "syllable";
 import { Validity } from "./Validity";
 import { fonts } from "./font";
-import { Haiku } from "./haiku";
+import { Haiku } from "./types";
 import { Button } from "./Button";
 import { format } from "date-fns";
 

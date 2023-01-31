@@ -9,7 +9,7 @@ import {
 import { Validity } from "./Validity";
 import { syllable } from "syllable";
 import { fonts } from "./font";
-import { Post } from "./haiku";
+import { Post } from "./types";
 
 const styles = StyleSheet.create({
   line: {
