@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
   intro: {
     fontSize: 20,
     fontFamily: fonts.PlexSerifBoldItalic,
+    marginBottom: 20,
   },
 });
 
