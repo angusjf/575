@@ -38,10 +38,7 @@ export default function App() {
         if (haikuFromStorage) {
           setTodaysHaiku(haikuFromStorage);
 
-          getDays().then((days) => {
-            console.log(days[0].posts);
-            setDays(days);
-          });
+          getDays().then(setDays);
         }
       }
       await SplashScreen.hideAsync();
@@ -62,11 +59,7 @@ export default function App() {
             setTodaysHaiku(haiku);
             post(username, haiku);
             storeTodaysHaiku(haiku);
-            // [{ date: new Date(), {haiku: todaysHaiku, author: username } }]
-            getDays().then((days) => {
-              console.log(days);
-              setDays(days);
-            });
+            getDays().then(setDays);
           }}
         />
       ) : (
