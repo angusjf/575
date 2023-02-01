@@ -5,6 +5,7 @@ import { storeUsername } from "../storage";
 import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { Validity } from "../Validity";
+import { fonts } from "../font";
 
 export const RegisterForm = ({
   setUsername,
@@ -26,8 +27,11 @@ export const RegisterForm = ({
 
   return (
     <View>
+      <Text style={{ fontFamily: fonts.PlexMonoItalic, fontSize: 15 }}>
+        how do you sign your poems?
+      </Text>
       <HaikuLineInput
-        placeholder="how do you sign your poems?"
+        placeholder="Bashō"
         value={input || ""}
         onChangeText={(text) => {
           setInput(text);

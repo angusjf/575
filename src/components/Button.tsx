@@ -25,14 +25,16 @@ export const Button = ({ isLoading, title, onPress }: ButtonProps) => (
 const styles = StyleSheet.create({
   submit: {
     marginTop: 15,
-    borderWidth: 1,
+    borderBottomWidth: 1,
+    borderEndWidth: 1,
     borderColor: "grey",
-    paddingHorizontal: 7,
+    paddingHorizontal: 14,
+    paddingBottom: 4,
     alignSelf: "center",
   },
   submitText: {
     fontSize: 20,
-    fontFamily: fonts.PlexSerifRegular,
+    fontFamily: fonts.PlexMonoItalic,
     alignSelf: "center",
   },
 });
