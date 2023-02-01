@@ -13,11 +13,11 @@ import { useState } from "react";
 
 const styles = StyleSheet.create({
   input: {
-    fontFamily: fonts.PlexSerifRegular,
+    fontFamily: fonts.PlexMonoItalic,
     paddingHorizontal: 7,
     paddingVertical: 5,
     marginVertical: 7,
-    fontSize: 20,
+    fontSize: 16,
   },
 });
 
@@ -32,6 +32,7 @@ export const HaikuLineInput = (
   return (
     <View style={{ flexDirection: "row" }}>
       <TextInput
+        multiline
         editable={props.validity !== "loading"}
         autoCapitalize="none"
         style={{

@@ -1,10 +1,9 @@
-import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { hasPostedToday, post } from "./src/firebaseClient";
 import { Feed } from "./src/components/Feed";
-import { fonts } from "./src/font";
+import { useLoadFonts } from "./src/font";
 import { HaikuForm } from "./src/components/HaikuForm";
 import { RegisterForm } from "./src/components/RegisterForm";
 import { getUsernameFromStorage, storeUsername } from "./src/storage";
@@ -13,10 +12,7 @@ import { useAppState } from "./src/useAppState";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
-    [fonts.PlexSerifRegular]: require("./assets/fonts/IBMPlexSerif-Regular.ttf"),
-    [fonts.PlexSerifBoldItalic]: require("./assets/fonts/IBMPlexSerif-BoldItalic.ttf"),
-  });
+  const fontsLoaded = useLoadFonts();
 
   const { state, setUsername, loadFeed } = useAppState();
 

@@ -13,13 +13,15 @@ import { Post } from "../types";
 
 const styles = StyleSheet.create({
   line: {
-    fontFamily: fonts.PlexSerifRegular,
+    fontFamily: fonts.PlexMonoItalic,
     fontSize: 20,
+    marginBottom: 5,
   },
   author: {
     fontFamily: fonts.PlexSerifBoldItalic,
     fontSize: 15,
     textAlign: "right",
+    marginTop: 5,
   },
   container: {
     marginBottom: 49,

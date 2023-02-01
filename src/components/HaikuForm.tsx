@@ -90,14 +90,19 @@ export const HaikuForm = ({ publish }: { publish: (haiku: Haiku) => void }) => {
 const styles = StyleSheet.create({
   intro: {
     fontSize: 20,
-    fontFamily: fonts.PlexSerifBoldItalic,
+    fontFamily: fonts.PlexMonoItalic,
     marginBottom: 20,
+  },
+  date: {
+    fontFamily: fonts.PlexMonoItalic,
   },
 });
 
 const now = new Date();
 
-const DateToday = () => <Text>{format(now, "MMM do ''yy")}</Text>;
+const DateToday = () => (
+  <Text style={styles.date}>{format(now, "MMM do ''yy")} - Spring</Text>
+);
 
 const InputScreen = ({
   haiku,
