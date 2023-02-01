@@ -1,6 +1,6 @@
 import { Reducer, useCallback, useReducer } from "react";
 import { getDays } from "./firebaseClient";
-import { Day } from "./src/types";
+import { Day } from "./types";
 
 type State =
   | { screen: "register" }

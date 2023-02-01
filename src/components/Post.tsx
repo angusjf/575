@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Validity } from "./Validity";
+import { Validity } from "../Validity";
 import { syllable } from "syllable";
-import { fonts } from "./font";
-import { Post } from "./types";
+import { fonts } from "../font";
+import { Post } from "../types";
 
 const styles = StyleSheet.create({
   line: {

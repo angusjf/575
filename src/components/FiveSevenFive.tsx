@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { syllable } from "syllable";
-import { Validity } from "./Validity";
-import { fonts } from "./font";
-import { Haiku, Post } from "./types";
+import { Validity } from "../Validity";
+import { fonts } from "../font";
+import { Haiku, Post } from "../types";
 
 const styles = StyleSheet.create({
   number: {

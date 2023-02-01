@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Validity } from "./Validity";
+import { Validity } from "../Validity";
 import { syllable } from "syllable";
-import { fonts } from "./font";
+import { fonts } from "../font";
 import { useState } from "react";
 
 const styles = StyleSheet.create({

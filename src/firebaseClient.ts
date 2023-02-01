@@ -1,6 +1,6 @@
 import { getDatabase, ref, set, get, child } from "firebase/database";
 import { firebaseApp } from "./firebase";
-import { Haiku, Day, Post } from "./src/types";
+import { Haiku, Day, Post } from "./types";
 import { dateDbKey } from "./utils/date";
 
 export const writeUserData = (userId: string, name: string) => {

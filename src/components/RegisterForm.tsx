@@ -1,10 +1,10 @@
 import { Text, View } from "react-native";
 import { useCallback, useState } from "react";
 import { registerUser } from "../firebaseClient";
-import { storeUsername } from "./storage";
+import { storeUsername } from "../storage";
 import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { Validity } from "./Validity";
+import { Validity } from "../Validity";
 
 export const RegisterForm = ({
   setUsername,

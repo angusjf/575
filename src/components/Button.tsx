@@ -4,7 +4,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { fonts } from "./font";
+import { fonts } from "../font";
 
 type ButtonProps = {
   isLoading?: boolean;

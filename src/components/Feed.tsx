@@ -5,10 +5,10 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { Day } from "./types";
+import { Day } from "../types";
 import { PostBox } from "./Post";
 import { Button } from "./Button";
-import { clear } from "./storage";
+import { clear } from "../storage";
 
 const styles = StyleSheet.create({
   wrapper: {

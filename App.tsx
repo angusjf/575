@@ -1,14 +1,14 @@
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { hasPostedToday, post } from "./firebaseClient";
-import { Feed } from "./src/Feed";
+import { StyleSheet, View } from "react-native";
+import { hasPostedToday, post } from "./src/firebaseClient";
+import { Feed } from "./src/components/Feed";
 import { fonts } from "./src/font";
-import { HaikuForm } from "./src/HaikuForm";
-import { RegisterForm } from "./src/RegisterForm";
+import { HaikuForm } from "./src/components/HaikuForm";
+import { RegisterForm } from "./src/components/RegisterForm";
 import { getUsernameFromStorage, storeUsername } from "./src/storage";
-import { useAppState } from "./useAppState";
+import { useAppState } from "./src/useAppState";
 
 SplashScreen.preventAutoHideAsync();
 

@@ -2,12 +2,12 @@ import { useReducer } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { syllable } from "syllable";
-import { Validity } from "./Validity";
-import { fonts } from "./font";
-import { Haiku } from "./types";
+import { Validity } from "../Validity";
+import { fonts } from "../font";
+import { Haiku } from "../types";
 import { Button } from "./Button";
 import { format } from "date-fns";
-import { valid } from "./valid";
+import { valid } from "../valid";
 
 type State = {
   haiku: Haiku;
