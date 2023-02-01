@@ -1,72 +1,44 @@
-import {
-  Reducer,
-  StaticLifecycle,
-  useCallback,
-  useReducer,
-  useState,
-} from "react";
-import { View, StyleSheet } from "react-native";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
-import { fonts } from "./src/font";
-import { HaikuForm } from "./src/HaikuForm";
-import { RegisterForm } from "./src/RegisterForm";
-import {
-  getUsernameFromStorage,
-  getTodaysHaikuFromStorage,
-  storeTodaysHaiku,
-  clear,
-} from "./src/storage";
-import { Haiku } from "./src/types";
-import { post } from "./firebaseClient";
+import { Reducer, useCallback, useReducer } from "react";
+import { getDays } from "./firebaseClient";
+import { Day } from "./src/types";
 
-SplashScreen.preventAutoHideAsync();
+type State =
+  | { screen: "register" }
+  | { screen: "compose"; username: string }
+  | { screen: "feed"; days: Day[] | null };
 
-type State = { state: "init" };
+type Action =
+  | { type: "set_username"; username: string }
+  | { type: "visit_feed" }
+  | { type: "set_days"; days: Day[] };
 
-type Action = { action: "set_username" };
+const reducer: Reducer<State, Action> = (state, action) => {
+  switch (action.type) {
+    case "set_username":
+      return { screen: "compose", username: action.username };
+    case "visit_feed":
+      return { screen: "feed", days: null };
+    case "set_days":
+      return { screen: "feed", days: action.days };
+  }
+};
 
-const reducer: Reducer<State, Action> = (state, action) => {};
+export const useAppState = () => {
+  const [state, dispatch] = useReducer(reducer, { screen: "register" });
 
-export function useAppState() {
-  const [fontsLoaded] = useFonts({
-    [fonts.PlexSerifRegular]: require("./assets/fonts/IBMPlexSerif-Regular.ttf"),
-    [fonts.PlexSerifBoldItalic]: require("./assets/fonts/IBMPlexSerif-BoldItalic.ttf"),
-  });
+  const setUsername = useCallback(
+    (username: string) => dispatch({ type: "set_username", username }),
+    []
+  );
 
-  const [state, dispatch] = useReducer(reducer, { state: "init" });
-
-  const [username, register] = useState<string | null>(null);
-  const [todaysHaiku, setTodaysHaiku] = useState<Haiku | null>(null);
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      const usernameFromStorage = await getUsernameFromStorage();
-      if (usernameFromStorage) {
-        register(usernameFromStorage);
-
-        const haikuFromStorage = await getTodaysHaikuFromStorage();
-        if (haikuFromStorage) {
-          setTodaysHaiku(haikuFromStorage);
-        }
-      }
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  const publish = (haiku: Haiku) => {
-    setTodaysHaiku(haiku);
-    post(username, haiku);
-    storeTodaysHaiku(haiku);
-  };
+  const loadFeed = useCallback(() => {
+    dispatch({ type: "visit_feed" });
+    getDays().then((days) => dispatch({ type: "set_days", days }));
+  }, []);
 
   return {
-    loading: !fontsLoaded,
-    onLayoutRootView,
-    username,
-    register,
-    todaysHaiku,
-    setTodaysHaiku,
-    publish,
+    state,
+    setUsername,
+    loadFeed,
   };
-}
+};

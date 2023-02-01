@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import { Day } from "./types";
 import { PostBox } from "./Post";
+import { Button } from "./Button";
+import { clear } from "./storage";
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -33,6 +35,7 @@ export const Feed = ({ days }: { days: Day[] | null }) => {
           />
         </SafeAreaView>
       )}
+      <Button title="clear storage" onPress={() => clear()} />
     </View>
   );
 };

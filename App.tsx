@@ -1,20 +1,14 @@
-import { useCallback, useState } from "react";
-import { View, StyleSheet } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { useCallback } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { hasPostedToday, post } from "./firebaseClient";
+import { Feed } from "./src/Feed";
 import { fonts } from "./src/font";
 import { HaikuForm } from "./src/HaikuForm";
 import { RegisterForm } from "./src/RegisterForm";
-import {
-  getUsernameFromStorage,
-  getTodaysHaikuFromStorage,
-  storeTodaysHaiku,
-  clear,
-} from "./src/storage";
-import { Day, Haiku } from "./src/types";
-import { Feed } from "./src/Feed";
-import { getDays, post } from "./firebaseClient";
-import { Button } from "./src/Button";
+import { getUsernameFromStorage, storeUsername } from "./src/storage";
+import { useAppState } from "./useAppState";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,9 +18,7 @@ export default function App() {
     [fonts.PlexSerifBoldItalic]: require("./assets/fonts/IBMPlexSerif-BoldItalic.ttf"),
   });
 
-  const [username, setUsername] = useState<string | null>(null);
-  const [todaysHaiku, setTodaysHaiku] = useState<Haiku | null>(null);
-  const [days, setDays] = useState<Day[] | null>(null);
+  const { state, setUsername, loadFeed } = useAppState();
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
@@ -34,11 +26,9 @@ export default function App() {
       if (usernameFromStorage) {
         setUsername(usernameFromStorage);
 
-        const haikuFromStorage = await getTodaysHaikuFromStorage();
-        if (haikuFromStorage) {
-          setTodaysHaiku(haikuFromStorage);
-
-          getDays().then(setDays);
+        const hasPosted = await hasPostedToday(usernameFromStorage);
+        if (hasPosted) {
+          loadFeed();
         }
       }
       await SplashScreen.hideAsync();
@@ -50,30 +40,30 @@ export default function App() {
   }
 
   return (
-    <View onLayout={onLayoutRootView} style={styles.container}>
-      {username === null ? (
-        <>
-          <RegisterForm setUsername={setUsername} />
-          <Button title="clear storage" onPress={() => clear()} />
-        </>
-      ) : todaysHaiku === null ? (
+    <View style={styles.root} onLayout={onLayoutRootView}>
+      {state.screen == "register" ? (
+        <RegisterForm
+          setUsername={(username) => {
+            setUsername(username);
+            storeUsername(username);
+          }}
+        />
+      ) : state.screen == "compose" ? (
         <HaikuForm
-          publish={(haiku) => {
-            setTodaysHaiku(haiku);
-            post(username, haiku);
-            storeTodaysHaiku(haiku);
-            getDays().then(setDays);
+          publish={async (haiku) => {
+            await post(state.username, haiku);
+            loadFeed();
           }}
         />
       ) : (
-        <Feed days={days} />
+        <Feed days={state.days} />
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     height: 600,
     backgroundColor: "#fff",
     alignItems: "center",

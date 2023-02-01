@@ -50,3 +50,11 @@ export const getDays = async (): Promise<Day[]> => {
     ),
   }));
 };
+
+export const hasPostedToday = async (userId: string) => {
+  const db = getDatabase(firebaseApp);
+  const dbRef = ref(db, `days/${dateDbKey(new Date())}/${userId}`);
+  return await get(dbRef).then((snapshot) => {
+    return snapshot.exists();
+  });
+};
