@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
 const now = new Date();
 
 const DateToday = () => (
-  <Text style={styles.date}>{format(now, "MMM do ''yy")} - Spring</Text>
+  <Text style={styles.date}>{format(now, "do MMM ''yy")} - Spring</Text>
 );
 
 const InputScreen = ({
