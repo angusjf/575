@@ -1,29 +1,55 @@
 import { Text, View } from "react-native";
-import { useCallback, useState } from "react";
-import { registerUser } from "../firebaseClient";
-import { storeUsername } from "../storage";
+import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { Validity } from "../Validity";
 import { fonts } from "../font";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { firebaseApp } from "../firebase";
 
 export const RegisterForm = ({
   setUsername,
 }: {
   setUsername: (username: string) => void;
 }) => {
-  const [input, setInput] = useState("");
-  const [validity, setValidity] = useState<Validity>("unchecked");
-  const handleLogin = useCallback(async (username: string) => {
-    try {
-      setValidity("loading");
-      await registerUser(username);
-      await storeUsername(username);
-      setUsername(username);
-    } catch (error: unknown) {
-      setValidity("invalid");
-    }
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const auth = getAuth(firebaseApp);
+
+  useEffect(() => {
+    const subscriber = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUsername(user.displayName ?? "");
+      }
+    });
+    return subscriber;
   }, []);
+
+  const handleCreateAccount = () => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
+        setValidity("loading");
+        setUsername(name);
+        await updateProfile(userCredential.user, { displayName: name });
+      })
+      .catch(async (error) => {
+        if (error.code === "auth/email-already-in-use") {
+          await signInWithEmailAndPassword(auth, email, password);
+          setUsername(name);
+          return;
+        }
+        console.error(error.code);
+        setValidity("invalid");
+      });
+  };
+
+  const [name, setName] = useState("");
+  const [validity, setValidity] = useState<Validity>("unchecked");
 
   return (
     <View>
@@ -31,18 +57,37 @@ export const RegisterForm = ({
         how do you sign your poems?
       </Text>
       <HaikuLineInput
-        placeholder="Bashō"
-        value={input || ""}
+        placeholder="how you sign your work"
+        value={name || ""}
         onChangeText={(text) => {
-          setInput(text);
-          setValidity("unchecked");
+          setName(text);
         }}
         validity={validity}
         long
       />
+      <HaikuLineInput
+        placeholder="the email address you use"
+        value={email || ""}
+        onChangeText={(text) => {
+          setEmail(text);
+        }}
+        validity={validity}
+        long
+      />
+      <HaikuLineInput
+        placeholder="a secret password"
+        value={password || ""}
+        onChangeText={(text) => {
+          setPassword(text);
+        }}
+        validity={validity}
+        long
+        secureTextEntry={true}
+        multiline={false}
+      />
       <Button
         title="continue"
-        onPress={() => handleLogin(input)}
+        onPress={() => handleCreateAccount()}
         isLoading={validity == "loading"}
       />
     </View>

@@ -6,7 +6,6 @@ import { Feed } from "./src/components/Feed";
 import { useLoadFonts } from "./src/font";
 import { HaikuForm } from "./src/components/HaikuForm";
 import { RegisterForm } from "./src/components/RegisterForm";
-import { getUsernameFromStorage, storeUsername } from "./src/storage";
 import { useAppState } from "./src/useAppState";
 
 SplashScreen.preventAutoHideAsync();
@@ -18,15 +17,6 @@ export default function App() {
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      const usernameFromStorage = await getUsernameFromStorage();
-      if (usernameFromStorage) {
-        setUsername(usernameFromStorage);
-
-        const hasPosted = await hasPostedToday(usernameFromStorage);
-        if (hasPosted) {
-          loadFeed();
-        }
-      }
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
@@ -41,7 +31,6 @@ export default function App() {
         <RegisterForm
           setUsername={(username) => {
             setUsername(username);
-            storeUsername(username);
           }}
         />
       ) : state.screen == "compose" ? (
