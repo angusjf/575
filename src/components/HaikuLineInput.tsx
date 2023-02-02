@@ -18,13 +18,15 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     marginVertical: 7,
     fontSize: 16,
+    borderBottomWidth: 1,
+    borderColor: "grey",
   },
 });
 
 export const HaikuLineInput = (
   props: TextInputProps & { long?: boolean; validity: Validity }
 ) => {
-  const [isFocused, setIsFocused] = useState(true);
+  const [focused, setIsFocused] = useState(false);
   const invalid =
     props.validity === "invalid" &&
     syllable(props.value || "") !== (props.long ? 7 : 5);
@@ -37,15 +39,19 @@ export const HaikuLineInput = (
         autoCapitalize="none"
         style={{
           ...styles.input,
-          ...(isFocused ? { borderBottomWidth: 1, borderColor: "grey" } : {}),
-          ...(invalid ? { borderBottomWidth: 1, borderColor: "red" } : {}),
+          ...(focused || props.value === ""
+            ? {}
+            : { borderBottomColor: "transparent" }),
+          ...(invalid ? { borderBottomColor: "red" } : {}),
           width: props.long ? 330 : 250,
         }}
         {...props}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />
-      {invalid && <Text>{syllable(props.value || "")}</Text>}
+      <Text style={{ color: focused || invalid ? "black" : "transparent" }}>
+        {syllable(props.value || "")}
+      </Text>
     </View>
   );
 };
