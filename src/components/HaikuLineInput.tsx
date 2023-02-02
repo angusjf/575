@@ -45,7 +45,7 @@ export const HaikuLineInput = (
                   ? "grey"
                   : invalid
                   ? "red"
-                  : "transparent",
+                  : "lightgrey",
               }),
           width: props.long ? 330 : 250,
         }}
@@ -53,7 +53,12 @@ export const HaikuLineInput = (
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />
-      <Text style={{ color: focused || invalid ? "black" : "transparent" }}>
+      <Text
+        style={{
+          color: focused || invalid ? "black" : "transparent",
+          width: 10,
+        }}
+      >
         {syllable(props.value || "")}
       </Text>
     </View>
