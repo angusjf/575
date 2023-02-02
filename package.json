@@ -20,7 +20,9 @@
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
     "react-native-web": "~0.18.9",
-    "syllable": "^5.0.1"
+    "syllable": "^5.0.1",
+    "expo-notifications": "~0.17.0",
+    "expo-device": "~5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
