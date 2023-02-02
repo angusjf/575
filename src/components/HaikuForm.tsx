@@ -19,11 +19,7 @@ type Action =
   | { type: "submit" }
   | { type: "invalid" };
 
-const defaultHaiku: Haiku = [
-  "one two three four five",
-  "one two three four five six sev",
-  "one two three four five",
-];
+const defaultHaiku: Haiku = ["", "", ""];
 
 const AI_WAIT_TIME = 2000;
 
@@ -124,6 +120,7 @@ const InputScreen = ({
         value={haiku[0]}
         onChangeText={(l) => changed(0, l)}
         validity={validity}
+        autoFocus
       />
       <HaikuLineInput
         placeholder="these brilliant-hued hibiscus -"
@@ -142,6 +139,14 @@ const InputScreen = ({
         title="check & share"
         isLoading={validity === "loading"}
         onPress={done}
+      />
+      <Button
+        title="prefill"
+        onPress={() => {
+          changed(0, "one two three four five");
+          changed(1, "one two three four five six sev");
+          changed(2, "one two three four five");
+        }}
       />
     </View>
   );

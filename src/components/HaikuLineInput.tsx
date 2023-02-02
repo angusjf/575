@@ -19,7 +19,6 @@ const styles = StyleSheet.create({
     marginVertical: 7,
     fontSize: 16,
     borderBottomWidth: 1,
-    borderColor: "grey",
   },
 });
 
@@ -39,10 +38,15 @@ export const HaikuLineInput = (
         autoCapitalize="none"
         style={{
           ...styles.input,
-          ...(focused || props.value === ""
+          ...(focused
             ? {}
-            : { borderBottomColor: "transparent" }),
-          ...(invalid ? { borderBottomColor: "red" } : {}),
+            : {
+                borderBottomColor: focused
+                  ? "grey"
+                  : invalid
+                  ? "red"
+                  : "transparent",
+              }),
           width: props.long ? 330 : 250,
         }}
         {...props}
