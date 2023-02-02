@@ -8,6 +8,7 @@ import { Haiku } from "../types";
 import { Button } from "./Button";
 import { format } from "date-fns";
 import { valid } from "../valid";
+import { getSeason } from "../sesaon";
 
 type State = {
   haiku: Haiku;
@@ -87,7 +88,8 @@ const styles = StyleSheet.create({
   intro: {
     fontSize: 20,
     fontFamily: fonts.PlexMonoItalic,
-    marginBottom: 20,
+    marginTop: 15,
+    marginBottom: 25,
   },
   date: {
     fontFamily: fonts.PlexMonoItalic,
@@ -97,7 +99,9 @@ const styles = StyleSheet.create({
 const now = new Date();
 
 const DateToday = () => (
-  <Text style={styles.date}>{format(now, "do MMM ''yy")} - Spring</Text>
+  <Text style={styles.date}>
+    {format(now, "do MMM ''yy")} - {getSeason(now)}
+  </Text>
 );
 
 const InputScreen = ({
@@ -139,6 +143,7 @@ const InputScreen = ({
         title="check & share"
         isLoading={validity === "loading"}
         onPress={done}
+        style={{ marginTop: 30 }}
       />
       <Button
         title="prefill"

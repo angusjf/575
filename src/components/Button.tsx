@@ -3,6 +3,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  TouchableOpacityProps,
 } from "react-native";
 import { fonts } from "../font";
 
@@ -12,8 +13,17 @@ type ButtonProps = {
   onPress: () => void;
 };
 
-export const Button = ({ isLoading, title, onPress }: ButtonProps) => (
-  <TouchableOpacity style={styles.submit} onPress={onPress}>
+export const Button = ({
+  isLoading,
+  title,
+  onPress,
+  ...props
+}: ButtonProps & TouchableOpacityProps) => (
+  <TouchableOpacity
+    {...props}
+    style={[styles.submit, props.style]}
+    onPress={onPress}
+  >
     {isLoading ? (
       <ActivityIndicator />
     ) : (
