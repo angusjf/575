@@ -58,3 +58,14 @@ export const hasPostedToday = async (userId: string) => {
     return snapshot.exists();
   });
 };
+
+export const uploadExpoPushToken = ({
+  userId,
+  token,
+}: {
+  userId: string;
+  token: string;
+}) => {
+  const db = getDatabase(firebaseApp);
+  set(ref(db, `expoPushTokens/${userId}/`), token);
+};

@@ -1,15 +1,29 @@
 import * as SplashScreen from "expo-splash-screen";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
-import { hasPostedToday, post } from "./src/firebaseClient";
+import {
+  hasPostedToday,
+  post,
+  uploadExpoPushToken,
+} from "./src/firebaseClient";
 import { Feed } from "./src/components/Feed";
 import { useLoadFonts } from "./src/font";
 import { HaikuForm } from "./src/components/HaikuForm";
 import { RegisterForm } from "./src/components/RegisterForm";
 import { getUsernameFromStorage, storeUsername } from "./src/storage";
 import { useAppState } from "./src/useAppState";
+import { registerForPushNotificationsAsync } from "./src/components/useNotifications";
+import * as Notifications from "expo-notifications";
 
 SplashScreen.preventAutoHideAsync();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function App() {
   const fontsLoaded = useLoadFonts();
@@ -42,6 +56,11 @@ export default function App() {
           setUsername={(username) => {
             setUsername(username);
             storeUsername(username);
+            registerForPushNotificationsAsync().then((token) => {
+              if (token) {
+                uploadExpoPushToken({ userId: username, token });
+              }
+            });
           }}
         />
       ) : state.screen == "compose" ? (
