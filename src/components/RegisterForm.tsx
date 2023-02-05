@@ -59,27 +59,21 @@ export const RegisterForm = ({
       <HaikuLineInput
         placeholder="how you sign your work"
         value={name || ""}
-        onChangeText={(text) => {
-          setName(text);
-        }}
+        onChangeText={setName}
         validity={validity}
         long
       />
       <HaikuLineInput
         placeholder="the email address you use"
         value={email || ""}
-        onChangeText={(text) => {
-          setEmail(text);
-        }}
+        onChangeText={setEmail}
         validity={validity}
         long
       />
       <HaikuLineInput
         placeholder="a secret password"
         value={password || ""}
-        onChangeText={(text) => {
-          setPassword(text);
-        }}
+        onChangeText={setPassword}
         validity={validity}
         long
         secureTextEntry={true}
