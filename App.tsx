@@ -45,7 +45,6 @@ export default function App() {
         <RegisterForm
           setUsername={(username) => {
             setUsername(username);
-            storeUsername(username);
             registerForPushNotificationsAsync().then((token) => {
               if (token) {
                 uploadExpoPushToken({ userId: username, token });
