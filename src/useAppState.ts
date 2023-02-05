@@ -1,4 +1,3 @@
-import { User } from "firebase/auth";
 import { Reducer, useCallback, useReducer } from "react";
 import { getDays } from "./firebaseClient";
 import { Day } from "./types";
@@ -13,7 +12,7 @@ type Action =
   | { type: "visit_feed" }
   | { type: "set_days"; days: Day[] };
 
-const reducer: Reducer<State, Action> = (state, action) => {
+const reducer: Reducer<State, Action> = (_state, action) => {
   switch (action.type) {
     case "set_username":
       return { screen: "compose", username: action.username };
