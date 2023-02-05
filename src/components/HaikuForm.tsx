@@ -8,7 +8,7 @@ import { Haiku } from "../types";
 import { Button } from "./Button";
 import { format } from "date-fns";
 import { valid } from "../valid";
-import { getSeason } from "../sesaon";
+import { getSeason } from "../seasons";
 
 type State = {
   haiku: Haiku;

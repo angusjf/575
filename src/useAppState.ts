@@ -1,4 +1,6 @@
-import { Reducer, useCallback, useReducer } from "react";
+import { getAuth } from "firebase/auth";
+import { Reducer, useCallback, useEffect, useReducer } from "react";
+import { firebaseApp } from "./firebase";
 import { getDays } from "./firebaseClient";
 import { Day } from "./types";
 
@@ -30,6 +32,17 @@ export const useAppState = () => {
     (username: string) => dispatch({ type: "set_username", username }),
     []
   );
+
+  useEffect(() => {
+    const auth = getAuth(firebaseApp);
+
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUsername(user.displayName ?? "");
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   const loadFeed = useCallback(() => {
     dispatch({ type: "visit_feed" });

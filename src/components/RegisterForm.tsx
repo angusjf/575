@@ -1,16 +1,14 @@
 import { Text, View } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { Validity } from "../Validity";
 import { fonts } from "../font";
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import { firebaseApp } from "../firebase";
 
 export const RegisterForm = ({
   setUsername,
@@ -19,16 +17,6 @@ export const RegisterForm = ({
 }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const auth = getAuth(firebaseApp);
-
-  useEffect(() => {
-    const subscriber = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUsername(user.displayName ?? "");
-      }
-    });
-    return subscriber;
-  }, []);
 
   const handleCreateAccount = () => {
     createUserWithEmailAndPassword(auth, email, password)
