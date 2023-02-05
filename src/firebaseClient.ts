@@ -18,9 +18,9 @@ export const isUserUnique = async (userId: string) => {
   });
 };
 
-export const post = (userId: string, haiku: Haiku) => {
+export const post = async (userId: string, haiku: Haiku) => {
   const db = getDatabase(firebaseApp);
-  set(ref(db, `days/${dateDbKey(new Date())}/${userId}`), {
+  await set(ref(db, `days/${dateDbKey(new Date())}/${userId}`), {
     haiku,
   });
 };

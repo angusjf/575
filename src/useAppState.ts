@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import { Reducer, useCallback, useReducer } from "react";
 import { getDays } from "./firebaseClient";
 import { Day } from "./types";
