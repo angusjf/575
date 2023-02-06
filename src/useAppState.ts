@@ -44,9 +44,10 @@ export const useAppState = () => {
     return unsubscribe;
   }, []);
 
-  const loadFeed = useCallback(() => {
+  const loadFeed = useCallback(async () => {
     dispatch({ type: "visit_feed" });
-    getDays().then((days) => dispatch({ type: "set_days", days }));
+    const days = await getDays();
+    dispatch({ type: "set_days", days });
   }, []);
 
   return {

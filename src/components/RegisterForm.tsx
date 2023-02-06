@@ -6,9 +6,11 @@ import { Validity } from "../Validity";
 import { fonts } from "../font";
 import {
   createUserWithEmailAndPassword,
+  getAuth,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
+import { firebaseApp } from "../firebase";
 
 export const RegisterForm = ({
   setUsername,
@@ -18,22 +20,28 @@ export const RegisterForm = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleCreateAccount = () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        setValidity("loading");
-        setUsername(name);
-        await updateProfile(userCredential.user, { displayName: name });
-      })
-      .catch(async (error) => {
-        if (error.code === "auth/email-already-in-use") {
+  const handleCreateAccount = async () => {
+    const auth = getAuth(firebaseApp);
+    try {
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      setValidity("loading");
+      setUsername(name);
+      await updateProfile(userCredentials.user, { displayName: name });
+    } catch (error: any) {
+      if (error.code === "auth/email-already-in-use") {
+        try {
           await signInWithEmailAndPassword(auth, email, password);
           setUsername(name);
-          return;
+        } catch {
+          setValidity("invalid");
         }
-        console.error(error.code);
-        setValidity("invalid");
-      });
+      }
+      setValidity("invalid");
+    }
   };
 
   const [name, setName] = useState("");
@@ -69,7 +77,7 @@ export const RegisterForm = ({
       />
       <Button
         title="continue"
-        onPress={() => handleCreateAccount()}
+        onPress={handleCreateAccount}
         isLoading={validity == "loading"}
       />
     </View>
