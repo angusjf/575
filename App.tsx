@@ -35,7 +35,7 @@ export default function App() {
   const onLayoutRootView = useCallback(async () => {
     if (
       fontsLoaded &&
-      ["loading_haiku", "loading_haiku"].includes(state.screen)
+      !["loading_haiku", "loading_haiku"].includes(state.screen)
     ) {
       await SplashScreen.hideAsync();
     }
