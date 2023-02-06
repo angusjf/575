@@ -44,7 +44,7 @@ export default function App() {
 
   return (
     <View style={styles.root} onLayout={onLayoutRootView}>
-      {state.screen == "register" ? (
+      {state.screen === "register" ? (
         <RegisterForm
           setUsername={(username) => {
             setUsername(username);
@@ -55,16 +55,16 @@ export default function App() {
             });
           }}
         />
-      ) : state.screen == "compose" ? (
+      ) : state.screen === "compose" ? (
         <HaikuForm
           publish={async (haiku) => {
             await post(state.username, haiku);
             loadFeed();
           }}
         />
-      ) : (
+      ) : state.screen === "feed" ? (
         <Feed days={state.days} />
-      )}
+      ) : state.screen === "loading_haiku" ? null : null}
 
       <Button
         title="log out"
