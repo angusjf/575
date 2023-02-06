@@ -13,6 +13,9 @@ import { RegisterForm } from "./src/components/RegisterForm";
 import { useAppState } from "./src/useAppState";
 import { registerForPushNotificationsAsync } from "./src/components/useNotifications";
 import * as Notifications from "expo-notifications";
+import { Button } from "./src/components/Button";
+import { firebaseApp } from "./src/firebase";
+import { getAuth } from "firebase/auth";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -62,6 +65,14 @@ export default function App() {
       ) : (
         <Feed days={state.days} />
       )}
+
+      <Button
+        title="log out"
+        onPress={() => {
+          const auth = getAuth(firebaseApp);
+          auth.signOut();
+        }}
+      />
     </View>
   );
 }
