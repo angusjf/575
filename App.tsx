@@ -1,13 +1,8 @@
 import * as SplashScreen from "expo-splash-screen";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
-import {
-  hasPostedToday,
-  post,
-  uploadExpoPushToken,
-} from "./src/firebaseClient";
+import { post, uploadExpoPushToken } from "./src/firebaseClient";
 import { Feed } from "./src/components/Feed";
-import { useLoadFonts } from "./src/font";
 import { HaikuForm } from "./src/components/HaikuForm";
 import { RegisterForm } from "./src/components/RegisterForm";
 import { useAppState } from "./src/useAppState";
@@ -28,20 +23,15 @@ Notifications.setNotificationHandler({
 });
 
 export default function App() {
-  const fontsLoaded = useLoadFonts();
-
-  const { state, setUsername, loadFeed } = useAppState();
+  const { state, setUsername, loadFeed, booting } = useAppState();
 
   const onLayoutRootView = useCallback(async () => {
-    if (
-      fontsLoaded &&
-      !["loading_haiku", "loading_haiku"].includes(state.screen)
-    ) {
+    if (!booting) {
       await SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [booting]);
 
-  if (!fontsLoaded) {
+  if (booting) {
     return null;
   }
 

@@ -2,6 +2,7 @@ import { getAuth } from "firebase/auth";
 import { useCallback, useEffect, useReducer } from "react";
 import { firebaseApp } from "./firebase";
 import { getDays, hasPostedToday } from "./firebaseClient";
+import { useLoadFonts } from "./font";
 import { Day } from "./types";
 
 type State =
@@ -48,6 +49,8 @@ export const useAppState = () => {
     { screen: "loading_user" }
   );
 
+  const fontsLoaded = useLoadFonts();
+
   const setUsername = useCallback(
     (username: string) => dispatch({ type: "set_username", username }),
     []
@@ -72,5 +75,8 @@ export const useAppState = () => {
     state,
     setUsername,
     loadFeed,
+    booting:
+      !fontsLoaded &&
+      !["loading_haiku", "loading_haiku"].includes(state.screen),
   };
 };
