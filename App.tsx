@@ -33,7 +33,10 @@ export default function App() {
   const { state, setUsername, loadFeed } = useAppState();
 
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
+    if (
+      fontsLoaded &&
+      ["loading_haiku", "loading_haiku"].includes(state.screen)
+    ) {
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
