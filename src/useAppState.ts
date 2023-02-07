@@ -13,7 +13,7 @@ import { Day, Haiku } from "./types";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 
-// SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
