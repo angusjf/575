@@ -10,6 +10,18 @@ import {
 } from "./firebaseClient";
 import { loadFonts } from "./font";
 import { Day, Haiku } from "./types";
+import * as Notifications from "expo-notifications";
+import * as SplashScreen from "expo-splash-screen";
+
+// SplashScreen.preventAutoHideAsync();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 type State =
   | {
@@ -44,31 +56,36 @@ export const useAppState = () => {
           if (action.username === null) {
             return { screen: "register" };
           } else {
+            SplashScreen.hideAsync();
             hasPostedToday(action.username).then((posted) =>
               dispatch({ type: "found_out_if_posted", posted })
             );
             return {
               screen: "loading",
               username: action.username,
-              fonts: false,
+              fonts: true,
             };
           }
         case "found_out_if_posted":
           if (action.posted) {
+            getDays().then((days) => dispatch({ type: "set_days", days }));
             return { screen: "feed", days: null };
           } else {
-            return { screen: "compose", username: state.username };
+            return { screen: "compose", username: "state.username" };
           }
-        default:
-          return state;
+        case "fonts_loaded":
+          return state.screen === "loading" ? { ...state, fonts: true } : state;
       }
     },
     { screen: "loading", fonts: false, feed: undefined, username: undefined }
   );
 
+  console.log(state);
   useEffect(() => {
-    loadFonts().then(() => dispatch({ type: "fonts_loaded" }));
-  });
+    loadFonts()
+      .then(() => dispatch({ type: "fonts_loaded" }))
+      .catch(console.error);
+  }, []);
 
   const setUsername = useCallback(
     (username: string) => dispatch({ type: "set_username", username }),
@@ -86,8 +103,12 @@ export const useAppState = () => {
 
   const loadFeed = useCallback(async () => {
     dispatch({ type: "visit_feed" });
-    const days = await getDays();
-    dispatch({ type: "set_days", days });
+    try {
+      const days = await getDays();
+      dispatch({ type: "set_days", days });
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
 
   const register = (username: string) => {

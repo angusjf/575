@@ -1,31 +1,15 @@
-import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { Feed } from "./src/components/Feed";
 import { HaikuForm } from "./src/components/HaikuForm";
 import { RegisterForm } from "./src/components/RegisterForm";
 import { useAppState } from "./src/useAppState";
-import * as Notifications from "expo-notifications";
 import { Button } from "./src/components/Button";
-
-SplashScreen.preventAutoHideAsync();
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
 
 export default function App() {
   const { state, register, publish, logout } = useAppState();
 
-  const onLayoutRootView = useCallback(async () => {
-    if (state.screen !== "loading") {
-      await SplashScreen.hideAsync();
-    }
-  }, [state]);
+  const onLayoutRootView = useCallback(async () => {}, [state]);
 
   if (state.screen === "loading") {
     return null;
