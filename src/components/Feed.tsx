@@ -34,7 +34,6 @@ export const Feed = ({ days }: { days: Day[] | null }) => {
           />
         </SafeAreaView>
       )}
-      <Button title="clear storage" onPress={() => clear()} />
     </View>
   );
 };

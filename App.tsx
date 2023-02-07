@@ -27,7 +27,7 @@ export default function App() {
     }
   }, [state]);
 
-  if (state.screen === "") {
+  if (state.screen === "loading") {
     return null;
   }
 

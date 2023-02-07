@@ -42,12 +42,12 @@ export const getDays = async (): Promise<Day[]> => {
 
   return Object.entries(days.val()).map(([date, posts]) => ({
     date: new Date(date),
-    posts: Object.entries(posts as Record<string, { haiku: Haiku }>).map(
-      ([user, data]) => ({
-        author: user,
-        haiku: data.haiku,
-      })
-    ),
+    posts: Object.entries(
+      (posts as Record<string, { haiku: Haiku }> | undefined) ?? []
+    ).map(([user, data]) => ({
+      author: user,
+      haiku: data.haiku,
+    })),
   }));
 };
 

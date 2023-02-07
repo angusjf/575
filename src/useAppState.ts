@@ -47,7 +47,11 @@ export const useAppState = () => {
             hasPostedToday(action.username).then((posted) =>
               dispatch({ type: "found_out_if_posted", posted })
             );
-            return { screen: "loading", username: action.username };
+            return {
+              screen: "loading",
+              username: action.username,
+              fonts: false,
+            };
           }
         case "found_out_if_posted":
           if (action.posted) {
@@ -55,6 +59,8 @@ export const useAppState = () => {
           } else {
             return { screen: "compose", username: state.username };
           }
+        default:
+          return state;
       }
     },
     { screen: "loading", fonts: false, feed: undefined, username: undefined }
