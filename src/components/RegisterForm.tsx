@@ -13,9 +13,9 @@ import {
 import { firebaseApp } from "../firebase";
 
 export const RegisterForm = ({
-  setUsername,
+  register,
 }: {
-  setUsername: (username: string) => void;
+  register: (username: string) => void;
 }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,13 +29,13 @@ export const RegisterForm = ({
         password
       );
       setValidity("loading");
-      setUsername(name);
+      register(name);
       await updateProfile(userCredentials.user, { displayName: name });
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
         try {
           await signInWithEmailAndPassword(auth, email, password);
-          setUsername(name);
+          register(name);
         } catch {
           setValidity("invalid");
         }

@@ -1,23 +1,34 @@
 import { getAuth } from "firebase/auth";
 import { useCallback, useEffect, useReducer } from "react";
 import { firebaseApp } from "./firebase";
-import { getDays, hasPostedToday } from "./firebaseClient";
-import { useLoadFonts } from "./font";
-import { Day } from "./types";
+import { registerForPushNotificationsAsync } from "./components/useNotifications";
+import {
+  getDays,
+  hasPostedToday,
+  post,
+  uploadExpoPushToken,
+} from "./firebaseClient";
+import { loadFonts } from "./font";
+import { Day, Haiku } from "./types";
 
 type State =
-  | { screen: "loading_user" }
-  | { screen: "loading_haiku"; username: string }
+  | {
+      screen: "loading";
+      fonts: boolean;
+      username?: string | null;
+      feed?: Day[] | null;
+    }
   | { screen: "register" }
   | { screen: "compose"; username: string }
   | { screen: "feed"; days: Day[] | null };
 
 type Action =
+  | { type: "fonts_loaded" }
+  | { type: "loaded_user"; username: string | null }
+  | { type: "found_out_if_posted"; posted: boolean }
   | { type: "set_username"; username: string }
   | { type: "visit_feed" }
-  | { type: "set_days"; days: Day[] }
-  | { type: "found_out_if_posted"; posted: boolean }
-  | { type: "loaded_user"; username: string | null };
+  | { type: "set_days"; days: Day[] };
 
 export const useAppState = () => {
   const [state, dispatch] = useReducer(
@@ -36,7 +47,7 @@ export const useAppState = () => {
             hasPostedToday(action.username).then((posted) =>
               dispatch({ type: "found_out_if_posted", posted })
             );
-            return { screen: "loading_haiku", username: action.username };
+            return { screen: "loading", username: action.username };
           }
         case "found_out_if_posted":
           if (action.posted) {
@@ -46,10 +57,12 @@ export const useAppState = () => {
           }
       }
     },
-    { screen: "loading_user" }
+    { screen: "loading", fonts: false, feed: undefined, username: undefined }
   );
 
-  const fontsLoaded = useLoadFonts();
+  useEffect(() => {
+    loadFonts().then(() => dispatch({ type: "fonts_loaded" }));
+  });
 
   const setUsername = useCallback(
     (username: string) => dispatch({ type: "set_username", username }),
@@ -71,12 +84,31 @@ export const useAppState = () => {
     dispatch({ type: "set_days", days });
   }, []);
 
+  const register = (username: string) => {
+    setUsername(username);
+    registerForPushNotificationsAsync().then((token) => {
+      if (token) {
+        uploadExpoPushToken({ userId: username, token });
+      }
+    });
+  };
+
+  const logout = () => {
+    const auth = getAuth(firebaseApp);
+    auth.signOut();
+  };
+
+  const publish = async (haiku: Haiku) => {
+    if (state.screen === "compose") {
+      await post(state.username, haiku);
+      loadFeed();
+    }
+  };
+
   return {
     state,
-    setUsername,
-    loadFeed,
-    booting:
-      !fontsLoaded &&
-      !["loading_haiku", "loading_haiku"].includes(state.screen),
+    register,
+    logout,
+    publish,
   };
 };

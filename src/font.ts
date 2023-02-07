@@ -1,4 +1,4 @@
-import { useFonts } from "expo-font";
+import { loadAsync, useFonts } from "expo-font";
 
 export const fonts = {
   PlexSerifRegular: "PlexSerifRegular",
@@ -6,12 +6,9 @@ export const fonts = {
   PlexMonoItalic: "IBMPlexMono-Italic",
 };
 
-export const useLoadFonts = () => {
-  const [fontsLoaded] = useFonts({
+export const loadFonts = () =>
+  loadAsync({
     [fonts.PlexSerifRegular]: require("../assets/fonts/IBMPlexSerif-Regular.ttf"),
     [fonts.PlexSerifBoldItalic]: require("../assets/fonts/IBMPlexSerif-BoldItalic.ttf"),
     [fonts.PlexMonoItalic]: require("../assets/fonts/IBMPlexMono-Italic.ttf"),
   });
-
-  return fontsLoaded;
-};
