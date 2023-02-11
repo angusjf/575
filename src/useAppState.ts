@@ -1,6 +1,6 @@
 import { getAuth } from "firebase/auth";
 import { firebaseApp } from "./firebase";
-import { getDays, post, registerUser } from "./firebaseClient";
+import { blockUser, getDays, post, registerUser } from "./firebaseClient";
 import { loadFonts } from "./font";
 import { Day, Haiku } from "./types";
 import * as Notifications from "expo-notifications";
@@ -28,19 +28,20 @@ type State =
   | { state: "finding_out_if_posted"; username: string }
   | { state: "register" }
   | { state: "compose"; username: string }
-  | { state: "feed"; days: Day[] | null }
+  | { state: "feed"; days: Day[] | null; username: string }
   | { state: "error"; message: string };
 
 type Msg =
   | { msg: "fonts_loaded" }
   | { msg: "loaded_user"; username: string | null }
   | { msg: "set_username"; username: string }
-  | { msg: "visit_feed" }
+  | { msg: "visit_feed"; username: string }
   | { msg: "set_days"; days: Day[] }
   | { msg: "load_feed" }
   | { msg: "register"; username: string }
   | { msg: "logout" }
-  | { msg: "publish"; haiku: Haiku };
+  | { msg: "publish"; haiku: Haiku }
+  | { msg: "block_user"; blockedUserId: string };
 
 const badActionForState = (msg: Msg, state: State): [State, []] => {
   return [
@@ -76,12 +77,12 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "set_username":
       return [{ state: "compose", username: msg.username }, []];
     case "visit_feed":
-      return [{ state: "feed", days: null }, []];
+      return [{ state: "feed", days: null, username: msg.username }, []];
     case "set_days":
       if (state.state === "finding_out_if_posted") {
         if (hasPostedToday(state.username, msg.days)) {
           return [
-            { state: "feed", days: msg.days },
+            { state: "feed", days: msg.days, username: state.username },
             [{ effect: "hide_splash" }],
           ];
         } else {
@@ -91,7 +92,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
           ];
         }
       }
-      return [{ state: "feed", days: msg.days }, []];
+      return [{ state: "feed", days: msg.days, username: "" }, []];
     case "loaded_user":
       if (state.state === "loading") {
         if (state.fonts) {
@@ -145,7 +146,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "publish":
       if (state.state === "compose") {
         return [
-          { state: "feed", days: null },
+          { state: "feed", days: null, username: state.username },
           [
             {
               effect: "post",
@@ -157,6 +158,20 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       } else {
         return badActionForState(msg, state);
       }
+    case "block_user":
+      if (state.state === "feed") {
+        return [
+          state,
+          [
+            {
+              effect: "block_user",
+              username: state.username,
+              blockedUserId: msg.blockedUserId,
+            },
+          ],
+        ];
+      }
+      return badActionForState(msg, state);
   }
 };
 
@@ -166,7 +181,8 @@ type Effect =
   | { effect: "logout" }
   | { effect: "load_fonts" }
   | { effect: "create_user"; username: string }
-  | { effect: "post"; username: string; haiku: Haiku };
+  | { effect: "post"; username: string; haiku: Haiku }
+  | { effect: "block_user"; username: string; blockedUserId: string };
 
 const runEffect = async (effect: Effect): Promise<Msg[]> => {
   switch (effect.effect) {
@@ -174,7 +190,8 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       await SplashScreen.hideAsync();
       return [];
     case "get_days":
-      const days = await getDays();
+      // TODO: don't hardcode this
+      const days = await getDays("Daniel");
       return [{ msg: "set_days", days }];
     case "logout":
       const auth = getAuth(firebaseApp);
@@ -188,6 +205,9 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       return [{ msg: "load_feed" }];
     case "create_user":
       await registerUser(effect.username);
+      return [];
+    case "block_user":
+      blockUser(effect.username, effect.blockedUserId);
       return [];
   }
 };
@@ -214,5 +234,9 @@ export const useAppState = () => {
     register: (username: string) => dispatch({ msg: "register", username }),
     logout: () => dispatch({ msg: "logout" }),
     publish: (haiku: Haiku) => dispatch({ msg: "publish", haiku }),
+    blockUser: (
+      // TODO: reload feed
+      blockedUserId: string
+    ) => dispatch({ msg: "block_user", blockedUserId }),
   };
 };

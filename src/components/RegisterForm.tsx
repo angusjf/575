@@ -11,6 +11,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { firebaseApp } from "../firebase";
+import { registerUser } from "../firebaseClient";
 
 const styles = StyleSheet.create({
   root: {
@@ -42,6 +43,7 @@ export const RegisterForm = ({
       setValidity("loading");
       register(name);
       await updateProfile(userCredentials.user, { displayName: name });
+      await registerUser(userCredentials.user.uid);
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
         try {

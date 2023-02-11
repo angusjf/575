@@ -53,7 +53,11 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-export const HaikuForm = ({ publish }: { publish: (haiku: Haiku) => void }) => {
+export const HaikuForm = ({
+  publish,
+}: {
+  publish: (haiku: Haiku, username: string) => void;
+}) => {
   const [state, dispatch] = useReducer(reducer, {
     haiku: defaultHaiku,
     validity: "unchecked",
@@ -74,7 +78,7 @@ export const HaikuForm = ({ publish }: { publish: (haiku: Haiku) => void }) => {
           ] as const;
 
           if (valid(syllables)) {
-            publish(state.haiku);
+            publish(state.haiku, "anonymous");
           } else {
             dispatch({ type: "invalid" });
           }
