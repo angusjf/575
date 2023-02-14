@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Feed } from "./src/components/Feed";
 import { HaikuForm } from "./src/components/HaikuForm";
 import { RegisterForm } from "./src/components/RegisterForm";
@@ -11,18 +11,20 @@ export default function App() {
 
   const onLayoutRootView = useCallback(async () => {}, [state]);
 
-  if (state.screen === "loading") {
+  if (state.state === "loading" || state.state === "finding_out_if_posted") {
     return null;
   }
 
   return (
     <View style={styles.root} onLayout={onLayoutRootView}>
-      {state.screen === "register" ? (
+      {state.state === "register" ? (
         <RegisterForm register={register} />
-      ) : state.screen === "compose" ? (
+      ) : state.state === "compose" ? (
         <HaikuForm publish={publish} />
-      ) : (
+      ) : state.state === "feed" ? (
         <Feed days={state.days} />
+      ) : (
+        <Text>Error: {state.message}</Text>
       )}
       <Button title="log out" onPress={logout} />
     </View>

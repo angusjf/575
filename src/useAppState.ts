@@ -1,17 +1,12 @@
 import { getAuth } from "firebase/auth";
-import { useCallback, useEffect, useReducer } from "react";
 import { firebaseApp } from "./firebase";
-import { registerForPushNotificationsAsync } from "./components/useNotifications";
-import {
-  getDays,
-  hasPostedToday,
-  post,
-  uploadExpoPushToken,
-} from "./firebaseClient";
+import { getDays, post } from "./firebaseClient";
 import { loadFonts } from "./font";
 import { Day, Haiku } from "./types";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
+import { useReducerWithEffects } from "./useReducerWithEffects";
+import { useEffect } from "react";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,117 +20,156 @@ Notifications.setNotificationHandler({
 
 type State =
   | {
-      screen: "loading";
+      state: "loading";
       fonts: boolean;
       username?: string | null;
-      feed?: Day[] | null;
     }
-  | { screen: "register" }
-  | { screen: "compose"; username: string }
-  | { screen: "feed"; days: Day[] | null };
+  | { state: "finding_out_if_posted"; username: string }
+  | { state: "register" }
+  | { state: "compose"; username: string }
+  | { state: "feed"; days: Day[] | null }
+  | { state: "error"; message: string };
 
 type Action =
-  | { type: "fonts_loaded" }
-  | { type: "loaded_user"; username: string | null }
-  | { type: "found_out_if_posted"; posted: boolean }
-  | { type: "set_username"; username: string }
-  | { type: "visit_feed" }
-  | { type: "set_days"; days: Day[] };
+  | { action: "fonts_loaded" }
+  | { action: "loaded_user"; username: string | null }
+  | { action: "set_username"; username: string }
+  | { action: "visit_feed" }
+  | { action: "set_days"; days: Day[] }
+  | { action: "load_feed" }
+  | { action: "register" }
+  | { action: "logout" }
+  | { action: "publish" };
+
+const badActionForState = (action: Action, state: State): [State, []] => {
+  return [
+    {
+      state: "error",
+      message: `bad action <${action.action}> for state <${state.state}>`,
+    },
+    [],
+  ];
+};
+
+const finishedLoading = (username: string | null): [State, Effect[]] => {
+  if (username === null) {
+    SplashScreen.hideAsync();
+    return [{ state: "register" }, []];
+  } else {
+    return [
+      { state: "finding_out_if_posted", username },
+      [{ effect: "get_days" }],
+    ];
+  }
+};
+
+const reducer = (state: State, action: Action): [State, Effect[]] => {
+  switch (action.action) {
+    case "set_username":
+      return [{ state: "compose", username: action.username }, []];
+    case "visit_feed":
+      return [{ state: "feed", days: null }, []];
+    case "set_days":
+      if (state.state === "loading") {
+        SplashScreen.hideAsync();
+      }
+      return [{ state: "feed", days: action.days }, []];
+    case "loaded_user":
+      if (state.state === "loading") {
+        if (state.fonts) {
+          return finishedLoading(action.username);
+        } else {
+          return [
+            { state: "loading", fonts: false, username: action.username },
+            [],
+          ];
+        }
+      } else {
+        return badActionForState(action, state);
+      }
+    case "fonts_loaded":
+      if (state.state === "loading") {
+        if (state.username !== undefined) {
+          return finishedLoading(state.username);
+        } else {
+          return [
+            state.state === "loading"
+              ? { state: "loading", fonts: true }
+              : state,
+            [],
+          ];
+        }
+      } else {
+        return badActionForState(action, state);
+      }
+    case "load_feed":
+      if (state.state === "loading") {
+        return [{ ...state, fonts: true }, [{ effect: "get_days" }]];
+      } else {
+        return badActionForState(action, state);
+      }
+    case "register":
+      return badActionForState(action, state);
+    case "logout": {
+      const auth = getAuth(firebaseApp);
+
+      auth.signOut();
+
+      return [{ state: "register" }, []];
+    }
+    case "publish":
+      return badActionForState(action, state);
+  }
+};
+
+type Effect =
+  | { effect: "hide_splash" }
+  | { effect: "get_days" }
+  | { effect: "logout" }
+  | { effect: "load_fonts" }
+  | { effect: "publish"; username: string; haiku: Haiku };
+
+const runEffect = async (effect: Effect): Promise<Action[]> => {
+  switch (effect.effect) {
+    case "hide_splash":
+      return Promise.resolve([]);
+    case "get_days":
+      const days = await getDays();
+      return [{ action: "set_days", days }];
+    case "logout":
+      const auth = getAuth(firebaseApp);
+      auth.signOut();
+      return Promise.resolve([]);
+    case "load_fonts":
+      await loadFonts();
+      return Promise.resolve([{ action: "fonts_loaded" }]);
+    case "publish":
+      await post(effect.username, effect.haiku);
+      return [{ action: "load_feed" }];
+  }
+};
+
+const init: [State, Effect[]] = [
+  { state: "loading", fonts: false },
+  [{ effect: "load_fonts" }],
+];
 
 export const useAppState = () => {
-  const [state, dispatch] = useReducer(
-    (state: State, action: Action): State => {
-      switch (action.type) {
-        case "set_username":
-          return { screen: "compose", username: action.username };
-        case "visit_feed":
-          return { screen: "feed", days: null };
-        case "set_days":
-          return { screen: "feed", days: action.days };
-        case "loaded_user":
-          if (action.username === null) {
-            return { screen: "register" };
-          } else {
-            SplashScreen.hideAsync();
-            hasPostedToday(action.username).then((posted) =>
-              dispatch({ type: "found_out_if_posted", posted })
-            );
-            return {
-              screen: "loading",
-              username: action.username,
-              fonts: true,
-            };
-          }
-        case "found_out_if_posted":
-          if (action.posted) {
-            getDays().then((days) => dispatch({ type: "set_days", days }));
-            return { screen: "feed", days: null };
-          } else {
-            return { screen: "compose", username: "state.username" };
-          }
-        case "fonts_loaded":
-          return state.screen === "loading" ? { ...state, fonts: true } : state;
-      }
-    },
-    { screen: "loading", fonts: false, feed: undefined, username: undefined }
-  );
-
-  console.log(state);
-  useEffect(() => {
-    loadFonts()
-      .then(() => dispatch({ type: "fonts_loaded" }))
-      .catch(console.error);
-  }, []);
-
-  const setUsername = useCallback(
-    (username: string) => dispatch({ type: "set_username", username }),
-    []
-  );
+  const [state, dispatch] = useReducerWithEffects(reducer, runEffect, init);
 
   useEffect(() => {
     const auth = getAuth(firebaseApp);
 
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      dispatch({ type: "loaded_user", username: user?.displayName ?? null });
+      dispatch({ action: "loaded_user", username: user?.displayName ?? null });
     });
     return unsubscribe;
   }, []);
 
-  const loadFeed = useCallback(async () => {
-    dispatch({ type: "visit_feed" });
-    try {
-      const days = await getDays();
-      dispatch({ type: "set_days", days });
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
-
-  const register = (username: string) => {
-    setUsername(username);
-    registerForPushNotificationsAsync().then((token) => {
-      if (token) {
-        uploadExpoPushToken({ userId: username, token });
-      }
-    });
-  };
-
-  const logout = () => {
-    const auth = getAuth(firebaseApp);
-    auth.signOut();
-  };
-
-  const publish = async (haiku: Haiku) => {
-    if (state.screen === "compose") {
-      await post(state.username, haiku);
-      loadFeed();
-    }
-  };
-
   return {
     state,
-    register,
-    logout,
-    publish,
+    register: () => dispatch({ action: "register" }),
+    logout: () => dispatch({ action: "logout" }),
+    publish: () => dispatch({ action: "publish" }),
   };
 };
