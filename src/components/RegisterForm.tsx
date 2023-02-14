@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
 import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
@@ -11,6 +11,15 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { firebaseApp } from "../firebase";
+
+const styles = StyleSheet.create({
+  root: {
+    height: 600,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
 
 export const RegisterForm = ({
   register: register,
@@ -47,7 +56,7 @@ export const RegisterForm = ({
   };
 
   return (
-    <View>
+    <View style={styles.root}>
       <Text style={{ fontFamily: fonts.PlexMonoItalic, fontSize: 15 }}>
         how do you sign your poems?
       </Text>

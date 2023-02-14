@@ -94,6 +94,12 @@ const styles = StyleSheet.create({
   date: {
     fontFamily: fonts.PlexMonoItalic,
   },
+  root: {
+    height: 600,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
 const now = new Date();
@@ -116,7 +122,7 @@ const InputScreen = ({
   validity: Validity;
 }) => {
   return (
-    <View>
+    <View style={styles.root}>
       <DateToday />
       <Text style={styles.intro}>Compose today's haiku</Text>
       <HaikuLineInput

@@ -6,17 +6,27 @@ import {
   View,
 } from "react-native";
 import { Day } from "../types";
+import { Button } from "./Button";
 import { PostBox } from "./Post";
 
 const styles = StyleSheet.create({
-  wrapper: {
-    marginTop: 147,
+  wrapper: {},
+  root: {
+    height: 600,
+    backgroundColor: "#fff",
+    alignItems: "center",
   },
 });
 
-export const Feed = ({ days }: { days: Day[] | null }) => {
+export const Feed = ({
+  days,
+  logout,
+}: {
+  days: Day[] | null;
+  logout: () => void;
+}) => {
   return (
-    <View>
+    <View style={styles.root}>
       {days === null ? (
         <ActivityIndicator />
       ) : (
@@ -33,6 +43,7 @@ export const Feed = ({ days }: { days: Day[] | null }) => {
           />
         </SafeAreaView>
       )}
+      <Button title="log out" onPress={logout} />
     </View>
   );
 };

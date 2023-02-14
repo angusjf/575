@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text } from "react-native";
 import { Feed } from "./src/components/Feed";
 import { HaikuForm } from "./src/components/HaikuForm";
 import { RegisterForm } from "./src/components/RegisterForm";
 import { useAppState } from "./src/useAppState";
-import { Button } from "./src/components/Button";
 
 export default function App() {
   const { state, register, publish, logout } = useAppState();
@@ -12,27 +11,17 @@ export default function App() {
     return null;
   }
 
-  return (
-    <View style={styles.root}>
-      {state.state === "register" ? (
-        <RegisterForm register={register} />
-      ) : state.state === "compose" ? (
-        <HaikuForm publish={publish} />
-      ) : state.state === "feed" ? (
-        <Feed days={state.days} />
-      ) : (
-        <Text>Error: {state.message}</Text>
-      )}
-      <Button title="log out" onPress={logout} />
-    </View>
-  );
-}
+  if (state.state === "register") {
+    return <RegisterForm register={register} />;
+  }
 
-const styles = StyleSheet.create({
-  root: {
-    height: 600,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+  if (state.state === "compose") {
+    return <HaikuForm publish={publish} />;
+  }
+
+  if (state.state === "feed") {
+    return <Feed days={state.days} logout={logout} />;
+  }
+
+  return <Text>Error: {state.message}</Text>;
+}
