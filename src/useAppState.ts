@@ -38,7 +38,7 @@ type Action =
   | { action: "visit_feed" }
   | { action: "set_days"; days: Day[] }
   | { action: "load_feed" }
-  | { action: "register"; username: string; email: string; password: string }
+  | { action: "register"; username: string }
   | { action: "logout" }
   | { action: "publish"; haiku: Haiku };
 
@@ -97,7 +97,8 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
           ];
         }
       } else {
-        return badActionForState(action, state);
+        // this runs in a use effect so we must assume it can run at any time
+        return [state, []];
       }
     case "fonts_loaded":
       if (state.state === "loading") {
@@ -127,8 +128,6 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
           {
             effect: "create_user",
             username: action.username,
-            email: action.email,
-            password: action.password,
           },
         ],
       ];
@@ -162,7 +161,7 @@ type Effect =
   | { effect: "get_days" }
   | { effect: "logout" }
   | { effect: "load_fonts" }
-  | { effect: "create_user"; username: string; email: string; password: string }
+  | { effect: "create_user"; username: string }
   | { effect: "publish"; username: string; haiku: Haiku };
 
 const runEffect = async (effect: Effect): Promise<Action[]> => {
@@ -207,8 +206,7 @@ export const useAppState = () => {
 
   return {
     state,
-    register: (username: string, email: string, password: string) =>
-      dispatch({ action: "register", username, email, password }),
+    register: (username: string) => dispatch({ action: "register", username }),
     logout: () => dispatch({ action: "logout" }),
     publish: (haiku: Haiku) => dispatch({ action: "publish", haiku }),
   };

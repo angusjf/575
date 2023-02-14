@@ -13,12 +13,14 @@ import {
 import { firebaseApp } from "../firebase";
 
 export const RegisterForm = ({
-  register,
+  register: register,
 }: {
-  register: (username: string, email: string, password: string) => void;
+  register: (username: string) => void;
 }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [validity, setValidity] = useState<Validity>("unchecked");
 
   const handleCreateAccount = async () => {
     const auth = getAuth(firebaseApp);
@@ -29,13 +31,13 @@ export const RegisterForm = ({
         password
       );
       setValidity("loading");
-      register(name, email, password);
+      register(name);
       await updateProfile(userCredentials.user, { displayName: name });
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
         try {
           await signInWithEmailAndPassword(auth, email, password);
-          register(name, email, password);
+          register(name);
         } catch {
           setValidity("invalid");
         }
@@ -43,9 +45,6 @@ export const RegisterForm = ({
       setValidity("invalid");
     }
   };
-
-  const [name, setName] = useState("");
-  const [validity, setValidity] = useState<Validity>("unchecked");
 
   return (
     <View>

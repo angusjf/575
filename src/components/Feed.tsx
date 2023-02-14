@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import { Day } from "../types";
 import { PostBox } from "./Post";
-import { Button } from "./Button";
 
 const styles = StyleSheet.create({
   wrapper: {
