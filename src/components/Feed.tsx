@@ -3,20 +3,46 @@ import {
   FlatList,
   SafeAreaView,
   StyleSheet,
+  Text,
   View,
 } from "react-native";
+import { fonts } from "../font";
 import { Day } from "../types";
 import { Button } from "./Button";
 import { PostBox } from "./Post";
+import { LinearGradient } from "expo-linear-gradient";
 
 const styles = StyleSheet.create({
-  wrapper: {},
   root: {
-    height: 600,
     backgroundColor: "#fff",
     alignItems: "center",
   },
+  logo: {
+    fontFamily: fonts.PlexSerifBoldItalic,
+    fontSize: 32,
+  },
+  topBar: {
+    position: "absolute",
+    background: "transparent",
+    zIndex: 100,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  feed: {
+    paddingTop: 64,
+  },
 });
+
+const TopBar = () => {
+  const white = "rgba(255, 255, 255, 255)";
+  const transparent = "rgba(255, 255, 255, 0)";
+  return (
+    <LinearGradient colors={[white, white, transparent]} style={styles.topBar}>
+      <Text style={styles.logo}>575</Text>
+    </LinearGradient>
+  );
+};
 
 export const Feed = ({
   days,
@@ -26,12 +52,14 @@ export const Feed = ({
   logout: () => void;
 }) => {
   return (
-    <View style={styles.root}>
-      {days === null ? (
-        <ActivityIndicator />
-      ) : (
-        <SafeAreaView style={styles.wrapper}>
+    <SafeAreaView style={styles.root}>
+      <View>
+        <TopBar />
+        {days === null ? (
+          <ActivityIndicator />
+        ) : (
           <FlatList
+            style={styles.feed}
             data={days[days.length - 1].posts}
             renderItem={({ item }) => (
               <PostBox
@@ -41,9 +69,9 @@ export const Feed = ({
               />
             )}
           />
-        </SafeAreaView>
-      )}
-      <Button title="log out" onPress={logout} />
-    </View>
+        )}
+        <Button title="log out" onPress={logout} />
+      </View>
+    </SafeAreaView>
   );
 };
