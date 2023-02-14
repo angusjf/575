@@ -138,11 +138,7 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
         ],
       ];
     case "logout": {
-      const auth = getAuth(firebaseApp);
-
-      auth.signOut();
-
-      return [{ state: "register" }, []];
+      return [{ state: "register" }, [{ effect: "logout" }]];
     }
     case "publish":
       if (state.state === "compose") {
