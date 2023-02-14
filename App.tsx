@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Feed } from "./src/components/Feed";
 import { HaikuForm } from "./src/components/HaikuForm";
 import { RegisterForm } from "./src/components/RegisterForm";
