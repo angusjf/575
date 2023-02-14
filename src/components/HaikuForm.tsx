@@ -123,42 +123,48 @@ const InputScreen = ({
 }) => {
   return (
     <View style={styles.root}>
-      <DateToday />
-      <Text style={styles.intro}>Compose today's haiku</Text>
-      <HaikuLineInput
-        placeholder="In the twilight rain"
-        value={haiku[0]}
-        onChangeText={(l) => changed(0, l)}
-        validity={validity}
-        autoFocus
-      />
-      <HaikuLineInput
-        placeholder="these brilliant-hued hibiscus -"
-        value={haiku[1]}
-        onChangeText={(l) => changed(1, l)}
-        validity={validity}
-        long
-      />
-      <HaikuLineInput
-        placeholder="A lovely sunset."
-        value={haiku[2]}
-        validity={validity}
-        onChangeText={(l) => changed(2, l)}
-      />
-      <Button
-        title="check & share"
-        isLoading={validity === "loading"}
-        onPress={done}
-        style={{ marginTop: 30 }}
-      />
-      <Button
-        title="prefill"
-        onPress={() => {
-          changed(0, "one two three four five");
-          changed(1, "one two three four five six sev");
-          changed(2, "one two three four five");
-        }}
-      />
+      <View>
+        <DateToday />
+        <Text style={styles.intro}>Compose today's haiku</Text>
+      </View>
+      <View>
+        <HaikuLineInput
+          placeholder="In the twilight rain"
+          value={haiku[0]}
+          onChangeText={(l) => changed(0, l)}
+          validity={validity}
+          autoFocus
+        />
+        <HaikuLineInput
+          placeholder="these brilliant-hued hibiscus -"
+          value={haiku[1]}
+          onChangeText={(l) => changed(1, l)}
+          validity={validity}
+          long
+        />
+        <HaikuLineInput
+          placeholder="A lovely sunset."
+          value={haiku[2]}
+          validity={validity}
+          onChangeText={(l) => changed(2, l)}
+        />
+      </View>
+      <View>
+        <Button
+          title="check & share"
+          isLoading={validity === "loading"}
+          onPress={done}
+          style={{ marginTop: 30 }}
+        />
+        <Button
+          title="prefill"
+          onPress={() => {
+            changed(0, "one two three four five");
+            changed(1, "one two three four five six sev");
+            changed(2, "one two three four five");
+          }}
+        />
+      </View>
     </View>
   );
 };
