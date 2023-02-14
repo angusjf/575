@@ -118,6 +118,8 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
     case "load_feed":
       if (state.state === "loading") {
         return [{ ...state, fonts: true }, [{ effect: "get_days" }]];
+      } else if (state.state === "feed") {
+        return [state, [{ effect: "get_days" }]];
       } else {
         return badActionForState(action, state);
       }
@@ -144,7 +146,7 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
           { state: "feed", days: null },
           [
             {
-              effect: "publish",
+              effect: "post",
               haiku: action.haiku,
               username: state.username,
             },
@@ -162,7 +164,7 @@ type Effect =
   | { effect: "logout" }
   | { effect: "load_fonts" }
   | { effect: "create_user"; username: string }
-  | { effect: "publish"; username: string; haiku: Haiku };
+  | { effect: "post"; username: string; haiku: Haiku };
 
 const runEffect = async (effect: Effect): Promise<Action[]> => {
   switch (effect.effect) {
@@ -178,7 +180,7 @@ const runEffect = async (effect: Effect): Promise<Action[]> => {
     case "load_fonts":
       await loadFonts();
       return Promise.resolve([{ action: "fonts_loaded" }]);
-    case "publish":
+    case "post":
       await post(effect.username, effect.haiku);
       return [{ action: "load_feed" }];
     case "create_user":

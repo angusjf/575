@@ -16,7 +16,7 @@ export function useReducerWithEffects<
 
   const [state, dispatch] = useReducer(
     (state: State, action: Action): State => {
-      console.log(action);
+      console.log(JSON.stringify(action));
       const [nextState, effects] = reducer(state, action);
       setEffects(effects);
       return nextState;
@@ -32,7 +32,7 @@ export function useReducerWithEffects<
     );
   }, [effects]);
 
-  console.log(state);
+  console.log(JSON.stringify(state));
 
   return [state, dispatch];
 }

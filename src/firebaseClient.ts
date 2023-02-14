@@ -1,7 +1,7 @@
 import { getDatabase, ref, set, get, child } from "firebase/database";
 import { firebaseApp } from "./firebase";
-import { Haiku, Day, Post } from "./types";
-import { dateDbKey } from "./utils/date";
+import { Haiku, Day } from "./types";
+import { dateDbKey, parseDateDbKey } from "./utils/date";
 
 export const writeUserData = (userId: string, name: string) => {
   const db = getDatabase(firebaseApp);
@@ -41,7 +41,7 @@ export const getDays = async (): Promise<Day[]> => {
   const days = await get(ref(db, "days/"));
 
   return Object.entries(days.val()).map(([date, posts]) => ({
-    date: new Date(date),
+    date: parseDateDbKey(date),
     posts: Object.entries(
       (posts as Record<string, { haiku: Haiku }> | undefined) ?? []
     ).map(([user, data]) => ({
