@@ -2,32 +2,33 @@ import { useEffect, useReducer, useState } from "react";
 
 export function useReducerWithEffects<
   State extends { state: string },
-  Action extends { action: string },
+  Msg extends { msg: string },
   Effect extends { effect: string }
 >(
-  // an action changes the state, and possibly triggers some effects
-  reducer: (state: State, action: Action) => [State, Effect[]],
-  // an effect runs some side-effect
-  runEffect: (effect: Effect) => Promise<Action[]>,
-  // starting state and effects to run
+  /* an action changes the state to a new `State`, and possibly triggers some `Effect`s
+   * crucially, it doesn't do anything else
+   */
+  reducer: (state: State, msg: Msg) => [State, Effect[]],
+  /* an `Effect` runs some side-effect, and possibly kicks some `Msg`s into the system when it's done
+   */
+  runEffect: (effect: Effect) => Promise<Msg[]>,
+  /* the starting state, and any `Effect`s to run on mount
+   */
   [initialState, initialEffects]: [State, Effect[]]
-): [State, (action: Action) => void] {
+): [State, (msg: Msg) => void] {
   const [effects, setEffects] = useState<Effect[]>(initialEffects);
 
-  const [state, dispatch] = useReducer(
-    (state: State, action: Action): State => {
-      console.log(JSON.stringify(action));
-      const [nextState, effects] = reducer(state, action);
-      setEffects(effects);
-      return nextState;
-    },
-    initialState
-  );
+  const [state, dispatch] = useReducer((state: State, msg: Msg): State => {
+    console.log(JSON.stringify(msg));
+    const [nextState, effects] = reducer(state, msg);
+    setEffects(effects);
+    return nextState;
+  }, initialState);
 
   useEffect(() => {
     console.log(effects);
-    const nextActions = effects.map(runEffect);
-    nextActions.forEach((promise) =>
+    const nextMsgs = effects.map(runEffect);
+    nextMsgs.forEach((promise) =>
       promise.then((resolved) => resolved.forEach(dispatch))
     );
   }, [effects]);

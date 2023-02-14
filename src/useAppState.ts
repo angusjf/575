@@ -31,22 +31,22 @@ type State =
   | { state: "feed"; days: Day[] | null }
   | { state: "error"; message: string };
 
-type Action =
-  | { action: "fonts_loaded" }
-  | { action: "loaded_user"; username: string | null }
-  | { action: "set_username"; username: string }
-  | { action: "visit_feed" }
-  | { action: "set_days"; days: Day[] }
-  | { action: "load_feed" }
-  | { action: "register"; username: string }
-  | { action: "logout" }
-  | { action: "publish"; haiku: Haiku };
+type Msg =
+  | { msg: "fonts_loaded" }
+  | { msg: "loaded_user"; username: string | null }
+  | { msg: "set_username"; username: string }
+  | { msg: "visit_feed" }
+  | { msg: "set_days"; days: Day[] }
+  | { msg: "load_feed" }
+  | { msg: "register"; username: string }
+  | { msg: "logout" }
+  | { msg: "publish"; haiku: Haiku };
 
-const badActionForState = (action: Action, state: State): [State, []] => {
+const badActionForState = (msg: Msg, state: State): [State, []] => {
   return [
     {
       state: "error",
-      message: `bad action <${action.action}> for state <${state.state}>`,
+      message: `bad msg <${msg.msg}> for state <${state.state}>`,
     },
     [],
   ];
@@ -69,17 +69,19 @@ const hasPostedToday = (username: string, days: Day[]): boolean =>
     .flatMap((day) => day.posts)
     .some((post) => post.author === username);
 
-const reducer = (state: State, action: Action): [State, Effect[]] => {
-  switch (action.action) {
+// the big rule for this function is no side effects
+// just return some effects if needs be
+const reducer = (state: State, msg: Msg): [State, Effect[]] => {
+  switch (msg.msg) {
     case "set_username":
-      return [{ state: "compose", username: action.username }, []];
+      return [{ state: "compose", username: msg.username }, []];
     case "visit_feed":
       return [{ state: "feed", days: null }, []];
     case "set_days":
       if (state.state === "finding_out_if_posted") {
-        if (hasPostedToday(state.username, action.days)) {
+        if (hasPostedToday(state.username, msg.days)) {
           return [
-            { state: "feed", days: action.days },
+            { state: "feed", days: msg.days },
             [{ effect: "hide_splash" }],
           ];
         } else {
@@ -89,14 +91,14 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
           ];
         }
       }
-      return [{ state: "feed", days: action.days }, []];
+      return [{ state: "feed", days: msg.days }, []];
     case "loaded_user":
       if (state.state === "loading") {
         if (state.fonts) {
-          return finishedLoading(action.username);
+          return finishedLoading(msg.username);
         } else {
           return [
-            { state: "loading", fonts: false, username: action.username },
+            { state: "loading", fonts: false, username: msg.username },
             [],
           ];
         }
@@ -117,7 +119,7 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
           ];
         }
       } else {
-        return badActionForState(action, state);
+        return badActionForState(msg, state);
       }
     case "load_feed":
       if (state.state === "loading") {
@@ -125,15 +127,15 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
       } else if (state.state === "feed") {
         return [state, [{ effect: "get_days" }]];
       } else {
-        return badActionForState(action, state);
+        return badActionForState(msg, state);
       }
     case "register":
       return [
-        { state: "compose", username: action.username },
+        { state: "compose", username: msg.username },
         [
           {
             effect: "create_user",
-            username: action.username,
+            username: msg.username,
           },
         ],
       ];
@@ -147,13 +149,13 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
           [
             {
               effect: "post",
-              haiku: action.haiku,
+              haiku: msg.haiku,
               username: state.username,
             },
           ],
         ];
       } else {
-        return badActionForState(action, state);
+        return badActionForState(msg, state);
       }
   }
 };
@@ -166,24 +168,24 @@ type Effect =
   | { effect: "create_user"; username: string }
   | { effect: "post"; username: string; haiku: Haiku };
 
-const runEffect = async (effect: Effect): Promise<Action[]> => {
+const runEffect = async (effect: Effect): Promise<Msg[]> => {
   switch (effect.effect) {
     case "hide_splash":
       await SplashScreen.hideAsync();
       return [];
     case "get_days":
       const days = await getDays();
-      return [{ action: "set_days", days }];
+      return [{ msg: "set_days", days }];
     case "logout":
       const auth = getAuth(firebaseApp);
       await auth.signOut();
       return [];
     case "load_fonts":
       await loadFonts();
-      return [{ action: "fonts_loaded" }];
+      return [{ msg: "fonts_loaded" }];
     case "post":
       await post(effect.username, effect.haiku);
-      return [{ action: "load_feed" }];
+      return [{ msg: "load_feed" }];
     case "create_user":
       await registerUser(effect.username);
       return [];
@@ -202,15 +204,15 @@ export const useAppState = () => {
     const auth = getAuth(firebaseApp);
 
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      dispatch({ action: "loaded_user", username: user?.displayName ?? null });
+      dispatch({ msg: "loaded_user", username: user?.displayName ?? null });
     });
     return unsubscribe;
   }, []);
 
   return {
     state,
-    register: (username: string) => dispatch({ action: "register", username }),
-    logout: () => dispatch({ action: "logout" }),
-    publish: (haiku: Haiku) => dispatch({ action: "publish", haiku }),
+    register: (username: string) => dispatch({ msg: "register", username }),
+    logout: () => dispatch({ msg: "logout" }),
+    publish: (haiku: Haiku) => dispatch({ msg: "publish", haiku }),
   };
 };
