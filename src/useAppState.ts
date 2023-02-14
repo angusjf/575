@@ -54,7 +54,6 @@ const badActionForState = (action: Action, state: State): [State, []] => {
 
 const finishedLoading = (username: string | null): [State, Effect[]] => {
   if (username === null) {
-    SplashScreen.hideAsync();
     return [{ state: "register" }, []];
   } else {
     return [
@@ -78,11 +77,16 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
       return [{ state: "feed", days: null }, []];
     case "set_days":
       if (state.state === "finding_out_if_posted") {
-        SplashScreen.hideAsync();
         if (hasPostedToday(state.username, action.days)) {
-          return [{ state: "feed", days: action.days }, []];
+          return [
+            { state: "feed", days: action.days },
+            [{ effect: "hide_splash" }],
+          ];
         } else {
-          return [{ state: "compose", username: state.username }, []];
+          return [
+            { state: "compose", username: state.username },
+            [{ effect: "hide_splash" }],
+          ];
         }
       }
       return [{ state: "feed", days: action.days }, []];
@@ -169,17 +173,18 @@ type Effect =
 const runEffect = async (effect: Effect): Promise<Action[]> => {
   switch (effect.effect) {
     case "hide_splash":
-      return Promise.resolve([]);
+      await SplashScreen.hideAsync();
+      return [];
     case "get_days":
       const days = await getDays();
       return [{ action: "set_days", days }];
     case "logout":
       const auth = getAuth(firebaseApp);
-      auth.signOut();
-      return Promise.resolve([]);
+      await auth.signOut();
+      return [];
     case "load_fonts":
       await loadFonts();
-      return Promise.resolve([{ action: "fonts_loaded" }]);
+      return [{ action: "fonts_loaded" }];
     case "post":
       await post(effect.username, effect.haiku);
       return [{ action: "load_feed" }];
