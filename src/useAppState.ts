@@ -1,12 +1,13 @@
 import { getAuth } from "firebase/auth";
 import { firebaseApp } from "./firebase";
-import { getDays, post } from "./firebaseClient";
+import { getDays, post, registerUser } from "./firebaseClient";
 import { loadFonts } from "./font";
 import { Day, Haiku } from "./types";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import { useReducerWithEffects } from "./useReducerWithEffects";
 import { useEffect } from "react";
+import { isToday } from "date-fns";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -37,9 +38,9 @@ type Action =
   | { action: "visit_feed" }
   | { action: "set_days"; days: Day[] }
   | { action: "load_feed" }
-  | { action: "register" }
+  | { action: "register"; username: string; email: string; password: string }
   | { action: "logout" }
-  | { action: "publish" };
+  | { action: "publish"; haiku: Haiku };
 
 const badActionForState = (action: Action, state: State): [State, []] => {
   return [
@@ -63,6 +64,12 @@ const finishedLoading = (username: string | null): [State, Effect[]] => {
   }
 };
 
+const hasPostedToday = (username: string, days: Day[]): boolean =>
+  days
+    .filter((day) => isToday(day.date))
+    .flatMap((day) => day.posts)
+    .some((post) => post.author === username);
+
 const reducer = (state: State, action: Action): [State, Effect[]] => {
   switch (action.action) {
     case "set_username":
@@ -70,8 +77,13 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
     case "visit_feed":
       return [{ state: "feed", days: null }, []];
     case "set_days":
-      if (state.state === "loading") {
+      if (state.state === "finding_out_if_posted") {
         SplashScreen.hideAsync();
+        if (hasPostedToday(state.username, action.days)) {
+          return [{ state: "feed", days: action.days }, []];
+        } else {
+          return [{ state: "compose", username: state.username }, []];
+        }
       }
       return [{ state: "feed", days: action.days }, []];
     case "loaded_user":
@@ -109,7 +121,17 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
         return badActionForState(action, state);
       }
     case "register":
-      return badActionForState(action, state);
+      return [
+        { state: "compose", username: action.username },
+        [
+          {
+            effect: "create_user",
+            username: action.username,
+            email: action.email,
+            password: action.password,
+          },
+        ],
+      ];
     case "logout": {
       const auth = getAuth(firebaseApp);
 
@@ -118,7 +140,20 @@ const reducer = (state: State, action: Action): [State, Effect[]] => {
       return [{ state: "register" }, []];
     }
     case "publish":
-      return badActionForState(action, state);
+      if (state.state === "compose") {
+        return [
+          { state: "feed", days: null },
+          [
+            {
+              effect: "publish",
+              haiku: action.haiku,
+              username: state.username,
+            },
+          ],
+        ];
+      } else {
+        return badActionForState(action, state);
+      }
   }
 };
 
@@ -127,6 +162,7 @@ type Effect =
   | { effect: "get_days" }
   | { effect: "logout" }
   | { effect: "load_fonts" }
+  | { effect: "create_user"; username: string; email: string; password: string }
   | { effect: "publish"; username: string; haiku: Haiku };
 
 const runEffect = async (effect: Effect): Promise<Action[]> => {
@@ -146,6 +182,9 @@ const runEffect = async (effect: Effect): Promise<Action[]> => {
     case "publish":
       await post(effect.username, effect.haiku);
       return [{ action: "load_feed" }];
+    case "create_user":
+      await registerUser(effect.username);
+      return [];
   }
 };
 
@@ -168,8 +207,9 @@ export const useAppState = () => {
 
   return {
     state,
-    register: () => dispatch({ action: "register" }),
+    register: (username: string, email: string, password: string) =>
+      dispatch({ action: "register", username, email, password }),
     logout: () => dispatch({ action: "logout" }),
-    publish: () => dispatch({ action: "publish" }),
+    publish: (haiku: Haiku) => dispatch({ action: "publish", haiku }),
   };
 };
