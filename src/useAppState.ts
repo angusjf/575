@@ -54,7 +54,7 @@ const badActionForState = (msg: Msg, state: State): [State, []] => {
 
 const finishedLoading = (username: string | null): [State, Effect[]] => {
   if (username === null) {
-    return [{ state: "register" }, []];
+    return [{ state: "register" }, [{ effect: "hide_splash" }]];
   } else {
     return [
       { state: "finding_out_if_posted", username },
