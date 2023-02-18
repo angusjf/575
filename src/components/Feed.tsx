@@ -1,7 +1,9 @@
 import {
   ActivityIndicator,
   FlatList,
+  Platform,
   SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
   View,
@@ -16,6 +18,8 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: "#fff",
     alignItems: "center",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingHorizontal: 5,
   },
   logo: {
     fontFamily: fonts.PlexSerifBoldItalic,
