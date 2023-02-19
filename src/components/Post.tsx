@@ -36,12 +36,12 @@ export const PostBox = ({
   return (
     <TouchableOpacity
       style={styles.container}
-      onLongPress={() => showOptions(author)}
+      onLongPress={() => showOptions(author.userId)}
     >
       <Text style={styles.line}>{haiku[0]}</Text>
       <Text style={styles.line}>{haiku[1]}</Text>
       <Text style={styles.line}>{haiku[2]}</Text>
-      <Text style={styles.author}>– {author}</Text>
+      <Text style={styles.author}>– {author.name}</Text>
     </TouchableOpacity>
   );
 };
