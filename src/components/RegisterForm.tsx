@@ -44,9 +44,9 @@ export const RegisterForm = ({
         password
       );
       setValidity("loading");
-      register(firebaseUserToUser(userCredentials.user));
       await updateProfile(userCredentials.user, { displayName: name });
       await registerUser(firebaseUserToUser(userCredentials.user));
+      register(firebaseUserToUser(userCredentials.user));
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
         try {

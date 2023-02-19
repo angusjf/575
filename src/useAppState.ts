@@ -144,15 +144,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         return badActionForState(msg, state);
       }
     case "register":
-      return [
-        { state: "compose", user: msg.user },
-        [
-          {
-            effect: "create_user",
-            user: msg.user,
-          },
-        ],
-      ];
+      return [{ state: "compose", user: msg.user }, []];
     case "logout": {
       return [{ state: "register" }, [{ effect: "logout" }]];
     }
@@ -256,7 +248,7 @@ export const useAppState = () => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       dispatch({
         msg: "loaded_user",
-        user: firebaseUserToUser(user),
+        user: user === null ? user : firebaseUserToUser(user),
       });
     });
     return unsubscribe;

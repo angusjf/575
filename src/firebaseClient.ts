@@ -13,6 +13,13 @@ export const post = async (user: User, haiku: Haiku) => {
   });
 };
 
+/**
+ * Register the user in the DB for storing additional info.
+ *
+ * THIS IS NOT THE SAME AS AUTHENTICATION.
+ *
+ * @param user - User being registered
+ */
 export const registerUser = async (user: User) => {
   const db = getDatabase(firebaseApp);
   set(ref(db, "users/" + user.userId), {
@@ -32,12 +39,16 @@ export const getDays = async (user: User): Promise<Day[]> => {
       date: parseDateDbKey(date),
       posts: Object.entries(
         (posts as
-          | Record<string, { haiku: Haiku; username: string }>
+          | Record<
+              string,
+              { haiku: Haiku; username: string; timestamp: number }
+            >
           | undefined) ?? []
       )
         .map(([userId, data]) => ({
           author: { userId, name: data.username },
           haiku: data.haiku,
+          timestamp: data.timestamp,
         }))
         .filter(
           (post) =>

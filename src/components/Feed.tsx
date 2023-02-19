@@ -106,7 +106,9 @@ export const Feed = ({
         ) : (
           <FlatList
             style={styles.feed}
-            data={days[days.length - 1].posts}
+            data={days[days.length - 1].posts.sort(
+              (postA, postB) => postB.timestamp - postA.timestamp
+            )}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
@@ -118,6 +120,7 @@ export const Feed = ({
                   author={item.author}
                   haiku={item.haiku}
                   showOptions={showOptions}
+                  timestamp={item.timestamp}
                 />
               );
             }}
