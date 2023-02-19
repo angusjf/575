@@ -6,7 +6,8 @@ import { useAppState } from "./src/useAppState";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 const UnwrappedApp = () => {
-  const { state, register, publish, logout } = useAppState();
+  const { state, register, publish, logout, blockUser, refreshFeed } =
+    useAppState();
 
   if (state.state === "loading" || state.state === "finding_out_if_posted") {
     return null;
@@ -21,7 +22,14 @@ const UnwrappedApp = () => {
   }
 
   if (state.state === "feed") {
-    return <Feed days={state.days} logout={logout} />;
+    return (
+      <Feed
+        days={state.days}
+        logout={logout}
+        blockUser={blockUser}
+        refreshFeed={refreshFeed}
+      />
+    );
   }
 
   return <Text>Error: {state.message}</Text>;

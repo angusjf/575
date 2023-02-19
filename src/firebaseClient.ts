@@ -59,10 +59,12 @@ export const uploadExpoPushToken = ({
   set(ref(db, `expoPushTokens/${userId}/`), token);
 };
 
-export const blockUser = (userId: string, blockedUserId: string) => {
+export const blockUser = async (userId: string, blockedUserId: string) => {
   const db = getDatabase(firebaseApp);
-  set(ref(db, `blockedUsers/${userId}/${blockedUserId}`), true);
-  set(ref(db, `blockedUsers/${blockedUserId}/${userId}`), true);
+  await Promise.all([
+    set(ref(db, `blockedUsers/${userId}/${blockedUserId}`), true),
+    set(ref(db, `blockedUsers/${blockedUserId}/${userId}`), true),
+  ]);
 };
 
 export const getBlockingUsers = async (userId: string) => {
