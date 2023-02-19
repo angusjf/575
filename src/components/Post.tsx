@@ -28,13 +28,20 @@ const styles = StyleSheet.create({
   },
 });
 
-export const PostBox = ({ haiku, author }: Post) => {
+export const PostBox = ({
+  haiku,
+  author,
+  showOptions,
+}: Post & { showOptions: (userId: string) => void }) => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onLongPress={() => showOptions(author)}
+    >
       <Text style={styles.line}>{haiku[0]}</Text>
       <Text style={styles.line}>{haiku[1]}</Text>
       <Text style={styles.line}>{haiku[2]}</Text>
       <Text style={styles.author}>– {author}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };

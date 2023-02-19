@@ -1,6 +1,6 @@
 import { getAuth } from "firebase/auth";
 import { firebaseApp } from "./firebase";
-import { getDays, post, registerUser } from "./firebaseClient";
+import { blockUser, getDays, post, registerUser } from "./firebaseClient";
 import { loadFonts } from "./font";
 import { Day, Haiku } from "./types";
 import * as Notifications from "expo-notifications";
@@ -28,19 +28,20 @@ type State =
   | { state: "finding_out_if_posted"; username: string }
   | { state: "register" }
   | { state: "compose"; username: string }
-  | { state: "feed"; days: Day[] | null }
+  | { state: "feed"; days: Day[] | null; username: string }
   | { state: "error"; message: string };
 
 type Msg =
   | { msg: "fonts_loaded" }
   | { msg: "loaded_user"; username: string | null }
   | { msg: "set_username"; username: string }
-  | { msg: "visit_feed" }
+  | { msg: "visit_feed"; username: string }
   | { msg: "set_days"; days: Day[] }
-  | { msg: "load_feed" }
+  | { msg: "load_feed"; username: string }
   | { msg: "register"; username: string }
   | { msg: "logout" }
-  | { msg: "publish"; haiku: Haiku };
+  | { msg: "publish"; haiku: Haiku }
+  | { msg: "block_user"; blockedUserId: string };
 
 const badActionForState = (msg: Msg, state: State): [State, []] => {
   return [
@@ -50,17 +51,6 @@ const badActionForState = (msg: Msg, state: State): [State, []] => {
     },
     [],
   ];
-};
-
-const finishedLoading = (username: string | null): [State, Effect[]] => {
-  if (username === null) {
-    return [{ state: "register" }, [{ effect: "hide_splash" }]];
-  } else {
-    return [
-      { state: "finding_out_if_posted", username },
-      [{ effect: "get_days" }],
-    ];
-  }
 };
 
 const hasPostedToday = (username: string, days: Day[]): boolean =>
@@ -76,26 +66,31 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "set_username":
       return [{ state: "compose", username: msg.username }, []];
     case "visit_feed":
-      return [{ state: "feed", days: null }, []];
+      return [{ state: "feed", days: null, username: msg.username }, []];
     case "set_days":
       if (state.state === "finding_out_if_posted") {
-        if (hasPostedToday(state.username, msg.days)) {
-          return [
-            { state: "feed", days: msg.days },
-            [{ effect: "hide_splash" }],
-          ];
-        } else {
-          return [
-            { state: "compose", username: state.username },
-            [{ effect: "hide_splash" }],
-          ];
-        }
+        return [
+          hasPostedToday(state.username, msg.days)
+            ? { state: "feed", days: msg.days, username: state.username }
+            : { state: "compose", username: state.username },
+          [{ effect: "hide_splash" }],
+        ];
+      } else if (state.state === "feed") {
+        return [{ ...state, days: msg.days }, []];
+      } else {
+        return badActionForState(msg, state);
       }
-      return [{ state: "feed", days: msg.days }, []];
     case "loaded_user":
       if (state.state === "loading") {
         if (state.fonts) {
-          return finishedLoading(msg.username);
+          if (msg.username === null) {
+            return [{ state: "register" }, [{ effect: "hide_splash" }]];
+          } else {
+            return [
+              { state: "finding_out_if_posted", username: msg.username },
+              [{ effect: "get_days", username: msg.username }],
+            ];
+          }
         } else {
           return [
             { state: "loading", fonts: false, username: msg.username },
@@ -109,7 +104,14 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "fonts_loaded":
       if (state.state === "loading") {
         if (state.username !== undefined) {
-          return finishedLoading(state.username);
+          if (state.username === null) {
+            return [{ state: "register" }, [{ effect: "hide_splash" }]];
+          } else {
+            return [
+              { state: "finding_out_if_posted", username: state.username },
+              [{ effect: "get_days", username: state.username }],
+            ];
+          }
         } else {
           return [
             state.state === "loading"
@@ -123,9 +125,12 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       }
     case "load_feed":
       if (state.state === "loading") {
-        return [{ ...state, fonts: true }, [{ effect: "get_days" }]];
+        return [
+          { ...state, fonts: true },
+          [{ effect: "get_days", username: msg.username }],
+        ];
       } else if (state.state === "feed") {
-        return [state, [{ effect: "get_days" }]];
+        return [state, [{ effect: "get_days", username: msg.username }]];
       } else {
         return badActionForState(msg, state);
       }
@@ -145,7 +150,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "publish":
       if (state.state === "compose") {
         return [
-          { state: "feed", days: null },
+          { state: "feed", days: null, username: state.username },
           [
             {
               effect: "post",
@@ -157,16 +162,31 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       } else {
         return badActionForState(msg, state);
       }
+    case "block_user":
+      if (state.state === "feed") {
+        return [
+          state,
+          [
+            {
+              effect: "block_user",
+              username: state.username,
+              blockedUserId: msg.blockedUserId,
+            },
+          ],
+        ];
+      }
+      return badActionForState(msg, state);
   }
 };
 
 type Effect =
   | { effect: "hide_splash" }
-  | { effect: "get_days" }
+  | { effect: "get_days"; username: string }
   | { effect: "logout" }
   | { effect: "load_fonts" }
   | { effect: "create_user"; username: string }
-  | { effect: "post"; username: string; haiku: Haiku };
+  | { effect: "post"; username: string; haiku: Haiku }
+  | { effect: "block_user"; username: string; blockedUserId: string };
 
 const runEffect = async (effect: Effect): Promise<Msg[]> => {
   switch (effect.effect) {
@@ -174,7 +194,7 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       await SplashScreen.hideAsync();
       return [];
     case "get_days":
-      const days = await getDays();
+      const days = await getDays(effect.username);
       return [{ msg: "set_days", days }];
     case "logout":
       const auth = getAuth(firebaseApp);
@@ -185,9 +205,12 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       return [{ msg: "fonts_loaded" }];
     case "post":
       await post(effect.username, effect.haiku);
-      return [{ msg: "load_feed" }];
+      return [{ msg: "load_feed", username: effect.username }];
     case "create_user":
       await registerUser(effect.username);
+      return [];
+    case "block_user":
+      blockUser(effect.username, effect.blockedUserId);
       return [];
   }
 };
@@ -214,5 +237,9 @@ export const useAppState = () => {
     register: (username: string) => dispatch({ msg: "register", username }),
     logout: () => dispatch({ msg: "logout" }),
     publish: (haiku: Haiku) => dispatch({ msg: "publish", haiku }),
+    blockUser: (
+      // TODO: reload feed
+      blockedUserId: string
+    ) => dispatch({ msg: "block_user", blockedUserId }),
   };
 };
