@@ -37,7 +37,7 @@ type Msg =
   | { msg: "set_username"; username: string }
   | { msg: "visit_feed"; username: string }
   | { msg: "set_days"; days: Day[] }
-  | { msg: "load_feed" }
+  | { msg: "load_feed"; username: string }
   | { msg: "register"; username: string }
   | { msg: "logout" }
   | { msg: "publish"; haiku: Haiku }
@@ -88,7 +88,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
           } else {
             return [
               { state: "finding_out_if_posted", username: msg.username },
-              [{ effect: "get_days" }],
+              [{ effect: "get_days", username: msg.username }],
             ];
           }
         } else {
@@ -109,7 +109,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
           } else {
             return [
               { state: "finding_out_if_posted", username: state.username },
-              [{ effect: "get_days" }],
+              [{ effect: "get_days", username: state.username }],
             ];
           }
         } else {
@@ -125,9 +125,12 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       }
     case "load_feed":
       if (state.state === "loading") {
-        return [{ ...state, fonts: true }, [{ effect: "get_days" }]];
+        return [
+          { ...state, fonts: true },
+          [{ effect: "get_days", username: msg.username }],
+        ];
       } else if (state.state === "feed") {
-        return [state, [{ effect: "get_days" }]];
+        return [state, [{ effect: "get_days", username: msg.username }]];
       } else {
         return badActionForState(msg, state);
       }
@@ -178,7 +181,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
 
 type Effect =
   | { effect: "hide_splash" }
-  | { effect: "get_days" }
+  | { effect: "get_days"; username: string }
   | { effect: "logout" }
   | { effect: "load_fonts" }
   | { effect: "create_user"; username: string }
@@ -192,7 +195,7 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       return [];
     case "get_days":
       // TODO: don't hardcode this
-      const days = await getDays("Daniel");
+      const days = await getDays(effect.username);
       return [{ msg: "set_days", days }];
     case "logout":
       const auth = getAuth(firebaseApp);
@@ -203,7 +206,7 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       return [{ msg: "fonts_loaded" }];
     case "post":
       await post(effect.username, effect.haiku);
-      return [{ msg: "load_feed" }];
+      return [{ msg: "load_feed", username: effect.username }];
     case "create_user":
       await registerUser(effect.username);
       return [];
