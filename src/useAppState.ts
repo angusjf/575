@@ -37,7 +37,7 @@ type Msg =
   | { msg: "set_username"; username: string }
   | { msg: "visit_feed"; username: string }
   | { msg: "set_days"; days: Day[] }
-  | { msg: "load_feed" }
+  | { msg: "load_feed"; username: string }
   | { msg: "register"; username: string }
   | { msg: "logout" }
   | { msg: "publish"; haiku: Haiku }
@@ -51,17 +51,6 @@ const badActionForState = (msg: Msg, state: State): [State, []] => {
     },
     [],
   ];
-};
-
-const finishedLoading = (username: string | null): [State, Effect[]] => {
-  if (username === null) {
-    return [{ state: "register" }, [{ effect: "hide_splash" }]];
-  } else {
-    return [
-      { state: "finding_out_if_posted", username },
-      [{ effect: "get_days" }],
-    ];
-  }
 };
 
 const hasPostedToday = (username: string, days: Day[]): boolean =>
@@ -80,23 +69,28 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       return [{ state: "feed", days: null, username: msg.username }, []];
     case "set_days":
       if (state.state === "finding_out_if_posted") {
-        if (hasPostedToday(state.username, msg.days)) {
-          return [
-            { state: "feed", days: msg.days, username: state.username },
-            [{ effect: "hide_splash" }],
-          ];
-        } else {
-          return [
-            { state: "compose", username: state.username },
-            [{ effect: "hide_splash" }],
-          ];
-        }
+        return [
+          hasPostedToday(state.username, msg.days)
+            ? { state: "feed", days: msg.days, username: state.username }
+            : { state: "compose", username: state.username },
+          [{ effect: "hide_splash" }],
+        ];
+      } else if (state.state === "feed") {
+        return [{ ...state, days: msg.days }, []];
+      } else {
+        return badActionForState(msg, state);
       }
-      return [{ state: "feed", days: msg.days, username: "" }, []];
     case "loaded_user":
       if (state.state === "loading") {
         if (state.fonts) {
-          return finishedLoading(msg.username);
+          if (msg.username === null) {
+            return [{ state: "register" }, [{ effect: "hide_splash" }]];
+          } else {
+            return [
+              { state: "finding_out_if_posted", username: msg.username },
+              [{ effect: "get_days", username: msg.username }],
+            ];
+          }
         } else {
           return [
             { state: "loading", fonts: false, username: msg.username },
@@ -110,7 +104,14 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "fonts_loaded":
       if (state.state === "loading") {
         if (state.username !== undefined) {
-          return finishedLoading(state.username);
+          if (state.username === null) {
+            return [{ state: "register" }, [{ effect: "hide_splash" }]];
+          } else {
+            return [
+              { state: "finding_out_if_posted", username: state.username },
+              [{ effect: "get_days", username: state.username }],
+            ];
+          }
         } else {
           return [
             state.state === "loading"
@@ -124,9 +125,12 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       }
     case "load_feed":
       if (state.state === "loading") {
-        return [{ ...state, fonts: true }, [{ effect: "get_days" }]];
+        return [
+          { ...state, fonts: true },
+          [{ effect: "get_days", username: msg.username }],
+        ];
       } else if (state.state === "feed") {
-        return [state, [{ effect: "get_days" }]];
+        return [state, [{ effect: "get_days", username: msg.username }]];
       } else {
         return badActionForState(msg, state);
       }
@@ -177,7 +181,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
 
 type Effect =
   | { effect: "hide_splash" }
-  | { effect: "get_days" }
+  | { effect: "get_days"; username: string }
   | { effect: "logout" }
   | { effect: "load_fonts" }
   | { effect: "create_user"; username: string }
@@ -190,8 +194,7 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       await SplashScreen.hideAsync();
       return [];
     case "get_days":
-      // TODO: don't hardcode this
-      const days = await getDays("Daniel");
+      const days = await getDays(effect.username);
       return [{ msg: "set_days", days }];
     case "logout":
       const auth = getAuth(firebaseApp);
@@ -202,7 +205,7 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       return [{ msg: "fonts_loaded" }];
     case "post":
       await post(effect.username, effect.haiku);
-      return [{ msg: "load_feed" }];
+      return [{ msg: "load_feed", username: effect.username }];
     case "create_user":
       await registerUser(effect.username);
       return [];
