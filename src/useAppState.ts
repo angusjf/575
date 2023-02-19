@@ -80,8 +80,11 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
             [{ effect: "hide_splash" }],
           ];
         }
+      } else if (state.state === "feed") {
+        return [{ ...state, days: msg.days }, []];
+      } else {
+        return badActionForState(msg, state);
       }
-      return [{ state: "feed", days: msg.days, username: "" }, []];
     case "loaded_user":
       if (state.state === "loading") {
         if (state.fonts) {
