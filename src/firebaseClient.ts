@@ -1,4 +1,5 @@
-import { getDatabase, ref, set, get, child } from "firebase/database";
+import { getAuth } from "firebase/auth";
+import { getDatabase, ref, set, get, remove, child } from "firebase/database";
 import { firebaseApp } from "./firebase";
 import { Haiku, Day, User } from "./types";
 import { dateDbKey, parseDateDbKey } from "./utils/date";
@@ -47,6 +48,12 @@ export const getDays = async (user: User): Promise<Day[]> => {
     console.log(e);
     return [];
   }
+};
+
+export const deleteAccount = async () => {
+  const auth = getAuth(firebaseApp);
+
+  await auth.currentUser?.delete();
 };
 
 export const uploadExpoPushToken = ({

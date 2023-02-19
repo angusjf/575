@@ -15,6 +15,7 @@ const UnwrappedApp = () => {
     blockUser,
     refreshFeed,
     openSettings,
+    deleteAccount,
   } = useAppState();
 
   if (state.state === "loading" || state.state === "finding_out_if_posted") {
@@ -41,7 +42,7 @@ const UnwrappedApp = () => {
   }
 
   if (state.state === "settings") {
-    return <Settings logout={logout} />;
+    return <Settings logout={logout} deleteAccount={deleteAccount} />;
   }
 
   return <Text>Error: {state.message}</Text>;

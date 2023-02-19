@@ -1,6 +1,12 @@
 import { getAuth } from "firebase/auth";
 import { firebaseApp } from "./firebase";
-import { blockUser, getDays, post, registerUser } from "./firebaseClient";
+import {
+  blockUser,
+  deleteAccount,
+  getDays,
+  post,
+  registerUser,
+} from "./firebaseClient";
 import { loadFonts } from "./font";
 import { Day, Haiku, User } from "./types";
 import * as Notifications from "expo-notifications";
@@ -44,7 +50,9 @@ type Msg =
   | { msg: "logout" }
   | { msg: "publish"; haiku: Haiku }
   | { msg: "block_user"; blockedUserId: string }
-  | { msg: "open_settings" };
+  | { msg: "open_settings" }
+  | { msg: "delete_account" }
+  | { msg: "account_deleted" };
 
 const badActionForState = (msg: Msg, state: State): [State, []] => {
   return [
@@ -183,6 +191,14 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       } else {
         return badActionForState(msg, state);
       }
+    case "delete_account":
+      if (state.state === "settings") {
+        return [state, [{ effect: "delete_user", user: state.user }]];
+      } else {
+        return badActionForState(msg, state);
+      }
+    case "account_deleted":
+      return [{ state: "register" }, []];
   }
 };
 
@@ -193,7 +209,8 @@ type Effect =
   | { effect: "load_fonts" }
   | { effect: "create_user"; user: User }
   | { effect: "post"; user: User; haiku: Haiku }
-  | { effect: "block_user"; user: User; blockedUserId: string };
+  | { effect: "block_user"; user: User; blockedUserId: string }
+  | { effect: "delete_user"; user: User };
 
 const runEffect = async (effect: Effect): Promise<Msg[]> => {
   switch (effect.effect) {
@@ -219,6 +236,9 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
     case "block_user":
       await blockUser(effect.user, effect.blockedUserId);
       return [{ msg: "load_feed", user: effect.user }];
+    case "delete_user":
+      await deleteAccount();
+      return [{ msg: "account_deleted" }];
   }
 };
 
@@ -258,5 +278,6 @@ export const useAppState = () => {
     openSettings: () => {
       dispatch({ msg: "open_settings" });
     },
+    deleteAccount: () => dispatch({ msg: "delete_account" }),
   };
 };

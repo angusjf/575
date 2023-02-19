@@ -36,14 +36,14 @@ const SettingsItem = ({ title, onPress }: SettingsItemProps) => (
   </TouchableOpacity>
 );
 
-type SettingsProps = { logout: () => void };
+type SettingsProps = { logout: () => void; deleteAccount: () => void };
 
-export const Settings = ({ logout }: SettingsProps) => {
+export const Settings = ({ logout, deleteAccount }: SettingsProps) => {
   const settings = useMemo(
     () => [
       { title: "Logout", onPress: logout },
-      { title: "Unblock users", onPress: () => undefined },
-      { title: "Delete your account", onPress: () => undefined },
+      // { title: "Unblock users", onPress: () => undefined },
+      { title: "Delete your account", onPress: deleteAccount },
     ],
     []
   );
