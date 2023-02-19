@@ -29,7 +29,8 @@ type State =
   | { state: "register" }
   | { state: "compose"; username: string }
   | { state: "feed"; days: Day[] | null; username: string }
-  | { state: "error"; message: string };
+  | { state: "error"; message: string }
+  | { state: "settings"; user: string };
 
 type Msg =
   | { msg: "fonts_loaded" }
@@ -41,7 +42,8 @@ type Msg =
   | { msg: "register"; username: string }
   | { msg: "logout" }
   | { msg: "publish"; haiku: Haiku }
-  | { msg: "block_user"; blockedUserId: string };
+  | { msg: "block_user"; blockedUserId: string }
+  | { msg: "open_settings" };
 
 const badActionForState = (msg: Msg, state: State): [State, []] => {
   return [
@@ -177,6 +179,12 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         ];
       }
       return badActionForState(msg, state);
+    case "open_settings":
+      if (state.state === "feed") {
+        return [{ state: "settings", user: state.username }, []];
+      } else {
+        return badActionForState(msg, state);
+      }
   }
 };
 
@@ -245,6 +253,9 @@ export const useAppState = () => {
       if (state.state === "feed") {
         dispatch({ msg: "load_feed", username: state.username });
       }
+    },
+    openSettings: () => {
+      dispatch({ msg: "open_settings" });
     },
   };
 };

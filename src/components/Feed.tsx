@@ -55,12 +55,17 @@ const TopBar = () => {
 
 type FeedProps = {
   days: Day[] | null;
-  logout: () => void;
   refreshFeed: () => void;
   blockUser: (blockedUserId: string) => void;
+  openSettings: () => void;
 };
 
-export const Feed = ({ days, logout, blockUser, refreshFeed }: FeedProps) => {
+export const Feed = ({
+  days,
+  blockUser,
+  refreshFeed,
+  openSettings,
+}: FeedProps) => {
   const { showActionSheetWithOptions } = useActionSheet();
 
   const showOptions = (blockedUserId: string) => {
@@ -118,7 +123,7 @@ export const Feed = ({ days, logout, blockUser, refreshFeed }: FeedProps) => {
             }}
           />
         )}
-        <Button title="log out" onPress={logout} />
+        <Button title="settings" onPress={openSettings} />
       </View>
     </SafeAreaView>
   );
