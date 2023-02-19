@@ -63,8 +63,13 @@ export const getDays = async (user: User): Promise<Day[]> => {
 
 export const deleteAccount = async () => {
   const auth = getAuth(firebaseApp);
-
-  await auth.currentUser?.delete();
+  try {
+    await auth.currentUser?.delete();
+  } catch (e: any) {
+    if (e.code === "auth/requires-recent-login") {
+      console.error("User needs to reauthenticate");
+    }
+  }
 };
 
 export const uploadExpoPushToken = ({
