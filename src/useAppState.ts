@@ -194,7 +194,6 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       await SplashScreen.hideAsync();
       return [];
     case "get_days":
-      // TODO: don't hardcode this
       const days = await getDays(effect.username);
       return [{ msg: "set_days", days }];
     case "logout":
