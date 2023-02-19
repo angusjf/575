@@ -53,17 +53,6 @@ const badActionForState = (msg: Msg, state: State): [State, []] => {
   ];
 };
 
-const finishedLoading = (username: string | null): [State, Effect[]] => {
-  if (username === null) {
-    return [{ state: "register" }, [{ effect: "hide_splash" }]];
-  } else {
-    return [
-      { state: "finding_out_if_posted", username },
-      [{ effect: "get_days" }],
-    ];
-  }
-};
-
 const hasPostedToday = (username: string, days: Day[]): boolean =>
   days
     .filter((day) => isToday(day.date))
@@ -96,7 +85,14 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "loaded_user":
       if (state.state === "loading") {
         if (state.fonts) {
-          return finishedLoading(msg.username);
+          if (msg.username === null) {
+            return [{ state: "register" }, [{ effect: "hide_splash" }]];
+          } else {
+            return [
+              { state: "finding_out_if_posted", username: msg.username },
+              [{ effect: "get_days" }],
+            ];
+          }
         } else {
           return [
             { state: "loading", fonts: false, username: msg.username },
@@ -110,7 +106,14 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "fonts_loaded":
       if (state.state === "loading") {
         if (state.username !== undefined) {
-          return finishedLoading(state.username);
+          if (state.username === null) {
+            return [{ state: "register" }, [{ effect: "hide_splash" }]];
+          } else {
+            return [
+              { state: "finding_out_if_posted", username: state.username },
+              [{ effect: "get_days" }],
+            ];
+          }
         } else {
           return [
             state.state === "loading"
