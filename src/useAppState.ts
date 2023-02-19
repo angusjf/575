@@ -76,6 +76,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
           [{ effect: "hide_splash" }],
         ];
       } else if (state.state === "feed") {
+        console.log("set_days", msg.days);
         return [{ ...state, days: msg.days }, []];
       } else {
         return badActionForState(msg, state);
@@ -130,7 +131,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
           [{ effect: "get_days", username: msg.username }],
         ];
       } else if (state.state === "feed") {
-        return [state, [{ effect: "get_days", username: msg.username }]];
+        return [state, [{ effect: "get_days", username: state.username }]];
       } else {
         return badActionForState(msg, state);
       }
@@ -210,8 +211,8 @@ const runEffect = async (effect: Effect): Promise<Msg[]> => {
       await registerUser(effect.username);
       return [];
     case "block_user":
-      blockUser(effect.username, effect.blockedUserId);
-      return [];
+      await blockUser(effect.username, effect.blockedUserId);
+      return [{ msg: "load_feed", username: effect.username }];
   }
 };
 
@@ -237,9 +238,13 @@ export const useAppState = () => {
     register: (username: string) => dispatch({ msg: "register", username }),
     logout: () => dispatch({ msg: "logout" }),
     publish: (haiku: Haiku) => dispatch({ msg: "publish", haiku }),
-    blockUser: (
-      // TODO: reload feed
-      blockedUserId: string
-    ) => dispatch({ msg: "block_user", blockedUserId }),
+    blockUser: (blockedUserId: string) => {
+      dispatch({ msg: "block_user", blockedUserId });
+    },
+    refreshFeed: () => {
+      if (state.state === "feed") {
+        dispatch({ msg: "load_feed", username: state.username });
+      }
+    },
   };
 };

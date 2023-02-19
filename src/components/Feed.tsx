@@ -2,6 +2,7 @@ import {
   ActivityIndicator,
   FlatList,
   Platform,
+  RefreshControl,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -15,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { PostBox } from "./Post";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
-import { useAppState } from "../useAppState";
+import { useState } from "react";
 
 const styles = StyleSheet.create({
   root: {
@@ -52,15 +53,15 @@ const TopBar = () => {
   );
 };
 
-export const Feed = ({
-  days,
-  logout,
-}: {
+type FeedProps = {
   days: Day[] | null;
   logout: () => void;
-}) => {
+  refreshFeed: () => void;
+  blockUser: (blockedUserId: string) => void;
+};
+
+export const Feed = ({ days, logout, blockUser, refreshFeed }: FeedProps) => {
   const { showActionSheetWithOptions } = useActionSheet();
-  const { blockUser } = useAppState();
 
   const showOptions = (blockedUserId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -84,6 +85,13 @@ export const Feed = ({
     );
   };
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    refreshFeed();
+    setTimeout(() => setRefreshing(false), 500);
+  };
+
   return (
     <SafeAreaView style={styles.root}>
       <View>
@@ -94,6 +102,10 @@ export const Feed = ({
           <FlatList
             style={styles.feed}
             data={days[days.length - 1].posts}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            showsVerticalScrollIndicator={false}
             renderItem={({ item }) => {
               return (
                 <PostBox
