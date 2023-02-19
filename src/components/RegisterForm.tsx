@@ -9,9 +9,12 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   updateProfile,
+  User as FirebaseUser,
 } from "firebase/auth";
 import { firebaseApp } from "../firebase";
 import { registerUser } from "../firebaseClient";
+import { User } from "../types";
+import { firebaseUserToUser } from "../utils/user";
 
 const styles = StyleSheet.create({
   root: {
@@ -25,7 +28,7 @@ const styles = StyleSheet.create({
 export const RegisterForm = ({
   register: register,
 }: {
-  register: (username: string) => void;
+  register: (user: User) => void;
 }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,14 +44,14 @@ export const RegisterForm = ({
         password
       );
       setValidity("loading");
-      register(name);
+      register(firebaseUserToUser(userCredentials.user));
       await updateProfile(userCredentials.user, { displayName: name });
-      await registerUser(userCredentials.user.uid);
+      await registerUser(firebaseUserToUser(userCredentials.user));
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
         try {
-          await signInWithEmailAndPassword(auth, email, password);
-          register(name);
+          const user = await signInWithEmailAndPassword(auth, email, password);
+          register(firebaseUserToUser(user.user));
         } catch {
           setValidity("invalid");
         }
