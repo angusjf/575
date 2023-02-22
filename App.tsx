@@ -2,21 +2,12 @@ import { Text } from "react-native";
 import { Feed } from "./src/components/Feed";
 import { HaikuForm } from "./src/components/HaikuForm";
 import { RegisterForm } from "./src/components/RegisterForm";
-import { useAppState } from "./src/useAppState";
+import { AppStateProvider, useAppState } from "./src/useAppState";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { Settings } from "./src/components/Settings";
 
 const UnwrappedApp = () => {
-  const {
-    state,
-    register,
-    publish,
-    logout,
-    blockUser,
-    refreshFeed,
-    openSettings,
-    deleteAccount,
-  } = useAppState();
+  const { state, register, publish, logout, deleteAccount } = useAppState();
 
   if (state.state === "loading" || state.state === "finding_out_if_posted") {
     return null;
@@ -31,14 +22,7 @@ const UnwrappedApp = () => {
   }
 
   if (state.state === "feed") {
-    return (
-      <Feed
-        days={state.days}
-        blockUser={blockUser}
-        refreshFeed={refreshFeed}
-        openSettings={openSettings}
-      />
-    );
+    return <Feed days={state.days} />;
   }
 
   if (state.state === "settings") {
@@ -50,8 +34,10 @@ const UnwrappedApp = () => {
 
 export default function App() {
   return (
-    <ActionSheetProvider>
-      <UnwrappedApp />
-    </ActionSheetProvider>
+    <AppStateProvider>
+      <ActionSheetProvider>
+        <UnwrappedApp />
+      </ActionSheetProvider>
+    </AppStateProvider>
   );
 }

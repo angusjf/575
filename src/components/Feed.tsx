@@ -17,6 +17,7 @@ import { PostBox } from "./Post";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
+import { useAppState } from "../useAppState";
 
 const styles = StyleSheet.create({
   root: {
@@ -55,18 +56,11 @@ const TopBar = () => {
 
 type FeedProps = {
   days: Day[] | null;
-  refreshFeed: () => void;
-  blockUser: (blockedUserId: string) => void;
-  openSettings: () => void;
 };
 
-export const Feed = ({
-  days,
-  blockUser,
-  refreshFeed,
-  openSettings,
-}: FeedProps) => {
+export const Feed = ({ days }: FeedProps) => {
   const { showActionSheetWithOptions } = useActionSheet();
+  const { refreshFeed, openSettings, blockUser } = useAppState();
 
   const showOptions = (blockedUserId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);

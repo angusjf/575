@@ -12,7 +12,7 @@ import { Day, Haiku, User } from "./types";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import { useReducerWithEffects } from "./useReducerWithEffects";
-import { useEffect } from "react";
+import { createContext, useContext, useEffect } from "react";
 import { isToday } from "date-fns";
 import { firebaseUserToUser } from "./utils/user";
 
@@ -239,7 +239,29 @@ const init: [State, Effect[]] = [
   [{ effect: "load_fonts" }],
 ];
 
-export const useAppState = () => {
+type AppContextType = {
+  state: State;
+  register: (user: User) => void;
+  logout: () => void;
+  publish: (haiku: Haiku) => void;
+  blockUser: (blockedUserId: string) => void;
+  refreshFeed: () => void;
+  openSettings: () => void;
+  deleteAccount: () => void;
+};
+
+const AppContext = createContext<AppContextType>({
+  state: init[0],
+  register: (user: User) => {},
+  logout: () => {},
+  publish: (haiku: Haiku) => {},
+  blockUser: (blockedUserId: string) => {},
+  refreshFeed: () => {},
+  openSettings: () => {},
+  deleteAccount: () => {},
+});
+
+export const AppStateProvider = (props: any) => {
   const [state, dispatch] = useReducerWithEffects(reducer, runEffect, init);
 
   useEffect(() => {
@@ -254,7 +276,7 @@ export const useAppState = () => {
     return unsubscribe;
   }, []);
 
-  return {
+  const context: AppContextType = {
     state,
     register: (user: User) => dispatch({ msg: "register", user }),
     logout: () => dispatch({ msg: "logout" }),
@@ -272,4 +294,14 @@ export const useAppState = () => {
     },
     deleteAccount: () => dispatch({ msg: "delete_account" }),
   };
+
+  return <AppContext.Provider value={context} {...props} />;
+};
+
+export const useAppState = () => {
+  const context = useContext(AppContext);
+  if (context === undefined) {
+    throw new Error("useAppState must be used within an AppStateProvider");
+  }
+  return context;
 };
