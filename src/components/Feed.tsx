@@ -6,18 +6,16 @@ import {
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import { fonts } from "../font";
-import { Day } from "../types";
-import { Button } from "./Button";
-import { LinearGradient } from "expo-linear-gradient";
 import { PostBox } from "./Post";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { useAppState } from "../useAppState";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { FeedStackParams } from "./FeedStack";
 
 const styles = StyleSheet.create({
   root: {
@@ -26,41 +24,20 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     paddingHorizontal: 5,
   },
-  logo: {
-    fontFamily: fonts.PlexSerifBoldItalic,
-    fontSize: 32,
-  },
-  topBar: {
-    position: "absolute",
-    background: "transparent",
-    zIndex: 100,
-    left: 0,
-    right: 0,
-    alignItems: "center",
-  },
   feed: {
     paddingTop: 64,
   },
 });
 
-const TopBar = () => {
-  const white = "rgba(255, 255, 255, 255)";
-  const transparent = "rgba(255, 255, 255, 0)";
+type FeedProps = NativeStackScreenProps<FeedStackParams>;
 
-  return (
-    <LinearGradient colors={[white, white, transparent]} style={styles.topBar}>
-      <Text style={styles.logo}>575</Text>
-    </LinearGradient>
-  );
-};
-
-type FeedProps = {
-  days: Day[] | null;
-};
-
-export const Feed = ({ days }: FeedProps) => {
+export const Feed = ({ navigation }: FeedProps) => {
   const { showActionSheetWithOptions } = useActionSheet();
-  const { refreshFeed, openSettings, blockUser } = useAppState();
+  const { state, refreshFeed, blockUser } = useAppState();
+
+  if (state.state !== "feed") return null;
+
+  const days = state.days;
 
   const showOptions = (blockedUserId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -94,7 +71,6 @@ export const Feed = ({ days }: FeedProps) => {
   return (
     <SafeAreaView style={styles.root}>
       <View>
-        <TopBar />
         {days === null ? (
           <ActivityIndicator />
         ) : (
@@ -120,7 +96,6 @@ export const Feed = ({ days }: FeedProps) => {
             }}
           />
         )}
-        <Button title="settings" onPress={openSettings} />
       </View>
     </SafeAreaView>
   );

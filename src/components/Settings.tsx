@@ -9,10 +9,12 @@ import {
   View,
   Text,
 } from "react-native";
+import { useAppState } from "../useAppState";
 
 const styles = StyleSheet.create({
   root: {
     backgroundColor: "#fff",
+    flex: 1,
   },
 });
 
@@ -36,9 +38,8 @@ const SettingsItem = ({ title, onPress }: SettingsItemProps) => (
   </TouchableOpacity>
 );
 
-type SettingsProps = { logout: () => void; deleteAccount: () => void };
-
-export const Settings = ({ logout, deleteAccount }: SettingsProps) => {
+export const Settings = () => {
+  const { logout, deleteAccount } = useAppState();
   const settings = useMemo(
     () => [
       { title: "Logout", onPress: logout },
@@ -50,12 +51,10 @@ export const Settings = ({ logout, deleteAccount }: SettingsProps) => {
 
   return (
     <SafeAreaView style={styles.root}>
-      <View>
-        <FlatList
-          data={settings}
-          renderItem={({ item }) => <SettingsItem {...item} />}
-        />
-      </View>
+      <FlatList
+        data={settings}
+        renderItem={({ item }) => <SettingsItem {...item} />}
+      />
     </SafeAreaView>
   );
 };

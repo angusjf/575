@@ -8,4 +8,9 @@ export type Post = {
   timestamp: number;
 };
 
-export type User = { username: string; userId: string; email: string };
+export type User = {
+  username: string;
+  userId: string;
+  email: string;
+  avatar: string;
+};
