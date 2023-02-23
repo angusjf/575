@@ -65,6 +65,7 @@ export const FeedStack = () => {
           component={Feed}
           options={({ navigation }) => ({
             headerTransparent: true,
+            headerTitleAlign: "center",
             headerBackground,
             headerTitle: () => <Text style={styles.logo}>575</Text>,
             headerRight: () => (
