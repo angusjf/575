@@ -8,6 +8,7 @@ import {
   StyleSheet,
   View,
   Share,
+  Alert,
 } from "react-native";
 import { fonts } from "../font";
 import { PostBox } from "./Post";
@@ -58,7 +59,15 @@ export const Feed = ({ navigation }: FeedProps) => {
             Share.share({ message: sharingMessage });
             break;
           case 1:
-            blockUser(blockedUserId);
+            Alert.alert(
+              "Block User",
+              "Are you sure you want to block this user?",
+              [
+                { text: "Cancel" },
+                { text: "Block", onPress: () => blockUser(blockedUserId) },
+              ],
+              { cancelable: true }
+            );
             break;
         }
       }
