@@ -7,6 +7,7 @@ import {
   StatusBar,
   StyleSheet,
   View,
+  Share,
 } from "react-native";
 import { fonts } from "../font";
 import { PostBox } from "./Post";
@@ -39,10 +40,10 @@ export const Feed = ({ navigation }: FeedProps) => {
 
   const days = state.days;
 
-  const showOptions = (blockedUserId: string) => {
+  const showOptions = (sharingMessage: string, blockedUserId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const options = ["Block User", "Cancel"];
-    const destructiveButtonIndex = 0;
+    const options = ["Share", "Block User", "Cancel"];
+    const destructiveButtonIndex = 1;
     const cancelButtonIndex = 2;
 
     showActionSheetWithOptions(
@@ -54,6 +55,9 @@ export const Feed = ({ navigation }: FeedProps) => {
       (selectedIndex?: number) => {
         switch (selectedIndex) {
           case 0:
+            Share.share({ message: sharingMessage });
+            break;
+          case 1:
             blockUser(blockedUserId);
             break;
         }

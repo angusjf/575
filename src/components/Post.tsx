@@ -1,13 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Validity } from "../Validity";
-import { syllable } from "syllable";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { fonts } from "../font";
 import { Post } from "../types";
 
@@ -32,11 +23,18 @@ export const PostBox = ({
   haiku,
   author,
   showOptions,
-}: Post & { showOptions: (userId: string) => void }) => {
+}: Post & {
+  showOptions: (sharingMessage: string, userId: string) => void;
+}) => {
   return (
     <TouchableOpacity
       style={styles.container}
-      onLongPress={() => showOptions(author.userId)}
+      onLongPress={() =>
+        showOptions(
+          haiku[0] + "\n" + haiku[1] + "\n" + haiku[2] + "\n~ " + author.name,
+          author.userId
+        )
+      }
     >
       <Text style={styles.line}>{haiku[0]}</Text>
       <Text style={styles.line}>{haiku[1]}</Text>
