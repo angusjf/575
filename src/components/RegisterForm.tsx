@@ -9,12 +9,11 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   updateProfile,
-  User as FirebaseUser,
 } from "firebase/auth";
 import { firebaseApp } from "../firebase";
 import { registerUser } from "../firebaseClient";
-import { User } from "../types";
 import { firebaseUserToUser } from "../utils/user";
+import { useAppState } from "../useAppState";
 
 const styles = StyleSheet.create({
   root: {
@@ -25,15 +24,13 @@ const styles = StyleSheet.create({
   },
 });
 
-export const RegisterForm = ({
-  register: register,
-}: {
-  register: (user: User) => void;
-}) => {
+export const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
+
+  const { register } = useAppState();
 
   const handleCreateAccount = async () => {
     const auth = getAuth(firebaseApp);
