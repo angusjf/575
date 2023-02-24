@@ -70,7 +70,7 @@ export const RootStack = () => {
   }
 
   if (state.state === "error") {
-    return <Text>{state.state}</Text>;
+    return <Text>{state.message}</Text>;
   }
 
   return (
