@@ -63,7 +63,7 @@ export const RegisterForm = () => {
         how do you sign your poems?
       </Text>
       <HaikuLineInput
-        placeholder="how you sign your work"
+        placeholder="preferred signature"
         value={name || ""}
         onChangeText={setName}
         validity={validity}
