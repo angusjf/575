@@ -59,7 +59,13 @@ export const RegisterForm = () => {
 
   return (
     <View style={styles.root}>
-      <Text style={{ fontFamily: fonts.PlexMonoItalic, fontSize: 15 }}>
+      <Text
+        style={{
+          fontFamily: fonts.PlexMonoItalic,
+          fontSize: 15,
+          paddingBottom: 38,
+        }}
+      >
         how do you sign your poems?
       </Text>
       <HaikuLineInput
