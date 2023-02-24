@@ -35,11 +35,12 @@ export const Button = ({
 const styles = StyleSheet.create({
   submit: {
     marginTop: 15,
-    borderBottomWidth: 1,
-    borderEndWidth: 1,
+    borderWidth: 1,
     borderColor: "grey",
-    paddingHorizontal: 14,
-    paddingBottom: 4,
+    paddingHorizontal: 30,
+    height: 50,
+    justifyContent: "center",
+    borderStyle: "dashed",
     alignSelf: "center",
   },
   submitText: {
