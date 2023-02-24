@@ -24,7 +24,6 @@ const styles = StyleSheet.create({
   logo: {
     fontFamily: fonts.PlexSerifBoldItalic,
     fontSize: 32,
-    marginLeft: "auto",
   },
 });
 
@@ -74,17 +73,25 @@ export const RootStack = () => {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator>
       {state.state === "onboarding" ? (
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+          options={{ headerShown: false }}
+        />
       ) : state.state === "compose" ? (
-        <Stack.Screen name="Compose" component={HaikuForm} />
+        <Stack.Screen
+          name="Compose"
+          component={HaikuForm}
+          options={{ headerShown: false }}
+        />
       ) : state.state === "feed" ? (
         <Stack.Screen
           name="Feed"
           component={Feed}
           options={() => ({
-            headerTransparent: true,
+            headerTransparent: true, // TODO: This isn't transparent anymore
             headerTitleAlign: "center",
             headerBackground,
             headerTitle: () => <Text style={styles.logo}>575</Text>,
@@ -92,9 +99,17 @@ export const RootStack = () => {
           })}
         />
       ) : state.state === "register" ? (
-        <Stack.Screen name="Register" component={RegisterForm} />
+        <Stack.Screen
+          name="Register"
+          component={RegisterForm}
+          options={{ headerShown: false }}
+        />
       ) : state.state === "settings" ? (
-        <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen
+          name="Settings"
+          component={Settings}
+          options={{ headerShown: false }}
+        />
       ) : null}
     </Stack.Navigator>
   );

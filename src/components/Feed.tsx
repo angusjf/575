@@ -84,6 +84,7 @@ export const Feed = () => {
           <ActivityIndicator />
         ) : (
           <FlatList
+            contentContainerStyle={{ paddingBottom: 20 }}
             style={styles.feed}
             data={days[days.length - 1].posts.sort(
               (postA, postB) => postB.timestamp - postA.timestamp
