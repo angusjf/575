@@ -69,6 +69,10 @@ export const RootStack = () => {
     return null;
   }
 
+  if (state.state === "error") {
+    return <Text>{state.state}</Text>;
+  }
+
   return (
     <Stack.Navigator>
       {state.state === "onboarding" ? (
