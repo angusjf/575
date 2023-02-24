@@ -74,13 +74,9 @@ export const RootStack = () => {
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {state.state === "onboarding" ? (
-        <Stack.Screen
-          name="Onboarding"
-          component={OnboardingScreen}
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       ) : state.state === "compose" ? (
         <Stack.Screen name="Compose" component={HaikuForm} />
       ) : state.state === "feed" ? (
