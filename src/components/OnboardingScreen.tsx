@@ -7,12 +7,9 @@ import {
   View,
   FlatList,
   Dimensions,
-  ScrollView,
   Animated,
 } from "react-native";
-import { Circle } from "react-native-svg";
 import { fonts } from "../font";
-import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { RegisterStackParamList } from "./RegisterStack";
 

@@ -62,7 +62,7 @@ export const RegisterForm = () => {
       <Text
         style={{
           fontFamily: fonts.PlexMonoItalic,
-          fontSize: 15,
+          fontSize: 21,
           paddingBottom: 38,
         }}
       >
@@ -75,6 +75,7 @@ export const RegisterForm = () => {
         onChangeText={setName}
         validity={validity}
         long
+        autoComplete="name"
       />
       <HaikuLineInput
         placeholder="the email address you use"
@@ -82,6 +83,11 @@ export const RegisterForm = () => {
         onChangeText={setEmail}
         validity={validity}
         long
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="email"
+        importantForAutofill="yes"
       />
       <HaikuLineInput
         placeholder="a secret password"
@@ -91,6 +97,10 @@ export const RegisterForm = () => {
         long
         secureTextEntry={true}
         multiline={false}
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="password"
+        importantForAutofill="yes"
       />
       <Button
         title="continue"
