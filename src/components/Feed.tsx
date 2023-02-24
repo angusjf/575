@@ -3,7 +3,6 @@ import {
   FlatList,
   Platform,
   RefreshControl,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   View,
@@ -78,35 +77,33 @@ export const Feed = () => {
   };
 
   return (
-    <SafeAreaView style={styles.root}>
-      <View>
-        {days === null ? (
-          <ActivityIndicator />
-        ) : (
-          <FlatList
-            contentContainerStyle={{ paddingBottom: 20 }}
-            style={styles.feed}
-            data={days[days.length - 1].posts.sort(
-              (postA, postB) => postB.timestamp - postA.timestamp
-            )}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => {
-              return (
-                <PostBox
-                  key={item.haiku.join("") + item.author}
-                  author={item.author}
-                  haiku={item.haiku}
-                  showOptions={showOptions}
-                  timestamp={item.timestamp}
-                />
-              );
-            }}
-          />
-        )}
-      </View>
-    </SafeAreaView>
+    <View style={styles.root}>
+      {days === null ? (
+        <ActivityIndicator />
+      ) : (
+        <FlatList
+          contentContainerStyle={{ paddingVertical: 50 }}
+          style={styles.feed}
+          data={days[days.length - 1].posts.sort(
+            (postA, postB) => postB.timestamp - postA.timestamp
+          )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => {
+            return (
+              <PostBox
+                key={item.haiku.join("") + item.author}
+                author={item.author}
+                haiku={item.haiku}
+                showOptions={showOptions}
+                timestamp={item.timestamp}
+              />
+            );
+          }}
+        />
+      )}
+    </View>
   );
 };
