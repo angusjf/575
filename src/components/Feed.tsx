@@ -16,8 +16,6 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { useAppState } from "../useAppState";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { FeedStackParams } from "./RootStack";
 
 const styles = StyleSheet.create({
   root: {
@@ -31,9 +29,7 @@ const styles = StyleSheet.create({
   },
 });
 
-type FeedProps = NativeStackScreenProps<FeedStackParams>;
-
-export const Feed = ({ navigation }: FeedProps) => {
+export const Feed = () => {
   const { showActionSheetWithOptions } = useActionSheet();
   const { state, refreshFeed, blockUser } = useAppState();
 

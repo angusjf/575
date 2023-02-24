@@ -9,7 +9,7 @@ import { HaikuForm } from "./HaikuForm";
 import { RegisterForm } from "./RegisterForm";
 import { OnboardingScreen } from "./OnboardingScreen";
 
-export type FeedStackParams = {
+export type RootStackParams = {
   Feed: undefined;
   Settings: undefined;
   Compose: undefined;
@@ -18,7 +18,7 @@ export type FeedStackParams = {
   Onboarding: undefined;
 };
 
-const Stack = createNativeStackNavigator<FeedStackParams>();
+const Stack = createNativeStackNavigator<RootStackParams>();
 
 const styles = StyleSheet.create({
   logo: {
