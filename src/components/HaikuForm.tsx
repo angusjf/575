@@ -9,6 +9,7 @@ import { Button } from "./Button";
 import { format } from "date-fns";
 import { valid } from "../valid";
 import { getSeason } from "../seasons";
+import { useAppState } from "../useAppState";
 
 type State = {
   haiku: Haiku;
@@ -53,11 +54,13 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-export const HaikuForm = ({ publish }: { publish: (haiku: Haiku) => void }) => {
+export const HaikuForm = () => {
   const [state, dispatch] = useReducer(reducer, {
     haiku: defaultHaiku,
     validity: "unchecked",
   });
+
+  const { publish } = useAppState();
 
   return (
     <InputScreen

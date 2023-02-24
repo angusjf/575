@@ -5,18 +5,18 @@ import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { FeedStack } from "./src/components/FeedStack";
 
 const UnwrappedApp = () => {
-  const { state, register, publish, logout, deleteAccount } = useAppState();
+  const { state } = useAppState();
 
   if (state.state === "loading" || state.state === "finding_out_if_posted") {
     return null;
   }
 
   if (state.state === "register") {
-    return <RegisterForm register={register} />;
+    return <RegisterForm />;
   }
 
   if (state.state === "compose") {
-    return <HaikuForm publish={publish} />;
+    return <HaikuForm />;
   }
 
   return <FeedStack />;
