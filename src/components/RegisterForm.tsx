@@ -17,7 +17,7 @@ import { useAppState } from "../useAppState";
 
 const styles = StyleSheet.create({
   root: {
-    height: 600,
+    flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
@@ -70,6 +70,7 @@ export const RegisterForm = () => {
       </Text>
       <HaikuLineInput
         placeholder="preferred signature"
+        autoFocus
         value={name || ""}
         onChangeText={setName}
         validity={validity}
