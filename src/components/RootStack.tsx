@@ -1,18 +1,24 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
 import { TouchableOpacity, Image, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "../font";
 import { Feed } from "./Feed";
 import { Settings } from "./Settings";
 import { useAppState } from "../useAppState";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { HaikuForm } from "./HaikuForm";
+import { RegisterForm } from "./RegisterForm";
+import { OnboardingScreen } from "./OnboardingScreen";
 
 export type FeedStackParams = {
   Feed: undefined;
   Settings: undefined;
+  Compose: undefined;
+  Register: undefined;
+  Loading: undefined;
+  Onboarding: undefined;
 };
 
-const Stack = createStackNavigator<FeedStackParams>();
+const Stack = createNativeStackNavigator<FeedStackParams>();
 
 const styles = StyleSheet.create({
   logo: {
@@ -56,25 +62,40 @@ const HeaderRight = ({ onPress }: { onPress: () => void }) => {
   );
 };
 
-export const FeedStack = () => {
+export const RootStack = () => {
+  const { state, openSettings } = useAppState();
+
+  if (state.state === "finding_out_if_posted" || state.state === "loading") {
+    return null;
+  }
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
+    <Stack.Navigator>
+      {state.state === "onboarding" ? (
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+          options={{ headerShown: false }}
+        />
+      ) : state.state === "compose" ? (
+        <Stack.Screen name="Compose" component={HaikuForm} />
+      ) : state.state === "feed" ? (
         <Stack.Screen
           name="Feed"
           component={Feed}
-          options={({ navigation }) => ({
+          options={() => ({
             headerTransparent: true,
             headerTitleAlign: "center",
             headerBackground,
             headerTitle: () => <Text style={styles.logo}>575</Text>,
-            headerRight: () => (
-              <HeaderRight onPress={() => navigation.navigate("Settings")} />
-            ),
+            headerRight: () => <HeaderRight onPress={() => openSettings()} />,
           })}
         />
+      ) : state.state === "register" ? (
+        <Stack.Screen name="Register" component={RegisterForm} />
+      ) : state.state === "settings" ? (
         <Stack.Screen name="Settings" component={Settings} />
-      </Stack.Navigator>
-    </NavigationContainer>
+      ) : null}
+    </Stack.Navigator>
   );
 };

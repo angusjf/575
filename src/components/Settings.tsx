@@ -24,18 +24,23 @@ type SettingsItemProps = {
 };
 
 const SettingsItem = ({ title, onPress }: SettingsItemProps) => (
-  <TouchableOpacity onPress={onPress}>
-    <View
+  <View
+    style={{
+      borderColor: "lightgrey",
+      borderBottomWidth: 1,
+      justifyContent: "center",
+    }}
+  >
+    <TouchableOpacity
+      onPress={onPress}
       style={{
-        height: 42,
-        borderColor: "lightgrey",
-        borderBottomWidth: 1,
+        height: 52,
         justifyContent: "center",
       }}
     >
       <Text style={{ paddingHorizontal: 22 }}>{title}</Text>
-    </View>
-  </TouchableOpacity>
+    </TouchableOpacity>
+  </View>
 );
 
 export const Settings = () => {

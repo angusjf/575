@@ -17,7 +17,7 @@ import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { useAppState } from "../useAppState";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { FeedStackParams } from "./FeedStack";
+import { FeedStackParams } from "./RootStack";
 
 const styles = StyleSheet.create({
   root: {

@@ -10,8 +10,9 @@ import {
   Animated,
 } from "react-native";
 import { fonts } from "../font";
+import { useAppState } from "../useAppState";
+import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { RegisterStackParamList } from "./RegisterStack";
 
 const styles = StyleSheet.create({
   container: {
@@ -84,9 +85,9 @@ const ONBOARDING_SLIDES = [
   },
 ];
 
-type OnboardingScreenProps = NativeStackScreenProps<RegisterStackParamList>;
+export const OnboardingScreen = () => {
+  const { finishOnboarding } = useAppState();
 
-export const OnboardingScreen = ({ navigation }: OnboardingScreenProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const viewableItemsChanged = useRef(
@@ -149,7 +150,7 @@ export const OnboardingScreen = ({ navigation }: OnboardingScreenProps) => {
           placeholder="how do you sign your work"
           long
           validity="unchecked"
-          onPressIn={() => navigation.navigate("Register")}
+          onPressIn={finishOnboarding}
         />
       </View>
     </SafeAreaView>

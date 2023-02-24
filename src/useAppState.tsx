@@ -32,6 +32,7 @@ type State =
       fonts: boolean;
       user?: User | null;
     }
+  | { state: "onboarding" }
   | { state: "finding_out_if_posted"; user: User }
   | { state: "register" }
   | { state: "compose"; user: User }
@@ -52,7 +53,8 @@ type Msg =
   | { msg: "block_user"; blockedUserId: string }
   | { msg: "open_settings" }
   | { msg: "delete_account" }
-  | { msg: "account_deleted" };
+  | { msg: "account_deleted" }
+  | { msg: "finish_onboarding" };
 
 const badActionForState = (msg: Msg, state: State): [State, []] => {
   return [
@@ -96,7 +98,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       if (state.state === "loading") {
         if (state.fonts) {
           if (msg.user === null) {
-            return [{ state: "register" }, [{ effect: "hide_splash" }]];
+            return [{ state: "onboarding" }, [{ effect: "hide_splash" }]];
           } else {
             return [
               { state: "finding_out_if_posted", user: msg.user },
@@ -114,7 +116,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       if (state.state === "loading") {
         if (state.user !== undefined) {
           if (state.user === null) {
-            return [{ state: "register" }, [{ effect: "hide_splash" }]];
+            return [{ state: "onboarding" }, [{ effect: "hide_splash" }]];
           } else {
             return [
               { state: "finding_out_if_posted", user: state.user },
@@ -146,7 +148,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "register":
       return [{ state: "compose", user: msg.user }, []];
     case "logout": {
-      return [{ state: "register" }, [{ effect: "logout" }]];
+      return [{ state: "onboarding" }, [{ effect: "logout" }]];
     }
     case "publish":
       if (state.state === "compose") {
@@ -190,6 +192,8 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         return badActionForState(msg, state);
       }
     case "account_deleted":
+      return [{ state: "onboarding" }, []];
+    case "finish_onboarding":
       return [{ state: "register" }, []];
   }
 };
@@ -248,6 +252,7 @@ type AppContextType = {
   refreshFeed: () => void;
   openSettings: () => void;
   deleteAccount: () => void;
+  finishOnboarding: () => void;
 };
 
 const AppContext = createContext<AppContextType>({
@@ -259,6 +264,7 @@ const AppContext = createContext<AppContextType>({
   refreshFeed: () => {},
   openSettings: () => {},
   deleteAccount: () => {},
+  finishOnboarding: () => {},
 });
 
 export const AppStateProvider = (props: any) => {
@@ -293,6 +299,7 @@ export const AppStateProvider = (props: any) => {
       dispatch({ msg: "open_settings" });
     },
     deleteAccount: () => dispatch({ msg: "delete_account" }),
+    finishOnboarding: () => dispatch({ msg: "finish_onboarding" }),
   };
 
   return <AppContext.Provider value={context} {...props} />;
