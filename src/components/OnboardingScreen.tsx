@@ -67,21 +67,21 @@ const styles = StyleSheet.create({
 const ONBOARDING_SLIDES = [
   {
     id: "0",
-    line1: "a haiku app ⁵",
-    line2: " to help you write a poem ⁷",
-    line3: "  every single day ⁵",
+    line1: "a haiku app⁵",
+    line2: "to help you write a poem⁷",
+    line3: "every single day⁵",
   },
   {
     id: "1",
-    line1: "our state of the art ⁵",
-    line2: " haiku validation tech ⁷",
-    line3: "  counts your syllables ⁵",
+    line1: "our state of the art⁵",
+    line2: "haiku validation tech⁷",
+    line3: "counts your syllables⁵",
   },
   {
     id: "2",
-    line1: "contemplate your day ⁵",
-    line2: " find your inner haiku poet ⁷",
-    line3: "  your friends also join ⁵",
+    line1: "contemplate your day⁵",
+    line2: "find your inner haiku poet⁷",
+    line3: "your friends also join⁵",
   },
 ];
 
@@ -98,7 +98,7 @@ export const OnboardingScreen = () => {
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
   return (
     <SafeAreaView style={styles.container}>
-      {/* <Text style={styles.logo}>575</Text> */}
+      <Text style={styles.logo}>575</Text>
       <FlatList
         snapToAlignment={"start"}
         snapToInterval={Dimensions.get("window").width}
@@ -128,19 +128,19 @@ export const OnboardingScreen = () => {
         <View
           style={{
             ...styles.scrollIndicatorBubble,
-            backgroundColor: currentIndex === 0 ? "black" : "white",
+            backgroundColor: currentIndex === 0 ? "black" : "#f9f6f6",
           }}
         />
         <View
           style={{
             ...styles.scrollIndicatorBubble,
-            backgroundColor: currentIndex === 1 ? "black" : "white",
+            backgroundColor: currentIndex === 1 ? "black" : "#f9f6f6",
           }}
         />
         <View
           style={{
             ...styles.scrollIndicatorBubble,
-            backgroundColor: currentIndex === 2 ? "black" : "white",
+            backgroundColor: currentIndex === 2 ? "black" : "#f9f6f6",
           }}
         />
       </View>
