@@ -9,7 +9,6 @@ import {
   Share,
   Alert,
 } from "react-native";
-import { fonts } from "../font";
 import { PostBox } from "./Post";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
@@ -18,10 +17,11 @@ import { useAppState } from "../useAppState";
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f6f6",
     alignItems: "center",
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     paddingHorizontal: 5,
+    flex: 1,
   },
   feed: {
     paddingTop: 64,

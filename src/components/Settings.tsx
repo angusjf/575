@@ -13,7 +13,7 @@ import { useAppState } from "../useAppState";
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f6f6",
     flex: 1,
   },
 });

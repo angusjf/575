@@ -1,5 +1,11 @@
 import { useReducer } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { syllable } from "syllable";
 import { Validity } from "../Validity";
@@ -98,10 +104,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PlexMonoItalic,
   },
   root: {
-    height: 600,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f6f6",
     alignItems: "center",
     justifyContent: "center",
+    flex: 1,
   },
 });
 
@@ -125,7 +131,10 @@ const InputScreen = ({
   validity: Validity;
 }) => {
   return (
-    <View style={styles.root}>
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <View>
         <DateToday />
         <Text style={styles.intro}>Compose today's haiku</Text>
@@ -170,6 +179,6 @@ const InputScreen = ({
           />
         )}
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };

@@ -18,7 +18,7 @@ import { useAppState } from "../useAppState";
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f6f6",
     alignItems: "center",
     justifyContent: "center",
   },

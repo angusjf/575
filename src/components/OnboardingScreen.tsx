@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "#f9f6f6",
   },
   slideContainer: {
     width: Dimensions.get("window").width,
