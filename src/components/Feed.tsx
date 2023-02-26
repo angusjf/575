@@ -14,6 +14,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { useAppState } from "../useAppState";
+import { SEPARATORS } from "../../assets/FeedSeparators";
 
 const styles = StyleSheet.create({
   root: {
@@ -82,7 +83,7 @@ export const Feed = () => {
         <ActivityIndicator />
       ) : (
         <FlatList
-          contentContainerStyle={{ paddingVertical: 50 }}
+          contentContainerStyle={{ paddingTop: 50, paddingBottom: 80 }}
           style={styles.feed}
           data={days[days.length - 1].posts.sort(
             (postA, postB) => postB.timestamp - postA.timestamp
@@ -91,15 +92,22 @@ export const Feed = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             return (
-              <PostBox
-                key={item.haiku.join("") + item.author}
-                author={item.author}
-                haiku={item.haiku}
-                showOptions={showOptions}
-                timestamp={item.timestamp}
-              />
+              <View>
+                <PostBox
+                  key={item.haiku.join("") + item.author}
+                  author={item.author}
+                  haiku={item.haiku}
+                  showOptions={showOptions}
+                  timestamp={item.timestamp}
+                />
+                {index === days[days.length - 1].posts.length - 1 ? null : (
+                  <View style={{ alignItems: "center" }}>
+                    {SEPARATORS[Math.floor(Math.random() * SEPARATORS.length)]}
+                  </View>
+                )}
+              </View>
             );
           }}
         />

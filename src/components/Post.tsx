@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   container: {
-    marginBottom: 49,
+    marginVertical: 21,
   },
 });
 
