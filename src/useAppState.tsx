@@ -66,12 +66,21 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       return [{ ...state, user: msg.user }, []];
     case "set_days":
       if (!state.days) {
-        return [
-          hasPostedToday(state.user!, msg.days)
-            ? { ...state, days: msg.days, user: state.user, loading: false }
-            : { ...state, user: state.user, loading: false },
-          [{ effect: "hide_splash" }],
-        ];
+        return hasPostedToday(state.user!, msg.days)
+          ? [
+              { ...state, days: msg.days, user: state.user, loading: false },
+              [
+                { effect: "hide_splash" },
+                { effect: "navigate", route: "Compose" },
+              ],
+            ]
+          : [
+              { ...state, user: state.user, loading: false },
+              [
+                { effect: "hide_splash" },
+                { effect: "navigate", route: "Feed" },
+              ],
+            ];
       } else {
         console.log("set_days", msg.days);
         return [{ ...state, days: msg.days }, []];
