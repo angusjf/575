@@ -77,7 +77,7 @@ export const Feed = () => {
 
   return (
     <View style={styles.root}>
-      {days === null || days === undefined ? (
+      {days === undefined ? (
         <ActivityIndicator />
       ) : (
         <FlatList
