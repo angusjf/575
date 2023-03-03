@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState } from "react";
 
 export function useReducerWithEffects<
-  State extends { state: string },
+  State,
   Msg extends { msg: string },
   Effect extends { effect: string }
 >(
