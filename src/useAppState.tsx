@@ -124,7 +124,10 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         return [state, [{ effect: "get_days", user: state.user! }]];
       }
     case "register":
-      return [{ ...state, user: msg.user }, []];
+      return [
+        { ...state, user: msg.user },
+        [{ effect: "navigate", route: "Compose" }],
+      ];
     case "logout": {
       return [
         { ...state, fonts: true, loading: false },
@@ -140,6 +143,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
             haiku: msg.haiku,
             user: state.user!,
           },
+          { effect: "navigate", route: "Feed" },
         ],
       ];
     case "block_user":

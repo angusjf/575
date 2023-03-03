@@ -77,13 +77,13 @@ export const Feed = () => {
 
   return (
     <View style={styles.root}>
-      {days === null ? (
+      {days === null || days === undefined ? (
         <ActivityIndicator />
       ) : (
         <FlatList
           contentContainerStyle={{ paddingTop: 50, paddingBottom: 80 }}
           style={styles.feed}
-          data={days![days!.length - 1].posts.sort(
+          data={days[days.length - 1].posts.sort(
             (postA, postB) => postB.timestamp - postA.timestamp
           )}
           refreshControl={
@@ -100,7 +100,7 @@ export const Feed = () => {
                   showOptions={showOptions}
                   timestamp={item.timestamp}
                 />
-                {index === days![days!.length - 1].posts.length - 1 ? null : (
+                {index === days[days.length - 1].posts.length - 1 ? null : (
                   <View style={{ alignItems: "center" }}>
                     {SEPARATORS[Math.floor(Math.random() * SEPARATORS.length)]}
                   </View>

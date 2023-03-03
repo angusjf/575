@@ -88,9 +88,9 @@ export const RootStack = () => {
           headerBackground,
           headerTitle: () => <Text style={styles.logo}>575</Text>,
           headerRight: () =>
-            route.name === "Feed" ? null : (
+            route.name === "Feed" ? (
               <HeaderRight onPress={() => openSettings()} />
-            ),
+            ) : null,
         })}
       />
       <Stack.Screen
