@@ -71,14 +71,14 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
               { ...state, days: msg.days, user: state.user, loading: false },
               [
                 { effect: "hide_splash" },
-                { effect: "navigate", route: "Compose" },
+                { effect: "navigate", route: "Feed" },
               ],
             ]
           : [
               { ...state, user: state.user, loading: false },
               [
                 { effect: "hide_splash" },
-                { effect: "navigate", route: "Feed" },
+                { effect: "navigate", route: "Compose" },
               ],
             ];
       } else {
