@@ -15,6 +15,7 @@ import { useReducerWithEffects } from "./useReducerWithEffects";
 import { createContext, useContext, useEffect } from "react";
 import { isToday } from "date-fns";
 import { firebaseUserToUser } from "./utils/user";
+import { useNavigation } from "@react-navigation/native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,19 +27,12 @@ Notifications.setNotificationHandler({
   }),
 });
 
-type State =
-  | {
-      state: "loading";
-      fonts: boolean;
-      user?: User | null;
-    }
-  | { state: "onboarding" }
-  | { state: "finding_out_if_posted"; user: User }
-  | { state: "register" }
-  | { state: "compose"; user: User }
-  | { state: "feed"; days: Day[] | null; user: User }
-  | { state: "error"; message: string }
-  | { state: "settings"; user: User };
+type State = {
+  loading: boolean;
+  fonts: boolean;
+  user: User | null | undefined;
+  days: Day[] | undefined;
+};
 
 type Msg =
   | { msg: "fonts_loaded" }
@@ -56,16 +50,6 @@ type Msg =
   | { msg: "account_deleted" }
   | { msg: "finish_onboarding" };
 
-const badActionForState = (msg: Msg, state: State): [State, []] => {
-  return [
-    {
-      state: "error",
-      message: `bad msg <${msg.msg}> for state <${state.state}>`,
-    },
-    [],
-  ];
-};
-
 const hasPostedToday = (user: User, days: Day[]): boolean =>
   days
     .filter((day) => isToday(day.date))
@@ -77,124 +61,122 @@ const hasPostedToday = (user: User, days: Day[]): boolean =>
 const reducer = (state: State, msg: Msg): [State, Effect[]] => {
   switch (msg.msg) {
     case "set_username":
-      return [{ state: "compose", user: msg.user }, []];
+      return [{ ...state, user: msg.user }, []];
     case "visit_feed":
-      return [{ state: "feed", days: null, user: msg.user }, []];
+      return [{ ...state, user: msg.user }, []];
     case "set_days":
-      if (state.state === "finding_out_if_posted") {
-        return [
-          hasPostedToday(state.user, msg.days)
-            ? { state: "feed", days: msg.days, user: state.user }
-            : { state: "compose", user: state.user },
-          [{ effect: "hide_splash" }],
-        ];
-      } else if (state.state === "feed") {
+      if (!state.days) {
+        return hasPostedToday(state.user!, msg.days)
+          ? [
+              { ...state, days: msg.days, user: state.user, loading: false },
+              [
+                { effect: "hide_splash" },
+                { effect: "navigate", route: "Feed" },
+              ],
+            ]
+          : [
+              { ...state, user: state.user, loading: false },
+              [
+                { effect: "hide_splash" },
+                { effect: "navigate", route: "Compose" },
+              ],
+            ];
+      } else {
         console.log("set_days", msg.days);
         return [{ ...state, days: msg.days }, []];
-      } else {
-        return badActionForState(msg, state);
       }
     case "loaded_user":
-      if (state.state === "loading") {
-        if (state.fonts) {
-          if (msg.user === null) {
-            return [{ state: "onboarding" }, [{ effect: "hide_splash" }]];
-          } else {
-            return [
-              { state: "finding_out_if_posted", user: msg.user },
-              [{ effect: "get_days", user: msg.user }],
-            ];
-          }
-        } else {
-          return [{ state: "loading", fonts: false, user: msg.user }, []];
-        }
-      } else {
-        // this runs in a use effect so we must assume it can run at any time
-        return [state, []];
-      }
-    case "fonts_loaded":
-      if (state.state === "loading") {
-        if (state.user !== undefined) {
-          if (state.user === null) {
-            return [{ state: "onboarding" }, [{ effect: "hide_splash" }]];
-          } else {
-            return [
-              { state: "finding_out_if_posted", user: state.user },
-              [{ effect: "get_days", user: state.user }],
-            ];
-          }
+      if (state.fonts) {
+        if (msg.user === null) {
+          return [
+            state,
+            [
+              { effect: "hide_splash" },
+              { effect: "navigate", route: "Onboarding" },
+            ],
+          ];
         } else {
           return [
-            state.state === "loading"
-              ? { state: "loading", fonts: true }
-              : state,
-            [],
+            { ...state, user: msg.user },
+            [{ effect: "get_days", user: msg.user }],
           ];
         }
       } else {
-        return badActionForState(msg, state);
+        return [{ ...state, fonts: false, user: msg.user }, []];
+      }
+    case "fonts_loaded":
+      if (state.user !== undefined) {
+        if (state.user === null) {
+          return [
+            state,
+            [
+              { effect: "hide_splash" },
+              { effect: "navigate", route: "Onboarding" },
+            ],
+          ];
+        } else {
+          return [
+            { ...state, user: state.user },
+            [{ effect: "get_days", user: state.user }],
+          ];
+        }
+      } else {
+        return [state.loading ? { ...state, fonts: true } : state, []];
       }
     case "load_feed":
-      if (state.state === "loading") {
+      if (state.loading) {
         return [
           { ...state, fonts: true },
           [{ effect: "get_days", user: msg.user }],
         ];
-      } else if (state.state === "feed") {
-        return [state, [{ effect: "get_days", user: state.user }]];
       } else {
-        return badActionForState(msg, state);
+        return [state, [{ effect: "get_days", user: state.user! }]];
       }
     case "register":
-      return [{ state: "compose", user: msg.user }, []];
+      return [
+        { ...state, user: msg.user },
+        [{ effect: "navigate", route: "Compose" }],
+      ];
     case "logout": {
-      return [{ state: "onboarding" }, [{ effect: "logout" }]];
+      return [
+        { ...state, fonts: true, loading: false },
+        [{ effect: "logout" }, { effect: "navigate", route: "Onboarding" }],
+      ];
     }
     case "publish":
-      if (state.state === "compose") {
-        return [
-          { state: "feed", days: null, user: state.user },
-          [
-            {
-              effect: "post",
-              haiku: msg.haiku,
-              user: state.user,
-            },
-          ],
-        ];
-      } else {
-        return badActionForState(msg, state);
-      }
+      return [
+        { ...state, days: undefined, user: state.user },
+        [
+          {
+            effect: "post",
+            haiku: msg.haiku,
+            user: state.user!,
+          },
+          { effect: "navigate", route: "Feed" },
+        ],
+      ];
     case "block_user":
-      if (state.state === "feed") {
-        return [
-          state,
-          [
-            {
-              effect: "block_user",
-              user: state.user,
-              blockedUserId: msg.blockedUserId,
-            },
-          ],
-        ];
-      }
-      return badActionForState(msg, state);
+      return [
+        state,
+        [
+          {
+            effect: "block_user",
+            user: state.user!,
+            blockedUserId: msg.blockedUserId,
+          },
+        ],
+      ];
     case "open_settings":
-      if (state.state === "feed") {
-        return [{ state: "settings", user: state.user }, []];
-      } else {
-        return badActionForState(msg, state);
-      }
+      return [
+        { ...state, user: state.user },
+        [{ effect: "navigate", route: "Settings" }],
+      ];
     case "delete_account":
-      if (state.state === "settings") {
-        return [state, [{ effect: "delete_user", user: state.user }]];
-      } else {
-        return badActionForState(msg, state);
-      }
+      return [state, [{ effect: "delete_user", user: state.user! }]];
     case "account_deleted":
-      return [{ state: "onboarding" }, []];
+      return [state, [{ effect: "navigate", route: "Settings" }]];
     case "finish_onboarding":
-      return [{ state: "register" }, []];
+      return [state, [{ effect: "navigate", route: "Register" }]];
   }
 };
 
@@ -206,40 +188,51 @@ type Effect =
   | { effect: "create_user"; user: User }
   | { effect: "post"; user: User; haiku: Haiku }
   | { effect: "block_user"; user: User; blockedUserId: string }
-  | { effect: "delete_user"; user: User };
+  | { effect: "delete_user"; user: User }
+  | { effect: "navigate"; route: string };
 
-const runEffect = async (effect: Effect): Promise<Msg[]> => {
-  switch (effect.effect) {
-    case "hide_splash":
-      await SplashScreen.hideAsync();
-      return [];
-    case "get_days":
-      const days = await getDays(effect.user);
-      return [{ msg: "set_days", days }];
-    case "logout":
-      const auth = getAuth(firebaseApp);
-      await auth.signOut();
-      return [];
-    case "load_fonts":
-      await loadFonts();
-      return [{ msg: "fonts_loaded" }];
-    case "post":
-      await post(effect.user, effect.haiku);
-      return [{ msg: "load_feed", user: effect.user }];
-    case "create_user":
-      await registerUser(effect.user);
-      return [];
-    case "block_user":
-      await blockUser(effect.user, effect.blockedUserId);
-      return [{ msg: "load_feed", user: effect.user }];
-    case "delete_user":
-      await deleteAccount();
-      return [{ msg: "account_deleted" }];
-  }
-};
+const runEffect =
+  (navigate: (route: string) => void) =>
+  async (effect: Effect): Promise<Msg[]> => {
+    switch (effect.effect) {
+      case "hide_splash":
+        await SplashScreen.hideAsync();
+        return [];
+      case "get_days":
+        const days = await getDays(effect.user);
+        return [{ msg: "set_days", days }];
+      case "logout":
+        const auth = getAuth(firebaseApp);
+        await auth.signOut();
+        return [];
+      case "load_fonts":
+        await loadFonts();
+        return [{ msg: "fonts_loaded" }];
+      case "post":
+        await post(effect.user, effect.haiku);
+        return [{ msg: "load_feed", user: effect.user }];
+      case "create_user":
+        await registerUser(effect.user);
+        return [];
+      case "block_user":
+        await blockUser(effect.user, effect.blockedUserId);
+        return [{ msg: "load_feed", user: effect.user }];
+      case "delete_user":
+        await deleteAccount();
+        return [{ msg: "account_deleted" }];
+      case "navigate":
+        navigate(effect.route);
+        return [];
+    }
+  };
 
 const init: [State, Effect[]] = [
-  { state: "loading", fonts: false },
+  {
+    loading: true,
+    fonts: false,
+    days: undefined,
+    user: undefined,
+  },
   [{ effect: "load_fonts" }],
 ];
 
@@ -268,7 +261,13 @@ const AppContext = createContext<AppContextType>({
 });
 
 export const AppStateProvider = (props: any) => {
-  const [state, dispatch] = useReducerWithEffects(reducer, runEffect, init);
+  const { navigate } = useNavigation();
+
+  const [state, dispatch] = useReducerWithEffects(
+    reducer,
+    runEffect(navigate),
+    init
+  );
 
   useEffect(() => {
     const auth = getAuth(firebaseApp);
@@ -287,17 +286,10 @@ export const AppStateProvider = (props: any) => {
     register: (user: User) => dispatch({ msg: "register", user }),
     logout: () => dispatch({ msg: "logout" }),
     publish: (haiku: Haiku) => dispatch({ msg: "publish", haiku }),
-    blockUser: (blockedUserId: string) => {
-      dispatch({ msg: "block_user", blockedUserId });
-    },
-    refreshFeed: () => {
-      if (state.state === "feed") {
-        dispatch({ msg: "load_feed", user: state.user });
-      }
-    },
-    openSettings: () => {
-      dispatch({ msg: "open_settings" });
-    },
+    blockUser: (blockedUserId: string) =>
+      dispatch({ msg: "block_user", blockedUserId }),
+    refreshFeed: () => dispatch({ msg: "load_feed", user: state.user! }),
+    openSettings: () => dispatch({ msg: "open_settings" }),
     deleteAccount: () => dispatch({ msg: "delete_account" }),
     finishOnboarding: () => dispatch({ msg: "finish_onboarding" }),
   };

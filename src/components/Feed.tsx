@@ -33,8 +33,6 @@ export const Feed = () => {
   const { showActionSheetWithOptions } = useActionSheet();
   const { state, refreshFeed, blockUser } = useAppState();
 
-  if (state.state !== "feed") return null;
-
   const days = state.days;
 
   const showOptions = (sharingMessage: string, blockedUserId: string) => {
@@ -79,7 +77,7 @@ export const Feed = () => {
 
   return (
     <View style={styles.root}>
-      {days === null ? (
+      {days === undefined ? (
         <ActivityIndicator />
       ) : (
         <FlatList

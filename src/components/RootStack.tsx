@@ -36,7 +36,6 @@ const headerBackground = () => (
 
 const HeaderRight = ({ onPress }: { onPress: () => void }) => {
   const { state } = useAppState();
-  if (state.state !== "feed") return null;
   return (
     <TouchableOpacity
       style={{
@@ -64,53 +63,46 @@ const HeaderRight = ({ onPress }: { onPress: () => void }) => {
 export const RootStack = () => {
   const { state, openSettings } = useAppState();
 
-  if (state.state === "finding_out_if_posted" || state.state === "loading") {
+  if (state.loading) {
     return null;
-  }
-
-  if (state.state === "error") {
-    return <Text>{state.message}</Text>;
   }
 
   return (
     <Stack.Navigator>
-      {state.state === "onboarding" ? (
-        <Stack.Screen
-          name="Onboarding"
-          component={OnboardingScreen}
-          options={{ headerShown: false }}
-        />
-      ) : state.state === "compose" ? (
-        <Stack.Screen
-          name="Compose"
-          component={HaikuForm}
-          options={{ headerShown: false }}
-        />
-      ) : state.state === "feed" ? (
-        <Stack.Screen
-          name="Feed"
-          component={Feed}
-          options={() => ({
-            headerTransparent: true, // TODO: This isn't transparent anymore
-            headerTitleAlign: "center",
-            headerBackground,
-            headerTitle: () => <Text style={styles.logo}>575</Text>,
-            headerRight: () => <HeaderRight onPress={() => openSettings()} />,
-          })}
-        />
-      ) : state.state === "register" ? (
-        <Stack.Screen
-          name="Register"
-          component={RegisterForm}
-          options={{ headerShown: false }}
-        />
-      ) : state.state === "settings" ? (
-        <Stack.Screen
-          name="Settings"
-          component={Settings}
-          options={{ headerShown: false }}
-        />
-      ) : null}
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Compose"
+        component={HaikuForm}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Feed"
+        component={Feed}
+        options={({ route }) => ({
+          headerTransparent: true, // TODO: This isn't transparent anymore
+          headerTitleAlign: "center",
+          headerBackground,
+          headerTitle: () => <Text style={styles.logo}>575</Text>,
+          headerRight: () =>
+            route.name === "Feed" ? (
+              <HeaderRight onPress={() => openSettings()} />
+            ) : null,
+        })}
+      />
+      <Stack.Screen
+        name="Register"
+        component={RegisterForm}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={Settings}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
