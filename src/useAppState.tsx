@@ -89,7 +89,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       if (state.fonts) {
         if (msg.user === null) {
           return [
-            state,
+            { ...state, loading: false },
             [
               { effect: "hide_splash" },
               { effect: "navigate", route: "Onboarding" },
@@ -97,7 +97,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
           ];
         } else {
           return [
-            { ...state, user: msg.user },
+            { ...state, loading: false, user: msg.user },
             [{ effect: "get_days", user: msg.user }],
           ];
         }
