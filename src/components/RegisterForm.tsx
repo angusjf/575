@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { Validity } from "../Validity";
@@ -14,6 +14,7 @@ import { firebaseApp } from "../firebase";
 import { registerUser } from "../firebaseClient";
 import { firebaseUserToUser } from "../utils/user";
 import { useAppState } from "../useAppState";
+import ExpoDraw from "./Pad";
 
 const styles = StyleSheet.create({
   root: {
@@ -57,6 +58,8 @@ export const RegisterForm = () => {
     }
   };
 
+  const strokes = useRef([]);
+
   return (
     <View style={styles.root}>
       <Text
@@ -68,6 +71,23 @@ export const RegisterForm = () => {
       >
         how do you sign your poems?
       </Text>
+      <ExpoDraw
+        strokes={[]}
+        containerStyle={{
+          backgroundColor: "rgb(216, 200, 200)",
+          height: 200,
+          width: 400,
+          marginBottom: 40,
+        }}
+        rewind={(undo) => {}}
+        clear={(clear) => {}}
+        color={"#2c2a2a"}
+        strokeWidth={4}
+        enabled={true}
+        onChangeStrokes={(newStrokes) => {
+          strokes.current = newStrokes;
+        }}
+      />
       <HaikuLineInput
         placeholder="preferred signature"
         autoFocus
