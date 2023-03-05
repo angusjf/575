@@ -17,11 +17,10 @@ export type Point = {
 
 const pointsToSvg = (points: Point[]) => {
   if (points.length > 0) {
-    var path = `M ${points[0].x},${points[0].y}`;
-    points.forEach((point) => {
-      path = path + ` L ${point.x},${point.y}`;
-    });
-    return path;
+    return (
+      `M ${points[0].x},${points[0].y}` +
+      points.slice(1).map((point) => ` L ${point.x},${point.y}`)
+    );
   } else {
     return "";
   }
@@ -43,12 +42,12 @@ export const convertStrokesToSvg = (
       <g>
         ${strokes
           .map(
-            (e) =>
-              `<${e.type.toLowerCase()} ${Object.keys(e.attributes)
+            (stroke) =>
+              `<${stroke.type.toLowerCase()} ${Object.keys(stroke.attributes)
                 .map(
                   (a) =>
                     `${humps.decamelize(a, { separator: "-" })}="${
-                      e.attributes[a]
+                      stroke.attributes[a]
                     }"`
                 )
                 .join(" ")}/>`
