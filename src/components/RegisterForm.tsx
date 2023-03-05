@@ -71,18 +71,21 @@ export const RegisterForm = () => {
       >
         how do you sign your poems?
       </Text>
-      <Whiteboard
-        strokes={strokes}
-        setStrokes={setStrokes}
-        containerStyle={{
+      <View
+        style={{
           backgroundColor: "rgb(216, 200, 200)",
           height: 200,
           width: 400,
           marginBottom: 40,
         }}
-        color={"#2c2a2a"}
-        strokeWidth={4}
-      />
+      >
+        <Whiteboard
+          strokes={strokes}
+          setStrokes={setStrokes}
+          color={"#2c2a2a"}
+          strokeWidth={4}
+        />
+      </View>
       <Button title="clear" onPress={() => setStrokes([])} />
       <HaikuLineInput
         placeholder="preferred signature"

@@ -61,7 +61,6 @@ export const convertStrokesToSvg = (
 type WhiteboardProps = {
   strokeWidth?: number;
   color?: string;
-  containerStyle?: StyleProp<ViewStyle>;
   strokes: Stroke[];
   setStrokes: React.Dispatch<React.SetStateAction<Stroke[]>>;
 };
@@ -69,7 +68,6 @@ type WhiteboardProps = {
 export const Whiteboard = ({
   strokeWidth = 4,
   color = "#000000",
-  containerStyle = {},
   strokes: previousStrokes,
   setStrokes: setPreviousStrokes,
 }: WhiteboardProps) => {
@@ -116,27 +114,25 @@ export const Whiteboard = ({
   });
 
   return (
-    <View style={containerStyle}>
-      <View style={styles.svgContainer} {...panResponder.panHandlers}>
-        <Svg style={styles.drawSurface}>
-          <G>
-            {previousStrokes.map((stroke) => (
-              <Path
-                {...stroke.attributes}
-                key={JSON.stringify(stroke.attributes)}
-              />
-            ))}
+    <View style={styles.svgContainer} {...panResponder.panHandlers}>
+      <Svg style={styles.drawSurface}>
+        <G>
+          {previousStrokes.map((stroke) => (
             <Path
-              d={pointsToSvg(currentPoints)}
-              stroke={color}
-              strokeWidth={strokeWidth || 4}
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              {...stroke.attributes}
+              key={JSON.stringify(stroke.attributes)}
             />
-          </G>
-        </Svg>
-      </View>
+          ))}
+          <Path
+            d={pointsToSvg(currentPoints)}
+            stroke={color}
+            strokeWidth={strokeWidth || 4}
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </G>
+      </Svg>
     </View>
   );
 };
