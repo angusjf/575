@@ -77,7 +77,7 @@ export const HaikuForm = () => {
       validity={state.validity}
       haiku={state.haiku}
       changed={(n, l) => dispatch({ type: "change_line", line: n, newLine: l })}
-      signature={user?.signature || ""}
+      signature={user?.signature || "<svg></svg>"}
       done={() => {
         dispatch({ type: "submit" });
         setTimeout(() => {
