@@ -6,17 +6,21 @@ import {
 } from "firebase/auth";
 import { getDatabase, ref, set, get, remove, child } from "firebase/database";
 import { firebaseApp } from "./firebase";
-import { Haiku, Day, User } from "./types";
+import { Haiku, Day, User, Post } from "./types";
 import { dateDbKey, parseDateDbKey } from "./utils/date";
 import { firebaseUserToUser } from "./utils/user";
 
 export const post = async (user: User, haiku: Haiku) => {
   const db = getDatabase(firebaseApp);
-  await set(ref(db, `days/${dateDbKey(new Date())}/${user.userId}`), {
+
+  const post: Post = {
     haiku,
     timestamp: Date.now(),
-    username: user.username,
-  });
+    author: user,
+    signature: user.signature,
+  };
+
+  await set(ref(db, `days/${dateDbKey(new Date())}/${user.userId}`), post);
 };
 
 /**
@@ -51,20 +55,17 @@ export const getDays = async (user: User): Promise<Day[]> => {
 
     const blockedUsers = await getBlockedUsers(user);
 
-    return Object.entries(days.val()).map(([date, posts]) => ({
+    const json = days.toJSON();
+    if (!json) throw new Error("bad json");
+
+    return Object.entries(json).map(([date, posts]) => ({
       date: parseDateDbKey(date),
-      posts: Object.entries(
-        (posts as
-          | Record<
-              string,
-              { haiku: Haiku; username: string; timestamp: number }
-            >
-          | undefined) ?? []
-      )
+      posts: Object.entries((posts as Record<string, Post> | undefined) ?? [])
         .map(([userId, data]) => ({
-          author: { userId, name: data.username },
-          haiku: data.haiku,
+          author: data.author,
+          haiku: Object.values(data.haiku) as Haiku,
           timestamp: data.timestamp,
+          signature: data.signature,
         }))
         .filter(
           (post) =>

@@ -4,7 +4,8 @@ export type Day = { date: Date; posts: Post[] };
 
 export type Post = {
   haiku: Haiku;
-  author: { userId: string; name: string };
+  author: User;
+  signature: string;
   timestamp: number;
 };
 

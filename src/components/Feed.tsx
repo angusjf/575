@@ -14,7 +14,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { useAppState } from "../useAppState";
-import { SEPARATORS } from "../../assets/FeedSeparators";
+import { SvgXml } from "react-native-svg";
 
 const styles = StyleSheet.create({
   root: {
@@ -90,22 +90,17 @@ export const Feed = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => {
+          renderItem={({ item }) => {
+            console.log(item.haiku);
             return (
-              <View>
-                <PostBox
-                  key={item.haiku.join("") + item.author}
-                  author={item.author}
-                  haiku={item.haiku}
-                  showOptions={showOptions}
-                  timestamp={item.timestamp}
-                />
-                {index === days[days.length - 1].posts.length - 1 ? null : (
-                  <View style={{ alignItems: "center" }}>
-                    {SEPARATORS[Math.floor(Math.random() * SEPARATORS.length)]}
-                  </View>
-                )}
-              </View>
+              <PostBox
+                signature={item.signature}
+                key={item.haiku.join("") + item.author}
+                author={item.author}
+                haiku={item.haiku}
+                showOptions={showOptions}
+                timestamp={item.timestamp}
+              />
             );
           }}
         />

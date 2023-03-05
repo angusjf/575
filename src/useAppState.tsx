@@ -83,7 +83,6 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
               ],
             ];
       } else {
-        console.log("set_days", msg.days);
         return [{ ...state, days: msg.days }, []];
       }
     case "loaded_user":

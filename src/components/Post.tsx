@@ -1,4 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { SvgXml } from "react-native-svg";
 import { fonts } from "../font";
 import { Post } from "../types";
 
@@ -23,6 +24,7 @@ export const PostBox = ({
   haiku,
   author,
   showOptions,
+  signature,
 }: Post & {
   showOptions: (sharingMessage: string, userId: string) => void;
 }) => {
@@ -31,7 +33,13 @@ export const PostBox = ({
       style={styles.container}
       onLongPress={() =>
         showOptions(
-          haiku[0] + "\n" + haiku[1] + "\n" + haiku[2] + "\n~ " + author.name,
+          haiku[0] +
+            "\n" +
+            haiku[1] +
+            "\n" +
+            haiku[2] +
+            "\n~ " +
+            author.username,
           author.userId
         )
       }
@@ -39,7 +47,8 @@ export const PostBox = ({
       <Text style={styles.line}>{haiku[0]}</Text>
       <Text style={styles.line}>{haiku[1]}</Text>
       <Text style={styles.line}>{haiku[2]}</Text>
-      <Text style={styles.author}>– {author.name}</Text>
+      <Text style={styles.author}>– {author.username}</Text>
+      <SvgXml xml={signature} />
     </TouchableOpacity>
   );
 };

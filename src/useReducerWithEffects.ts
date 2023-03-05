@@ -19,21 +19,17 @@ export function useReducerWithEffects<
   const [effects, setEffects] = useState<Effect[]>(initialEffects);
 
   const [state, dispatch] = useReducer((state: State, msg: Msg): State => {
-    console.log(JSON.stringify(msg));
     const [nextState, effects] = reducer(state, msg);
     setEffects(effects);
     return nextState;
   }, initialState);
 
   useEffect(() => {
-    console.log(effects);
     const nextMsgs = effects.map(runEffect);
     nextMsgs.forEach((promise) =>
       promise.then((resolved) => resolved.forEach(dispatch))
     );
   }, [effects]);
-
-  console.log(JSON.stringify(state));
 
   return [state, dispatch];
 }
