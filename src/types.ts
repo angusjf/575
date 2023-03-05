@@ -13,4 +13,5 @@ export type User = {
   userId: string;
   email: string;
   avatar: string;
+  signature: string;
 };

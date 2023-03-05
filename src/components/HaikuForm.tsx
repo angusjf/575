@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { valid } from "../valid";
 import { getSeason } from "../seasons";
 import { useAppState } from "../useAppState";
+import { Svg, SvgXml } from "react-native-svg";
 
 type State = {
   haiku: Haiku;
@@ -66,13 +67,17 @@ export const HaikuForm = () => {
     validity: "unchecked",
   });
 
-  const { publish } = useAppState();
+  const {
+    publish,
+    state: { user },
+  } = useAppState();
 
   return (
     <InputScreen
       validity={state.validity}
       haiku={state.haiku}
       changed={(n, l) => dispatch({ type: "change_line", line: n, newLine: l })}
+      signature={user?.signature || ""}
       done={() => {
         dispatch({ type: "submit" });
         setTimeout(() => {
@@ -123,12 +128,14 @@ const InputScreen = ({
   haiku,
   changed,
   done,
+  signature,
   validity,
 }: {
   haiku: Haiku;
   changed: (n: 0 | 1 | 2, l: string) => void;
   done: () => void;
   validity: Validity;
+  signature: string;
 }) => {
   return (
     <KeyboardAvoidingView
@@ -160,6 +167,7 @@ const InputScreen = ({
           validity={validity}
           onChangeText={(l) => changed(2, l)}
         />
+        <SvgXml xml={signature} />
       </View>
       <View>
         <Button

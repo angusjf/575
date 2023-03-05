@@ -5,7 +5,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { Validity } from "../Validity";
@@ -20,7 +20,7 @@ import { firebaseApp } from "../firebase";
 import { registerUser } from "../firebaseClient";
 import { firebaseUserToUser } from "../utils/user";
 import { useAppState } from "../useAppState";
-import { Stroke, Whiteboard } from "./Whiteboard";
+import { convertStrokesToSvg, Stroke, Whiteboard } from "./Whiteboard";
 
 const styles = StyleSheet.create({
   root: {
@@ -31,16 +31,24 @@ const styles = StyleSheet.create({
   },
 });
 
+const signatureHeight = 200;
+const signatureWidth = 400;
+
 export const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
+  const [strokes, setStrokes] = useState<Stroke[]>([]);
 
   const { register } = useAppState();
 
   const handleCreateAccount = async () => {
     const auth = getAuth(firebaseApp);
+    const signature = convertStrokesToSvg(strokes, {
+      width: signatureWidth,
+      height: signatureHeight,
+    });
     try {
       const userCredentials = await createUserWithEmailAndPassword(
         auth,
@@ -49,13 +57,13 @@ export const RegisterForm = () => {
       );
       setValidity("loading");
       await updateProfile(userCredentials.user, { displayName: name });
-      await registerUser(firebaseUserToUser(userCredentials.user));
-      register(firebaseUserToUser(userCredentials.user));
+      await registerUser(firebaseUserToUser(userCredentials.user, signature));
+      register(firebaseUserToUser(userCredentials.user, signature));
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
         try {
           const user = await signInWithEmailAndPassword(auth, email, password);
-          register(firebaseUserToUser(user.user));
+          register(firebaseUserToUser(user.user, signature));
         } catch {
           setValidity("invalid");
         }
@@ -63,8 +71,6 @@ export const RegisterForm = () => {
       setValidity("invalid");
     }
   };
-
-  const [strokes, setStrokes] = useState<Stroke[]>([]);
 
   return (
     <KeyboardAvoidingView
@@ -85,8 +91,8 @@ export const RegisterForm = () => {
       <View
         style={{
           backgroundColor: "rgb(216, 200, 200)",
-          height: 200,
-          width: 400,
+          height: signatureHeight,
+          width: signatureWidth,
           marginBottom: 40,
         }}
       >

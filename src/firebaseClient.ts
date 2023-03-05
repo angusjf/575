@@ -2,11 +2,13 @@ import {
   EmailAuthProvider,
   getAuth,
   reauthenticateWithCredential,
+  User as FirebaseUser,
 } from "firebase/auth";
 import { getDatabase, ref, set, get, remove, child } from "firebase/database";
 import { firebaseApp } from "./firebase";
 import { Haiku, Day, User } from "./types";
 import { dateDbKey, parseDateDbKey } from "./utils/date";
+import { firebaseUserToUser } from "./utils/user";
 
 export const post = async (user: User, haiku: Haiku) => {
   const db = getDatabase(firebaseApp);
@@ -29,7 +31,17 @@ export const registerUser = async (user: User) => {
   set(ref(db, "users/" + user.userId), {
     username: user.username,
     registeredAt: Date.now(),
+    signature: user.signature,
   });
+};
+
+export const getUser = async (firebaseUser: FirebaseUser): Promise<User> => {
+  const db = getDatabase(firebaseApp);
+  const user = (await get(ref(db, `users/${firebaseUser.uid}`))).toJSON() as {
+    signature: string;
+  };
+
+  return firebaseUserToUser(firebaseUser, user.signature);
 };
 
 export const getDays = async (user: User): Promise<Day[]> => {

@@ -4,6 +4,7 @@ import {
   blockUser,
   deleteAccount,
   getDays,
+  getUser,
   post,
   registerUser,
 } from "./firebaseClient";
@@ -276,11 +277,19 @@ export const AppStateProvider = (props: any) => {
   useEffect(() => {
     const auth = getAuth(firebaseApp);
 
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      dispatch({
-        msg: "loaded_user",
-        user: user === null ? user : firebaseUserToUser(user),
-      });
+    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+      if (firebaseUser === null) {
+        dispatch({
+          msg: "loaded_user",
+          user: null,
+        });
+      } else {
+        const user = await getUser(firebaseUser);
+        dispatch({
+          msg: "loaded_user",
+          user,
+        });
+      }
     });
     return unsubscribe;
   }, []);

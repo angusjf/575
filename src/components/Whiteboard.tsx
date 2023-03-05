@@ -31,12 +31,10 @@ export type Stroke = {
 
 export const convertStrokesToSvg = (
   strokes: Stroke[],
-  layout: { width: number; height: number }
+  { width, height }: { width: number; height: number }
 ): string => {
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${layout.width}" height="${
-    layout.height
-  }" version="1.1">
+    <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" version="1.1">
       <g>
         ${strokes
           .map(
