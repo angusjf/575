@@ -106,14 +106,6 @@ export class Whiteboard extends React.Component {
     });
   }
 
-  onResponderGrant(evt) {
-    this.onTouch(evt);
-  }
-
-  onResponderMove(evt) {
-    this.onTouch(evt);
-  }
-
   onResponderRelease() {
     let strokes = this.state.previousStrokes;
     if (this.state.currentPoints.length < 1) return;
