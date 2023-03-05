@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties, useRef, useState } from "react";
 import {
   View,
   PanResponder,
@@ -36,116 +36,95 @@ export const convertStrokesToSvg = (
   `;
 };
 
-export class Whiteboard extends React.Component {
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-      currentPoints: [],
-      previousStrokes: this.props.strokes || [],
-      newStroke: [],
-      pen: new Pen(),
-    };
+type WhiteboardProps = {
+  strokeWidth: number;
+  color: string;
+  containerStyle: CSSProperties;
+};
 
-    const onResponderRelease = () => {
-      let strokes = this.state.previousStrokes;
-      if (this.state.currentPoints.length < 1) return;
+export const Whiteboard = ({
+  strokeWidth,
+  color,
+  containerStyle,
+}: WhiteboardProps) => {
+  const [currentPoints, setCurrentPoints] = useState<Point[]>([]);
+  const [previousStrokes, setPreviousStrokes] = useState<Stroke[]>([]);
+  const pen = useRef(new Pen());
 
-      let points = this.state.currentPoints;
-      if (points.length === 1) {
-        let p = points[0];
-        let distance = parseInt(Math.sqrt(this.props.strokeWidth || 4) / 2);
-        points.push(new Point(p.x + distance, p.y + distance, p.time));
-      }
+  const onResponderRelease = () => {
+    if (currentPoints.length < 1) return;
 
-      let newElement = {
-        type: "Path",
-        attributes: {
-          d: this.state.pen.pointsToSvg(points),
-          stroke: this.props.color || "#000000",
-          strokeWidth: this.props.strokeWidth || 4,
-          fill: "none",
-          strokeLinecap: "round",
-          strokeLinejoin: "round",
-        },
-      };
-
-      this.state.pen.addStroke(points);
-
-      this.setState({
-        previousStrokes: [...this.state.previousStrokes, newElement],
-        currentPoints: [],
-      });
-    };
-    const onTouch = (evt: GestureResponderEvent) => {
-      let x, y, timestamp;
-      [x, y, timestamp] = [
-        evt.nativeEvent.locationX,
-        evt.nativeEvent.locationY,
-        evt.nativeEvent.timestamp,
-      ];
-      let newPoint = new Point(x, y, timestamp);
-      let newCurrentPoints = this.state.currentPoints;
-      newCurrentPoints.push(newPoint);
-
-      this.setState({
-        previousStrokes: this.state.previousStrokes,
-        currentPoints: newCurrentPoints,
-      });
-    };
-
-    this._panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gs) => true,
-      onMoveShouldSetPanResponder: (evt, gs) => true,
-      onPanResponderGrant: (evt) => onTouch(evt),
-      onPanResponderMove: (evt) => onTouch(evt),
-      onPanResponderRelease: (evt, gs) => onResponderRelease(evt, gs),
-    });
-  }
-
-  componentWillReceiveProps(newProps) {
-    if (
-      this.props.strokes &&
-      newProps.strokes &&
-      JSON.stringify(this.props.strokes) !== JSON.stringify(newProps.strokes)
-    ) {
-      this.setState({
-        previousStrokes: newProps.strokes,
-        newStroke: [],
-      });
+    if (currentPoints.length === 1) {
+      let p = currentPoints[0];
+      let distance = Math.sqrt(strokeWidth || 4) / 2;
+      currentPoints.push(new Point(p.x + distance, p.y + distance, p.time));
     }
-  }
 
-  render() {
-    return (
-      <View
-        onLayout={(e) => {
-          this.state.pen.setOffset(e.nativeEvent.layout);
-          this._layout = e.nativeEvent.layout;
-        }}
-        style={[styles.drawContainer, this.props.containerStyle]}
-      >
-        <View style={styles.svgContainer} {...this._panResponder.panHandlers}>
-          <Svg style={styles.drawSurface}>
-            <G>
-              {this.state.previousStrokes.map((stroke) => (
-                <Path {...stroke.attributes} />
-              ))}
-              <Path
-                key={this.state.previousStrokes.length}
-                d={this.state.pen.pointsToSvg(this.state.currentPoints)}
-                stroke={this.props.color || "#000000"}
-                strokeWidth={this.props.strokeWidth || 4}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </G>
-          </Svg>
-        </View>
+    let newElement: Stroke = {
+      type: "Path",
+      attributes: {
+        d: pen.current.pointsToSvg(currentPoints),
+        stroke: color || "#000000",
+        strokeWidth: strokeWidth || 4,
+        fill: "none",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+      },
+    };
+
+    pen.current.addStroke(currentPoints);
+
+    setPreviousStrokes((oldPrevStrokes) => [...oldPrevStrokes, newElement]);
+    setCurrentPoints([]);
+  };
+
+  const onTouch = (evt: GestureResponderEvent) => {
+    const [x, y, timestamp] = [
+      evt.nativeEvent.locationX,
+      evt.nativeEvent.locationY,
+      evt.nativeEvent.timestamp,
+    ];
+
+    const newPoint = new Point(x, y, timestamp);
+
+    setCurrentPoints([...currentPoints, newPoint]);
+  };
+
+  const _panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (_) => true,
+    onMoveShouldSetPanResponder: (_) => true,
+    onPanResponderGrant: onTouch,
+    onPanResponderMove: onTouch,
+    onPanResponderRelease: () => onResponderRelease(),
+  });
+
+  return (
+    <View
+      onLayout={(e) => {
+        pen.current.setOffset(e.nativeEvent.layout);
+      }}
+      style={[styles.drawContainer, containerStyle]}
+    >
+      <View style={styles.svgContainer} {..._panResponder.panHandlers}>
+        <Svg style={styles.drawSurface}>
+          <G>
+            {previousStrokes.map((stroke) => (
+              <Path {...stroke.attributes} />
+            ))}
+            <Path
+              d={pen.current.pointsToSvg(currentPoints)}
+              stroke={color || "#000000"}
+              strokeWidth={strokeWidth || 4}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </G>
+        </Svg>
       </View>
-    );
-  }
-}
+    </View>
+  );
+};
 
 let styles = StyleSheet.create({
   drawContainer: {},

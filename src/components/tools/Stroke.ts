@@ -1,1 +1,4 @@
-export type Stroke = { attributes: Record<string, string>; type: string };
+export type Stroke = {
+  attributes: Record<string, string | number>;
+  type: string;
+};

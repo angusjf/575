@@ -23,7 +23,7 @@ export class Pen {
     this.strokes.pop();
   }
 
-  setOffset(options: Point) {
+  setOffset(options: { x: number; y: number }) {
     if (!options) return;
     this._offsetX = options.x;
     this._offsetY = options.y;
