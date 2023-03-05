@@ -10,15 +10,21 @@ import {
 import Svg, { G, Path } from "react-native-svg";
 import humps from "humps";
 
-type WhiteboardProps = {
-  strokeWidth: number;
-  color: string;
-  containerStyle: StyleProp<ViewStyle>;
-};
-
 export type Point = {
   x: number;
   y: number;
+};
+
+const pointsToSvg = (points: Point[]) => {
+  if (points.length > 0) {
+    var path = `M ${points[0].x},${points[0].y}`;
+    points.forEach((point) => {
+      path = path + ` L ${point.x},${point.y}`;
+    });
+    return path;
+  } else {
+    return "";
+  }
 };
 
 export type Stroke = {
@@ -53,25 +59,22 @@ export const convertStrokesToSvg = (
   `;
 };
 
-const pointsToSvg = (points: Point[]) => {
-  if (points.length > 0) {
-    var path = `M ${points[0].x},${points[0].y}`;
-    points.forEach((point) => {
-      path = path + ` L ${point.x},${point.y}`;
-    });
-    return path;
-  } else {
-    return "";
-  }
+type WhiteboardProps = {
+  strokeWidth: number;
+  color: string;
+  containerStyle: StyleProp<ViewStyle>;
+  strokes: Stroke[];
+  setStrokes: React.Dispatch<React.SetStateAction<Stroke[]>>;
 };
 
 export const Whiteboard = ({
   strokeWidth,
   color,
   containerStyle,
+  strokes: previousStrokes,
+  setStrokes: setPreviousStrokes,
 }: WhiteboardProps) => {
   const [currentPoints, setCurrentPoints] = useState<Point[]>([]);
-  const [previousStrokes, setPreviousStrokes] = useState<Stroke[]>([]);
 
   const onResponderRelease = () => {
     if (currentPoints.length < 1) return;

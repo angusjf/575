@@ -14,7 +14,7 @@ import { firebaseApp } from "../firebase";
 import { registerUser } from "../firebaseClient";
 import { firebaseUserToUser } from "../utils/user";
 import { useAppState } from "../useAppState";
-import { Whiteboard } from "./Whiteboard";
+import { Stroke, Whiteboard } from "./Whiteboard";
 
 const styles = StyleSheet.create({
   root: {
@@ -58,6 +58,8 @@ export const RegisterForm = () => {
     }
   };
 
+  const [strokes, setStrokes] = useState<Stroke[]>([]);
+
   return (
     <View style={styles.root}>
       <Text
@@ -70,6 +72,8 @@ export const RegisterForm = () => {
         how do you sign your poems?
       </Text>
       <Whiteboard
+        strokes={strokes}
+        setStrokes={setStrokes}
         containerStyle={{
           backgroundColor: "rgb(216, 200, 200)",
           height: 200,
