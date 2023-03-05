@@ -14,7 +14,7 @@ import { firebaseApp } from "../firebase";
 import { registerUser } from "../firebaseClient";
 import { firebaseUserToUser } from "../utils/user";
 import { useAppState } from "../useAppState";
-import { Whiteboard } from "./Pad";
+import { Stroke, Whiteboard } from "./Whiteboard";
 
 const styles = StyleSheet.create({
   root: {
@@ -58,7 +58,7 @@ export const RegisterForm = () => {
     }
   };
 
-  const strokes = useRef([]);
+  const [strokes, setStrokes] = useState<Stroke[]>([]);
 
   return (
     <View style={styles.root}>
@@ -72,22 +72,18 @@ export const RegisterForm = () => {
         how do you sign your poems?
       </Text>
       <Whiteboard
-        strokes={[]}
+        strokes={strokes}
+        setStrokes={setStrokes}
         containerStyle={{
           backgroundColor: "rgb(216, 200, 200)",
           height: 200,
           width: 400,
           marginBottom: 40,
         }}
-        rewind={(undo) => {}}
-        clear={(clear) => {}}
         color={"#2c2a2a"}
         strokeWidth={4}
-        enabled={true}
-        onChangeStrokes={(newStrokes) => {
-          strokes.current = newStrokes;
-        }}
       />
+      <Button title="clear" onPress={() => setStrokes([])} />
       <HaikuLineInput
         placeholder="preferred signature"
         autoFocus
