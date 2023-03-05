@@ -46,12 +46,59 @@ export class Whiteboard extends React.Component {
       pen: new Pen(),
     };
 
+    const onResponderRelease = () => {
+      let strokes = this.state.previousStrokes;
+      if (this.state.currentPoints.length < 1) return;
+
+      let points = this.state.currentPoints;
+      if (points.length === 1) {
+        let p = points[0];
+        let distance = parseInt(Math.sqrt(this.props.strokeWidth || 4) / 2);
+        points.push(new Point(p.x + distance, p.y + distance, p.time));
+      }
+
+      let newElement = {
+        type: "Path",
+        attributes: {
+          d: this.state.pen.pointsToSvg(points),
+          stroke: this.props.color || "#000000",
+          strokeWidth: this.props.strokeWidth || 4,
+          fill: "none",
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+        },
+      };
+
+      this.state.pen.addStroke(points);
+
+      this.setState({
+        previousStrokes: [...this.state.previousStrokes, newElement],
+        currentPoints: [],
+      });
+    };
+    const onTouch = (evt: GestureResponderEvent) => {
+      let x, y, timestamp;
+      [x, y, timestamp] = [
+        evt.nativeEvent.locationX,
+        evt.nativeEvent.locationY,
+        evt.nativeEvent.timestamp,
+      ];
+      let newPoint = new Point(x, y, timestamp);
+      let newCurrentPoints = this.state.currentPoints;
+      newCurrentPoints.push(newPoint);
+
+      this.setState({
+        previousStrokes: this.state.previousStrokes,
+        currentPoints: newCurrentPoints,
+      });
+    };
+
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gs) => true,
       onMoveShouldSetPanResponder: (evt, gs) => true,
-      onPanResponderGrant: (evt) => this.onTouch(evt),
-      onPanResponderMove: (evt) => this.onTouch(evt),
-      onPanResponderRelease: (evt, gs) => this.onResponderRelease(evt, gs),
+      onPanResponderGrant: (evt) => onTouch(evt),
+      onPanResponderMove: (evt) => onTouch(evt),
+      onPanResponderRelease: (evt, gs) => onResponderRelease(evt, gs),
     });
   }
 
@@ -67,59 +114,6 @@ export class Whiteboard extends React.Component {
       });
     }
   }
-
-  onTouch(evt: GestureResponderEvent) {
-    let x, y, timestamp;
-    [x, y, timestamp] = [
-      evt.nativeEvent.locationX,
-      evt.nativeEvent.locationY,
-      evt.nativeEvent.timestamp,
-    ];
-    let newPoint = new Point(x, y, timestamp);
-    let newCurrentPoints = this.state.currentPoints;
-    newCurrentPoints.push(newPoint);
-
-    this.setState({
-      previousStrokes: this.state.previousStrokes,
-      currentPoints: newCurrentPoints,
-    });
-  }
-
-  onResponderRelease() {
-    let strokes = this.state.previousStrokes;
-    if (this.state.currentPoints.length < 1) return;
-
-    let points = this.state.currentPoints;
-    if (points.length === 1) {
-      let p = points[0];
-      let distance = parseInt(Math.sqrt(this.props.strokeWidth || 4) / 2);
-      points.push(new Point(p.x + distance, p.y + distance, p.time));
-    }
-
-    let newElement = {
-      type: "Path",
-      attributes: {
-        d: this.state.pen.pointsToSvg(points),
-        stroke: this.props.color || "#000000",
-        strokeWidth: this.props.strokeWidth || 4,
-        fill: "none",
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-      },
-    };
-
-    this.state.pen.addStroke(points);
-
-    this.setState({
-      previousStrokes: [...this.state.previousStrokes, newElement],
-      currentPoints: [],
-    });
-  }
-
-  exportToSVG = () => {
-    const strokes = [...this.state.previousStrokes];
-    return convertStrokesToSvg(strokes, this._layout);
-  };
 
   render() {
     return (
