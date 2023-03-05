@@ -14,7 +14,7 @@ import { firebaseApp } from "../firebase";
 import { registerUser } from "../firebaseClient";
 import { firebaseUserToUser } from "../utils/user";
 import { useAppState } from "../useAppState";
-import ExpoDraw from "./Pad";
+import { Whiteboard } from "./Pad";
 
 const styles = StyleSheet.create({
   root: {
@@ -71,7 +71,7 @@ export const RegisterForm = () => {
       >
         how do you sign your poems?
       </Text>
-      <ExpoDraw
+      <Whiteboard
         strokes={[]}
         containerStyle={{
           backgroundColor: "rgb(216, 200, 200)",

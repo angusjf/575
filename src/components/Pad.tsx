@@ -1,15 +1,15 @@
 import React from "react";
 import { View, PanResponder, StyleSheet, Platform } from "react-native";
-import Svg, { G, Surface, Path } from "react-native-svg";
-import Pen from "./tools/Pen";
-import Point from "./tools/Point";
-
+import Svg, { G, Path } from "react-native-svg";
+import { Pen } from "./tools/Pen";
+import { Point } from "./tools/Point";
 import humps from "humps";
+import { Stroke } from "./tools/Stroke";
 
-const { OS } = Platform;
-// import Bezier from '../tools/bezier'
-
-export const convertStrokesToSvg = (strokes, layout = {}) => {
+export const convertStrokesToSvg = (
+  strokes: Stroke[],
+  layout: { width: number; height: number }
+): string => {
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${layout.width}" height="${
     layout.height
@@ -31,7 +31,7 @@ export const convertStrokesToSvg = (strokes, layout = {}) => {
   `;
 };
 
-export default class Whiteboard extends React.Component {
+export class Whiteboard extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
@@ -68,28 +68,6 @@ export default class Whiteboard extends React.Component {
       });
     }
   }
-
-  rewind = () => {
-    if (
-      this.state.currentPoints.length > 0 ||
-      this.state.previousStrokes.length < 1
-    )
-      return;
-    let strokes = this.state.previousStrokes;
-    strokes.pop();
-
-    this.state.pen.rewindStroke();
-
-    this.setState(
-      {
-        previousStrokes: [...strokes],
-        currentPoints: [],
-      },
-      () => {
-        this._onChangeStrokes([...strokes]);
-      }
-    );
-  };
 
   clear = () => {
     this.setState(
@@ -214,7 +192,6 @@ export default class Whiteboard extends React.Component {
               />
             </G>
           </Svg>
-
           {this.props.children}
         </View>
       </View>
@@ -223,8 +200,7 @@ export default class Whiteboard extends React.Component {
 }
 
 let styles = StyleSheet.create({
-  drawContainer: {
-  },
+  drawContainer: {},
   svgContainer: {
     flex: 1,
   },

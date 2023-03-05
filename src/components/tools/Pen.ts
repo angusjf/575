@@ -1,11 +1,18 @@
-export default class Pen {
-  constructor(strokes) {
+import { Point } from "./Point";
+import { Stroke } from "./Stroke";
+
+export class Pen {
+  strokes: Stroke[];
+  _offsetX: number;
+  _offsetY: number;
+
+  constructor(strokes?: Stroke[]) {
     this.strokes = strokes || [];
     this._offsetX = 0;
     this._offsetY = 0;
   }
 
-  addStroke(points) {
+  addStroke(points: Point[]) {
     if (points.length > 0) {
       this.strokes.push(points);
     }
@@ -16,13 +23,13 @@ export default class Pen {
     this.strokes.pop();
   }
 
-  setOffset(options) {
+  setOffset(options: Point) {
     if (!options) return;
     this._offsetX = options.x;
     this._offsetY = options.y;
   }
 
-  pointsToSvg(points) {
+  pointsToSvg(points: Point[]) {
     let offsetX = this._offsetX;
     let offsetY = this._offsetY;
     if (points.length > 0) {
@@ -39,8 +46,4 @@ export default class Pen {
   clear = () => {
     this.strokes = [];
   };
-
-  copy() {
-    return new Reaction(this.strokes.slice());
-  }
 }
