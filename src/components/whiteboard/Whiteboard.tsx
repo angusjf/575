@@ -6,7 +6,6 @@ import {
   GestureResponderEvent,
 } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
-import { Pen } from "./Pen";
 import { Point } from "./Point";
 import { Stroke } from "./Stroke";
 
@@ -16,6 +15,18 @@ type WhiteboardProps = {
   containerStyle: CSSProperties;
 };
 
+const pointsToSvg = (points: Point[]) => {
+  if (points.length > 0) {
+    var path = `M ${points[0].x},${points[0].y}`;
+    points.forEach((point) => {
+      path = path + ` L ${point.x},${point.y}`;
+    });
+    return path;
+  } else {
+    return "";
+  }
+};
+
 export const Whiteboard = ({
   strokeWidth,
   color,
@@ -23,7 +34,6 @@ export const Whiteboard = ({
 }: WhiteboardProps) => {
   const [currentPoints, setCurrentPoints] = useState<Point[]>([]);
   const [previousStrokes, setPreviousStrokes] = useState<Stroke[]>([]);
-  const pen = useRef(new Pen());
 
   const onResponderRelease = () => {
     if (currentPoints.length < 1) return;
@@ -37,7 +47,7 @@ export const Whiteboard = ({
     let newElement: Stroke = {
       type: "Path",
       attributes: {
-        d: pen.current.pointsToSvg(currentPoints),
+        d: pointsToSvg(currentPoints),
         stroke: color || "#000000",
         strokeWidth: strokeWidth || 4,
         fill: "none",
@@ -45,8 +55,6 @@ export const Whiteboard = ({
         strokeLinejoin: "round",
       },
     };
-
-    pen.current.addStroke(currentPoints);
 
     setPreviousStrokes((oldPrevStrokes) => [...oldPrevStrokes, newElement]);
     setCurrentPoints([]);
@@ -68,12 +76,7 @@ export const Whiteboard = ({
   });
 
   return (
-    <View
-      onLayout={(e) => {
-        pen.current.setOffset(e.nativeEvent.layout);
-      }}
-      style={[styles.drawContainer, containerStyle]}
-    >
+    <View style={[styles.drawContainer, containerStyle]}>
       <View style={styles.svgContainer} {..._panResponder.panHandlers}>
         <Svg style={styles.drawSurface}>
           <G>
@@ -84,7 +87,7 @@ export const Whiteboard = ({
               />
             ))}
             <Path
-              d={pen.current.pointsToSvg(currentPoints)}
+              d={pointsToSvg(currentPoints)}
               stroke={color || "#000000"}
               strokeWidth={strokeWidth || 4}
               fill="none"
