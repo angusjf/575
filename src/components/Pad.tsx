@@ -53,12 +53,6 @@ export class Whiteboard extends React.Component {
       onPanResponderMove: (evt) => this.onTouch(evt),
       onPanResponderRelease: (evt, gs) => this.onResponderRelease(evt, gs),
     });
-    const rewind = props.rewind || function () {};
-    const clear = props.clear || function () {};
-    this._clientEvents = {
-      rewind: rewind(this.rewind),
-      clear: clear(this.clear),
-    };
   }
 
   componentWillReceiveProps(newProps) {
@@ -73,21 +67,6 @@ export class Whiteboard extends React.Component {
       });
     }
   }
-
-  clear = () => {
-    this.setState(
-      {
-        previousStrokes: [],
-        currentPoints: [],
-        newStroke: [],
-      },
-      () => {
-        this._onChangeStrokes([]);
-      }
-    );
-
-    this.state.pen.clear();
-  };
 
   onTouch(evt: GestureResponderEvent) {
     let x, y, timestamp;
@@ -131,35 +110,11 @@ export class Whiteboard extends React.Component {
 
     this.state.pen.addStroke(points);
 
-    this.setState(
-      {
-        previousStrokes: [...this.state.previousStrokes, newElement],
-        currentPoints: [],
-      },
-      () => {
-        this._onChangeStrokes(this.state.previousStrokes);
-      }
-    );
+    this.setState({
+      previousStrokes: [...this.state.previousStrokes, newElement],
+      currentPoints: [],
+    });
   }
-
-  _onChangeStrokes = (strokes) => {
-    if (this.props.onChangeStrokes) {
-      this.props.onChangeStrokes(strokes);
-    }
-  };
-
-  _onLayoutContainer = (e) => {
-    this.state.pen.setOffset(e.nativeEvent.layout);
-    this._layout = e.nativeEvent.layout;
-  };
-
-  _renderSvgElement = (e, tracker) => {
-    if (e.type === "Path") {
-      return <Path {...e.attributes} key={tracker} />;
-    }
-
-    return null;
-  };
 
   exportToSVG = () => {
     const strokes = [...this.state.previousStrokes];
@@ -169,15 +124,18 @@ export class Whiteboard extends React.Component {
   render() {
     return (
       <View
-        onLayout={this._onLayoutContainer}
+        onLayout={(e) => {
+          this.state.pen.setOffset(e.nativeEvent.layout);
+          this._layout = e.nativeEvent.layout;
+        }}
         style={[styles.drawContainer, this.props.containerStyle]}
       >
         <View style={styles.svgContainer} {...this._panResponder.panHandlers}>
           <Svg style={styles.drawSurface}>
             <G>
-              {this.state.previousStrokes.map((stroke, index) => {
-                return this._renderSvgElement(stroke, index);
-              })}
+              {this.state.previousStrokes.map((stroke) => (
+                <Path {...stroke.attributes} />
+              ))}
               <Path
                 key={this.state.previousStrokes.length}
                 d={this.state.pen.pointsToSvg(this.state.currentPoints)}
@@ -189,7 +147,6 @@ export class Whiteboard extends React.Component {
               />
             </G>
           </Svg>
-          {this.props.children}
         </View>
       </View>
     );
