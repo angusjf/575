@@ -14,7 +14,7 @@ import { firebaseApp } from "../firebase";
 import { registerUser } from "../firebaseClient";
 import { firebaseUserToUser } from "../utils/user";
 import { useAppState } from "../useAppState";
-import { Whiteboard } from "./whiteboard/Whiteboard";
+import { Whiteboard } from "./Whiteboard";
 
 const styles = StyleSheet.create({
   root: {
@@ -57,8 +57,6 @@ export const RegisterForm = () => {
       setValidity("invalid");
     }
   };
-
-  const strokes = useRef([]);
 
   return (
     <View style={styles.root}>

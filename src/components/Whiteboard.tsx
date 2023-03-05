@@ -1,18 +1,54 @@
-import React, { CSSProperties, useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   PanResponder,
   StyleSheet,
   GestureResponderEvent,
+  ViewStyle,
+  StyleProp,
 } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
-import { Point } from "./Point";
-import { Stroke } from "./Stroke";
+import humps from "humps";
 
 type WhiteboardProps = {
   strokeWidth: number;
   color: string;
-  containerStyle: CSSProperties;
+  containerStyle: StyleProp<ViewStyle>;
+};
+
+export type Point = {
+  x: number;
+  y: number;
+};
+
+export type Stroke = {
+  attributes: Record<string, string | number>;
+  type: string;
+};
+
+export const convertStrokesToSvg = (
+  strokes: Stroke[],
+  layout: { width: number; height: number }
+): string => {
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${layout.width}" height="${
+    layout.height
+  }" version="1.1">
+      <g>
+        ${strokes
+          .map((e) => {
+            return `<${e.type.toLowerCase()} ${Object.keys(e.attributes)
+              .map((a) => {
+                return `${humps.decamelize(a, { separator: "-" })}="${
+                  e.attributes[a]
+                }"`;
+              })
+              .join(" ")}/>`;
+          })
+          .join("\n")}
+      </g>
+    </svg>
+  `;
 };
 
 const pointsToSvg = (points: Point[]) => {
@@ -76,7 +112,7 @@ export const Whiteboard = ({
   });
 
   return (
-    <View style={[styles.drawContainer, containerStyle]}>
+    <View style={containerStyle}>
       <View style={styles.svgContainer} {..._panResponder.panHandlers}>
         <Svg style={styles.drawSurface}>
           <G>
@@ -102,7 +138,6 @@ export const Whiteboard = ({
 };
 
 let styles = StyleSheet.create({
-  drawContainer: {},
   svgContainer: {
     flex: 1,
   },
