@@ -83,6 +83,7 @@ export const RegisterForm = () => {
         color={"#2c2a2a"}
         strokeWidth={4}
       />
+      <Button title="clear" onPress={() => setStrokes([])} />
       <HaikuLineInput
         placeholder="preferred signature"
         autoFocus
