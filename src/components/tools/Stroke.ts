@@ -1,1 +1,1 @@
-export type Stroke = unknown;
+export type Stroke = { attributes: Record<string, string>; type: string };

@@ -1,5 +1,10 @@
 import React from "react";
-import { View, PanResponder, StyleSheet, Platform } from "react-native";
+import {
+  View,
+  PanResponder,
+  StyleSheet,
+  GestureResponderEvent,
+} from "react-native";
 import Svg, { G, Path } from "react-native-svg";
 import { Pen } from "./tools/Pen";
 import { Point } from "./tools/Point";
@@ -44,8 +49,8 @@ export class Whiteboard extends React.Component {
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gs) => true,
       onMoveShouldSetPanResponder: (evt, gs) => true,
-      onPanResponderGrant: (evt, gs) => this.onResponderGrant(evt, gs),
-      onPanResponderMove: (evt, gs) => this.onResponderMove(evt, gs),
+      onPanResponderGrant: (evt) => this.onTouch(evt),
+      onPanResponderMove: (evt) => this.onTouch(evt),
       onPanResponderRelease: (evt, gs) => this.onResponderRelease(evt, gs),
     });
     const rewind = props.rewind || function () {};
@@ -84,7 +89,7 @@ export class Whiteboard extends React.Component {
     this.state.pen.clear();
   };
 
-  onTouch(evt) {
+  onTouch(evt: GestureResponderEvent) {
     let x, y, timestamp;
     [x, y, timestamp] = [
       evt.nativeEvent.locationX,
