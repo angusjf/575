@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   FlatList,
   Platform,
@@ -10,6 +10,7 @@ import {
   Text,
 } from "react-native";
 import { useAppState } from "../useAppState";
+import Dialog from "react-native-dialog";
 
 const styles = StyleSheet.create({
   root: {
@@ -45,11 +46,16 @@ const SettingsItem = ({ title, onPress }: SettingsItemProps) => (
 
 export const Settings = () => {
   const { logout, deleteAccount } = useAppState();
+  const [visible, setVisible] = useState(false);
+  const [password, setPassword] = useState("");
   const settings = useMemo(
     () => [
       { title: "Logout", onPress: logout },
       // { title: "Unblock users", onPress: () => undefined },
-      { title: "Delete your account", onPress: deleteAccount },
+      {
+        title: "Delete your account",
+        onPress: () => setVisible(true),
+      },
     ],
     []
   );
@@ -60,6 +66,29 @@ export const Settings = () => {
         data={settings}
         renderItem={({ item }) => <SettingsItem {...item} />}
       />
+      <Dialog.Container visible={visible}>
+        <Dialog.Title>Delete Account</Dialog.Title>
+        <Dialog.Description>
+          Are you sure you want to delete your account? You cannot undo this
+          action. Please enter your password to confirm.
+        </Dialog.Description>
+        <Dialog.Input
+          placeholder="Current password"
+          secureTextEntry
+          multiline={false}
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoComplete="password"
+          importantForAutofill="yes"
+          onChangeText={setPassword}
+        />
+        <Dialog.Button label="Cancel" onPress={() => setVisible(false)} />
+        <Dialog.Button
+          onPress={() => deleteAccount(password)}
+          label="Delete"
+          bold
+        />
+      </Dialog.Container>
     </SafeAreaView>
   );
 };

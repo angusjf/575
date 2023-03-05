@@ -1,4 +1,8 @@
-import { getAuth } from "firebase/auth";
+import {
+  EmailAuthProvider,
+  getAuth,
+  reauthenticateWithCredential,
+} from "firebase/auth";
 import { getDatabase, ref, set, get, remove, child } from "firebase/database";
 import { firebaseApp } from "./firebase";
 import { Haiku, Day, User } from "./types";
@@ -61,15 +65,15 @@ export const getDays = async (user: User): Promise<Day[]> => {
   }
 };
 
-export const deleteAccount = async () => {
+export const deleteAccount = async (password: string) => {
   const auth = getAuth(firebaseApp);
-  try {
-    await auth.currentUser?.delete();
-  } catch (e: any) {
-    if (e.code === "auth/requires-recent-login") {
-      console.error("User needs to reauthenticate");
-    }
-  }
+  if (!auth.currentUser) return;
+  const credential = EmailAuthProvider.credential(
+    auth.currentUser.email ?? "",
+    password
+  );
+  reauthenticateWithCredential(auth.currentUser, credential);
+  await auth.currentUser?.delete();
 };
 
 export const uploadExpoPushToken = ({

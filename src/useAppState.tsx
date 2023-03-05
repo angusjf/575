@@ -46,7 +46,7 @@ type Msg =
   | { msg: "publish"; haiku: Haiku }
   | { msg: "block_user"; blockedUserId: string }
   | { msg: "open_settings" }
-  | { msg: "delete_account" }
+  | { msg: "delete_account"; password: string }
   | { msg: "account_deleted" }
   | { msg: "finish_onboarding" };
 
@@ -172,9 +172,12 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         [{ effect: "navigate", route: "Settings" }],
       ];
     case "delete_account":
-      return [state, [{ effect: "delete_user", user: state.user! }]];
+      return [
+        state,
+        [{ effect: "delete_user", user: state.user!, password: msg.password }],
+      ];
     case "account_deleted":
-      return [state, [{ effect: "navigate", route: "Settings" }]];
+      return [state, [{ effect: "navigate", route: "Onboarding" }]];
     case "finish_onboarding":
       return [state, [{ effect: "navigate", route: "Register" }]];
   }
@@ -187,7 +190,7 @@ type Effect =
   | { effect: "load_fonts" }
   | { effect: "post"; user: User; haiku: Haiku }
   | { effect: "block_user"; user: User; blockedUserId: string }
-  | { effect: "delete_user"; user: User }
+  | { effect: "delete_user"; user: User; password: string }
   | { effect: "navigate"; route: string };
 
 const runEffect =
@@ -214,8 +217,13 @@ const runEffect =
         await blockUser(effect.user, effect.blockedUserId);
         return [{ msg: "load_feed", user: effect.user }];
       case "delete_user":
-        await deleteAccount();
-        return [{ msg: "account_deleted" }];
+        try {
+          await deleteAccount(effect.password);
+          return [{ msg: "account_deleted" }];
+        } catch (e) {
+          console.log(e);
+          return [];
+        }
       case "navigate":
         navigate(effect.route);
         return [];
@@ -240,7 +248,7 @@ type AppContextType = {
   blockUser: (blockedUserId: string) => void;
   refreshFeed: () => void;
   openSettings: () => void;
-  deleteAccount: () => void;
+  deleteAccount: (password: string) => void;
   finishOnboarding: () => void;
 };
 
@@ -252,7 +260,7 @@ const AppContext = createContext<AppContextType>({
   blockUser: (blockedUserId: string) => {},
   refreshFeed: () => {},
   openSettings: () => {},
-  deleteAccount: () => {},
+  deleteAccount: (password: string) => {},
   finishOnboarding: () => {},
 });
 
@@ -286,7 +294,8 @@ export const AppStateProvider = (props: any) => {
       dispatch({ msg: "block_user", blockedUserId }),
     refreshFeed: () => dispatch({ msg: "load_feed", user: state.user! }),
     openSettings: () => dispatch({ msg: "open_settings" }),
-    deleteAccount: () => dispatch({ msg: "delete_account" }),
+    deleteAccount: (password: string) =>
+      dispatch({ msg: "delete_account", password }),
     finishOnboarding: () => dispatch({ msg: "finish_onboarding" }),
   };
 

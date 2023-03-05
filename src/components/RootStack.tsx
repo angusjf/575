@@ -83,8 +83,9 @@ export const RootStack = () => {
         name="Feed"
         component={Feed}
         options={({ route }) => ({
-          headerTransparent: true, // TODO: This isn't transparent anymore
+          headerTransparent: true,
           headerTitleAlign: "center",
+          headerBackVisible: false,
           headerBackground,
           headerTitle: () => <Text style={styles.logo}>575</Text>,
           headerRight: () =>
@@ -98,11 +99,7 @@ export const RootStack = () => {
         component={RegisterForm}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="Settings"
-        component={Settings}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="Settings" component={Settings} />
     </Stack.Navigator>
   );
 };

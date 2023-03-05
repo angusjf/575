@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useRef, useState } from "react";
 import { Button } from "./Button";
 import { HaikuLineInput } from "./HaikuLineInput";
@@ -61,16 +67,21 @@ export const RegisterForm = () => {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
 
   return (
-    <View style={styles.root}>
-      <Text
-        style={{
-          fontFamily: fonts.PlexMonoItalic,
-          fontSize: 21,
-          paddingBottom: 38,
-        }}
-      >
-        how do you sign your poems?
-      </Text>
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View>
+        <Text
+          style={{
+            fontFamily: fonts.PlexMonoItalic,
+            fontSize: 21,
+            paddingBottom: 38,
+          }}
+        >
+          how do you sign your poems?
+        </Text>
+      </View>
       <View
         style={{
           backgroundColor: "rgb(216, 200, 200)",
@@ -126,6 +137,6 @@ export const RegisterForm = () => {
         onPress={handleCreateAccount}
         isLoading={validity == "loading"}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 };
