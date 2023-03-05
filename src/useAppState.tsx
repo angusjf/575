@@ -185,7 +185,6 @@ type Effect =
   | { effect: "get_days"; user: User }
   | { effect: "logout" }
   | { effect: "load_fonts" }
-  | { effect: "create_user"; user: User }
   | { effect: "post"; user: User; haiku: Haiku }
   | { effect: "block_user"; user: User; blockedUserId: string }
   | { effect: "delete_user"; user: User }
@@ -211,9 +210,6 @@ const runEffect =
       case "post":
         await post(effect.user, effect.haiku);
         return [{ msg: "load_feed", user: effect.user }];
-      case "create_user":
-        await registerUser(effect.user);
-        return [];
       case "block_user":
         await blockUser(effect.user, effect.blockedUserId);
         return [{ msg: "load_feed", user: effect.user }];
