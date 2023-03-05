@@ -36,15 +36,17 @@ export const convertStrokesToSvg = (
   }" version="1.1">
       <g>
         ${strokes
-          .map((e) => {
-            return `<${e.type.toLowerCase()} ${Object.keys(e.attributes)
-              .map((a) => {
-                return `${humps.decamelize(a, { separator: "-" })}="${
-                  e.attributes[a]
-                }"`;
-              })
-              .join(" ")}/>`;
-          })
+          .map(
+            (e) =>
+              `<${e.type.toLowerCase()} ${Object.keys(e.attributes)
+                .map(
+                  (a) =>
+                    `${humps.decamelize(a, { separator: "-" })}="${
+                      e.attributes[a]
+                    }"`
+                )
+                .join(" ")}/>`
+          )
           .join("\n")}
       </g>
     </svg>
