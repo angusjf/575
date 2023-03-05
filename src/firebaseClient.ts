@@ -96,6 +96,7 @@ export const uploadExpoPushToken = ({
   userId: string;
   token: string;
 }) => {
+  console.log(`expoPushTokens/${userId}/`);
   const db = getDatabase(firebaseApp);
   set(ref(db, `expoPushTokens/${userId}/`), token);
 };
@@ -113,7 +114,9 @@ export const getBlockedUsers = async (user: User) => {
     const db = getDatabase(firebaseApp);
     const blockedUsers = await get(ref(db, `blockedUsers/${user.userId}`));
 
-    return Object.entries(blockedUsers.val());
+    const json = blockedUsers.toJSON();
+
+    return json ? Object.entries(json) : [];
   } catch (e) {
     console.log(e);
     return [];

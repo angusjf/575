@@ -6,7 +6,7 @@ import {
   getDays,
   getUser,
   post,
-  registerUser,
+  uploadExpoPushToken,
 } from "./firebaseClient";
 import { loadFonts } from "./font";
 import { Day, Haiku, User } from "./types";
@@ -15,8 +15,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { useReducerWithEffects } from "./useReducerWithEffects";
 import { createContext, useContext, useEffect } from "react";
 import { isToday } from "date-fns";
-import { firebaseUserToUser } from "./utils/user";
 import { useNavigation } from "@react-navigation/native";
+import { registerForPushNotificationsAsync } from "./components/useNotifications";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -135,7 +135,10 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "register":
       return [
         { ...state, user: msg.user },
-        [{ effect: "navigate", route: "Compose" }],
+        [
+          { effect: "navigate", route: "Compose" },
+          { effect: "register_for_notifications", userId: msg.user.userId },
+        ],
       ];
     case "logout": {
       return [
@@ -191,7 +194,8 @@ type Effect =
   | { effect: "post"; user: User; haiku: Haiku }
   | { effect: "block_user"; user: User; blockedUserId: string }
   | { effect: "delete_user"; user: User; password: string }
-  | { effect: "navigate"; route: string };
+  | { effect: "navigate"; route: string }
+  | { effect: "register_for_notifications"; userId: string };
 
 const runEffect =
   (navigate: (route: string) => void) =>
@@ -224,6 +228,13 @@ const runEffect =
           console.log(e);
           return [];
         }
+      case "register_for_notifications":
+        const token = await registerForPushNotificationsAsync();
+        console.log("reg", token);
+        if (token) {
+          uploadExpoPushToken({ userId: effect.userId, token });
+        }
+        return [];
       case "navigate":
         navigate(effect.route);
         return [];
