@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@types/humps": "^2.0.2",
     "@types/react": "~18.0.14",
     "@types/react-native": "~0.70.6",
     "prettier": "2.8.3",
