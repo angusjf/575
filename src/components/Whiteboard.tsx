@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   PanResponder,
@@ -103,15 +103,13 @@ export const Whiteboard = ({
     ]);
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: (_) => true,
-      onMoveShouldSetPanResponder: (_) => true,
-      onPanResponderGrant: onTouch,
-      onPanResponderMove: onTouch,
-      onPanResponderRelease: () => onResponderRelease(),
-    })
-  );
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (_) => true,
+    onMoveShouldSetPanResponder: (_) => true,
+    onPanResponderGrant: onTouch,
+    onPanResponderMove: onTouch,
+    onPanResponderRelease: () => onResponderRelease(),
+  });
 
   return (
     <View style={styles.svgContainer} {...panResponder.current.panHandlers}>
