@@ -8,7 +8,7 @@ import {
   StyleProp,
 } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
-import humps from "humps";
+import { decamelize } from "humps";
 
 export type Point = {
   x: number;
@@ -46,7 +46,7 @@ export const convertStrokesToSvg = (
               `<${stroke.type.toLowerCase()} ${Object.keys(stroke.attributes)
                 .map(
                   (a) =>
-                    `${humps.decamelize(a, { separator: "-" })}="${
+                    `${decamelize(a, { separator: "-" })}="${
                       stroke.attributes[a]
                     }"`
                 )
@@ -59,17 +59,17 @@ export const convertStrokesToSvg = (
 };
 
 type WhiteboardProps = {
-  strokeWidth: number;
-  color: string;
-  containerStyle: StyleProp<ViewStyle>;
+  strokeWidth?: number;
+  color?: string;
+  containerStyle?: StyleProp<ViewStyle>;
   strokes: Stroke[];
   setStrokes: React.Dispatch<React.SetStateAction<Stroke[]>>;
 };
 
 export const Whiteboard = ({
-  strokeWidth,
-  color,
-  containerStyle,
+  strokeWidth = 4,
+  color = "#000000",
+  containerStyle = {},
   strokes: previousStrokes,
   setStrokes: setPreviousStrokes,
 }: WhiteboardProps) => {
@@ -80,7 +80,7 @@ export const Whiteboard = ({
 
     if (currentPoints.length === 1) {
       let p = currentPoints[0];
-      let distance = Math.sqrt(strokeWidth || 4) / 2;
+      let distance = Math.sqrt(strokeWidth) / 2;
       currentPoints.push({ x: p.x + distance, y: p.y + distance });
     }
 
@@ -88,8 +88,8 @@ export const Whiteboard = ({
       type: "Path",
       attributes: {
         d: pointsToSvg(currentPoints),
-        stroke: color || "#000000",
-        strokeWidth: strokeWidth || 4,
+        stroke: color,
+        strokeWidth: strokeWidth,
         fill: "none",
         strokeLinecap: "round",
         strokeLinejoin: "round",
@@ -128,7 +128,7 @@ export const Whiteboard = ({
             ))}
             <Path
               d={pointsToSvg(currentPoints)}
-              stroke={color || "#000000"}
+              stroke={color}
               strokeWidth={strokeWidth || 4}
               fill="none"
               strokeLinecap="round"
