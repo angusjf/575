@@ -93,14 +93,21 @@ export const Feed = () => {
           renderItem={({ item }) => {
             console.log(item.haiku);
             return (
-              <PostBox
-                signature={item.signature}
-                key={item.haiku.join("") + item.author}
-                author={item.author}
-                haiku={item.haiku}
-                showOptions={showOptions}
-                timestamp={item.timestamp}
-              />
+              <View style={{ alignItems: "center" }}>
+                <PostBox
+                  key={item.haiku.join("") + item.author}
+                  author={item.author}
+                  haiku={item.haiku}
+                  showOptions={showOptions}
+                  timestamp={item.timestamp}
+                />
+                <SvgXml
+                  xml={item.signature}
+                  width={100}
+                  height={100}
+                  viewBox="0 0 500 200"
+                />
+              </View>
             );
           }}
         />
