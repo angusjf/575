@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   PanResponder,
   StyleSheet,
   GestureResponderEvent,
-  ViewStyle,
-  StyleProp,
 } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
 import { decamelize } from "humps";
@@ -105,16 +103,18 @@ export const Whiteboard = ({
     ]);
   };
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: (_) => true,
-    onMoveShouldSetPanResponder: (_) => true,
-    onPanResponderGrant: onTouch,
-    onPanResponderMove: onTouch,
-    onPanResponderRelease: () => onResponderRelease(),
-  });
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (_) => true,
+      onMoveShouldSetPanResponder: (_) => true,
+      onPanResponderGrant: onTouch,
+      onPanResponderMove: onTouch,
+      onPanResponderRelease: () => onResponderRelease(),
+    })
+  );
 
   return (
-    <View style={styles.svgContainer} {...panResponder.panHandlers}>
+    <View style={styles.svgContainer} {...panResponder.current.panHandlers}>
       <Svg style={styles.drawSurface}>
         <G>
           {previousStrokes.map((stroke) => (
