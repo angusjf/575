@@ -103,7 +103,7 @@ export const Whiteboard = ({
     ]);
   };
 
-  const _panResponder = PanResponder.create({
+  const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: (_) => true,
     onMoveShouldSetPanResponder: (_) => true,
     onPanResponderGrant: onTouch,
@@ -113,7 +113,7 @@ export const Whiteboard = ({
 
   return (
     <View style={containerStyle}>
-      <View style={styles.svgContainer} {..._panResponder.panHandlers}>
+      <View style={styles.svgContainer} {...panResponder.panHandlers}>
         <Svg style={styles.drawSurface}>
           <G>
             {previousStrokes.map((stroke) => (
