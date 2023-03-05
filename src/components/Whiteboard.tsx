@@ -112,7 +112,7 @@ export const Whiteboard = ({
   });
 
   return (
-    <View style={styles.svgContainer} {...panResponder.current.panHandlers}>
+    <View style={styles.svgContainer} {...panResponder.panHandlers}>
       <Svg style={styles.drawSurface}>
         <G>
           {previousStrokes.map((stroke) => (
