@@ -6,35 +6,9 @@ import {
   GestureResponderEvent,
 } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
-import { Pen } from "./tools/Pen";
-import { Point } from "./tools/Point";
-import humps from "humps";
-import { Stroke } from "./tools/Stroke";
-
-export const convertStrokesToSvg = (
-  strokes: Stroke[],
-  layout: { width: number; height: number }
-): string => {
-  return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${layout.width}" height="${
-    layout.height
-  }" version="1.1">
-      <g>
-        ${strokes
-          .map((e) => {
-            return `<${e.type.toLowerCase()} ${Object.keys(e.attributes)
-              .map((a) => {
-                return `${humps.decamelize(a, { separator: "-" })}="${
-                  e.attributes[a]
-                }"`;
-              })
-              .join(" ")}/>`;
-          })
-          .join("\n")}
-      </g>
-    </svg>
-  `;
-};
+import { Pen } from "./Pen";
+import { Point } from "./Point";
+import { Stroke } from "./Stroke";
 
 type WhiteboardProps = {
   strokeWidth: number;
@@ -57,7 +31,7 @@ export const Whiteboard = ({
     if (currentPoints.length === 1) {
       let p = currentPoints[0];
       let distance = Math.sqrt(strokeWidth || 4) / 2;
-      currentPoints.push(new Point(p.x + distance, p.y + distance, p.time));
+      currentPoints.push({ x: p.x + distance, y: p.y + distance });
     }
 
     let newElement: Stroke = {
@@ -79,15 +53,10 @@ export const Whiteboard = ({
   };
 
   const onTouch = (evt: GestureResponderEvent) => {
-    const [x, y, timestamp] = [
-      evt.nativeEvent.locationX,
-      evt.nativeEvent.locationY,
-      evt.nativeEvent.timestamp,
-    ];
-
-    const newPoint = new Point(x, y, timestamp);
-
-    setCurrentPoints([...currentPoints, newPoint]);
+    setCurrentPoints([
+      ...currentPoints,
+      { x: evt.nativeEvent.locationX, y: evt.nativeEvent.locationY },
+    ]);
   };
 
   const _panResponder = PanResponder.create({
@@ -109,7 +78,10 @@ export const Whiteboard = ({
         <Svg style={styles.drawSurface}>
           <G>
             {previousStrokes.map((stroke) => (
-              <Path {...stroke.attributes} />
+              <Path
+                {...stroke.attributes}
+                key={JSON.stringify(stroke.attributes)}
+              />
             ))}
             <Path
               d={pen.current.pointsToSvg(currentPoints)}

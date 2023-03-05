@@ -14,7 +14,7 @@ import { firebaseApp } from "../firebase";
 import { registerUser } from "../firebaseClient";
 import { firebaseUserToUser } from "../utils/user";
 import { useAppState } from "../useAppState";
-import { Whiteboard } from "./Pad";
+import { Whiteboard } from "./whiteboard/Whiteboard";
 
 const styles = StyleSheet.create({
   root: {
