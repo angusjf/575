@@ -38,12 +38,21 @@ export const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [validity, setValidity] = useState<Validity>("unchecked");
   const [strokes, setStrokes] = useState<Stroke[]>([]);
+  const [validity, setValidity] = useState<Validity>("unchecked");
 
   const { register } = useAppState();
 
   const handleCreateAccount = async () => {
+    if (
+      email === "" ||
+      password === "" ||
+      name === "" ||
+      strokes.length === 0
+    ) {
+      setValidity("invalid");
+      return;
+    }
     const auth = getAuth(firebaseApp);
     const signature = convertStrokesToSvg(strokes, {
       width: signatureWidth,
