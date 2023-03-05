@@ -72,21 +72,14 @@ export const RegisterForm = () => {
         how do you sign your poems?
       </Text>
       <Whiteboard
-        strokes={[]}
         containerStyle={{
           backgroundColor: "rgb(216, 200, 200)",
           height: 200,
           width: 400,
           marginBottom: 40,
         }}
-        rewind={(undo) => {}}
-        clear={(clear) => {}}
         color={"#2c2a2a"}
         strokeWidth={4}
-        enabled={true}
-        onChangeStrokes={(newStrokes) => {
-          strokes.current = newStrokes;
-        }}
       />
       <HaikuLineInput
         placeholder="preferred signature"
