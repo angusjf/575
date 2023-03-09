@@ -6,7 +6,7 @@ import {
 } from "firebase/auth";
 import { getDatabase, ref, set, get, remove, child } from "firebase/database";
 import { firebaseApp } from "./firebase";
-import { Haiku, Day, User, Post } from "./types";
+import { Haiku, Day, User, Post, BlockedUser } from "./types";
 import { dateDbKey, parseDateDbKey } from "./utils/date";
 import { firebaseUserToUser } from "./utils/user";
 
@@ -73,7 +73,9 @@ export const getDays = async (user: User): Promise<Day[]> => {
         .filter(
           (post) =>
             !blockedUsers.map((user) => user[0]).includes(post.author.userId) &&
-            !blockingUsers.map((user) => user[0]).includes(post.author.userId)
+            !blockingUsers
+              .map((user) => user.userId)
+              .includes(post.author.userId)
         ),
     }));
   } catch (e) {
@@ -117,14 +119,19 @@ export const blockUser = async (
   ]);
 };
 
-export const getBlockingUsers = async (user: User) => {
+export const getBlockingUsers = async (user: User): Promise<BlockedUser[]> => {
   try {
     const db = getDatabase(firebaseApp);
     const blockingUsers = await get(ref(db, `blocks/${user.userId}`));
 
     const json = blockingUsers.toJSON();
 
-    return json ? Object.entries(json) : [];
+    return json
+      ? Object.entries(json).map((user) => ({
+          userId: user[0],
+          username: user[1],
+        }))
+      : [];
   } catch (e) {
     console.log(e);
     return [];
@@ -143,4 +150,12 @@ export const getBlockedUsers = async (user: User) => {
     console.log(e);
     return [];
   }
+};
+
+export const unblockUser = async (user: User, blockedUserId: string) => {
+  const db = getDatabase(firebaseApp);
+  await Promise.all([
+    remove(ref(db, `blocks/${user.userId}/${blockedUserId}`)),
+    remove(ref(db, `blocked/${blockedUserId}/${user.userId}`)),
+  ]);
 };

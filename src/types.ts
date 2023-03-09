@@ -16,3 +16,8 @@ export type User = {
   avatar: string;
   signature: string;
 };
+
+export type BlockedUser = {
+  username: string;
+  userId: string;
+};

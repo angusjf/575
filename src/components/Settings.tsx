@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Platform,
@@ -11,11 +11,18 @@ import {
 } from "react-native";
 import { useAppState } from "../useAppState";
 import Dialog from "react-native-dialog";
+import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import { fonts } from "../font";
 
 const styles = StyleSheet.create({
   root: {
     backgroundColor: "#f9f6f6",
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+    flexDirection: "row",
   },
 });
 
@@ -45,13 +52,23 @@ const SettingsItem = ({ title, onPress }: SettingsItemProps) => (
 );
 
 export const Settings = () => {
-  const { logout, deleteAccount } = useAppState();
+  const { logout, deleteAccount, state, unblockUser } = useAppState();
   const [visible, setVisible] = useState(false);
   const [password, setPassword] = useState("");
+
+  // ref
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // variables
+  const snapPoints = useMemo(() => ["50%", "60%"], []);
+
   const settings = useMemo(
     () => [
       { title: "Logout", onPress: logout },
-      { title: "Unblock users", onPress: () => undefined },
+      {
+        title: "Unblock users",
+        onPress: () => bottomSheetRef.current?.expand(),
+      },
       {
         title: "Delete your account",
         onPress: () => setVisible(true),
@@ -60,6 +77,7 @@ export const Settings = () => {
     []
   );
 
+  const BLOCKED_USERS = state.blockedUsers;
   return (
     <SafeAreaView style={styles.root}>
       <FlatList
@@ -89,6 +107,82 @@ export const Settings = () => {
           bold
         />
       </Dialog.Container>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        style={{
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 4,
+          },
+          shadowOpacity: 0.3,
+          shadowRadius: 4.65,
+
+          elevation: 8,
+        }}
+      >
+        <View style={styles.contentContainer}>
+          {state.blockedUsers ? (
+            <BottomSheetFlatList
+              data={BLOCKED_USERS}
+              renderItem={({ item }) => (
+                <BlockedUser
+                  name={item.username}
+                  unblock={() => unblockUser(item.userId)}
+                />
+              )}
+              refreshing={false}
+              style={{ width: "100%" }}
+              horizontal={false}
+            />
+          ) : null}
+        </View>
+      </BottomSheet>
     </SafeAreaView>
+  );
+};
+
+const BlockedUser = ({
+  name,
+  unblock,
+}: {
+  name: string;
+  unblock: () => void;
+}) => {
+  return (
+    <View
+      style={{
+        borderColor: "lightgrey",
+        borderBottomWidth: 1,
+        justifyContent: "space-between",
+        flex: 1,
+        flexDirection: "row",
+        paddingHorizontal: 22,
+        alignItems: "center",
+        paddingVertical: 7,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 21,
+          fontFamily: fonts.PlexMonoItalic,
+        }}
+      >
+        {name}
+      </Text>
+      <TouchableOpacity onPress={unblock}>
+        <Text
+          style={{
+            fontSize: 30,
+            fontFamily: fonts.PlexSerifRegular,
+          }}
+        >
+          x
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 };

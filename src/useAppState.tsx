@@ -3,13 +3,16 @@ import { firebaseApp } from "./firebase";
 import {
   blockUser,
   deleteAccount,
+  getBlockedUsers,
+  getBlockingUsers,
   getDays,
   getUser,
   post,
+  unblockUser,
   uploadExpoPushToken,
 } from "./firebaseClient";
 import { loadFonts } from "./font";
-import { Day, Haiku, User } from "./types";
+import { BlockedUser, Day, Haiku, User } from "./types";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import { useReducerWithEffects } from "./useReducerWithEffects";
@@ -33,6 +36,7 @@ type State = {
   fonts: boolean;
   user: User | null | undefined;
   days: Day[] | undefined;
+  blockedUsers: BlockedUser[] | undefined;
 };
 
 type Msg =
@@ -40,7 +44,7 @@ type Msg =
   | { msg: "loaded_user"; user: User | null }
   | { msg: "set_username"; user: User }
   | { msg: "visit_feed"; user: User }
-  | { msg: "set_days"; days: Day[] }
+  | { msg: "set_days"; days: Day[]; blockedUsers: BlockedUser[] }
   | { msg: "load_feed"; user: User }
   | { msg: "register"; user: User }
   | { msg: "logout" }
@@ -49,7 +53,8 @@ type Msg =
   | { msg: "open_settings" }
   | { msg: "delete_account"; password: string }
   | { msg: "account_deleted" }
-  | { msg: "finish_onboarding" };
+  | { msg: "finish_onboarding" }
+  | { msg: "unblock_user"; blockedUserId: string };
 
 const hasPostedToday = (user: User, days: Day[]): boolean =>
   days
@@ -69,7 +74,13 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       if (!state.days) {
         return hasPostedToday(state.user!, msg.days)
           ? [
-              { ...state, days: msg.days, user: state.user, loading: false },
+              {
+                ...state,
+                days: msg.days,
+                user: state.user,
+                loading: false,
+                blockedUsers: msg.blockedUsers,
+              },
               [
                 { effect: "hide_splash" },
                 { effect: "navigate", route: "Feed" },
@@ -170,6 +181,17 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
           },
         ],
       ];
+    case "unblock_user":
+      return [
+        state,
+        [
+          {
+            effect: "unblock_user",
+            user: state.user!,
+            blockedUserId: msg.blockedUserId,
+          },
+        ],
+      ];
     case "open_settings":
       return [
         { ...state, user: state.user },
@@ -201,7 +223,8 @@ type Effect =
     }
   | { effect: "delete_user"; user: User; password: string }
   | { effect: "navigate"; route: string }
-  | { effect: "register_for_notifications"; userId: string };
+  | { effect: "register_for_notifications"; userId: string }
+  | { effect: "unblock_user"; user: User; blockedUserId: string };
 
 const runEffect =
   (navigate: (route: string) => void) =>
@@ -212,7 +235,8 @@ const runEffect =
         return [];
       case "get_days":
         const days = await getDays(effect.user);
-        return [{ msg: "set_days", days }];
+        const blockedUsers = await getBlockingUsers(effect.user);
+        return [{ msg: "set_days", days, blockedUsers }];
       case "logout":
         const auth = getAuth(firebaseApp);
         await auth.signOut();
@@ -229,6 +253,9 @@ const runEffect =
           effect.blockedUserId,
           effect.blockedUserName
         );
+        return [{ msg: "load_feed", user: effect.user }];
+      case "unblock_user":
+        await unblockUser(effect.user, effect.blockedUserId);
         return [{ msg: "load_feed", user: effect.user }];
       case "delete_user":
         try {
@@ -257,6 +284,7 @@ const init: [State, Effect[]] = [
     fonts: false,
     days: undefined,
     user: undefined,
+    blockedUsers: undefined,
   },
   [{ effect: "load_fonts" }],
 ];
@@ -271,6 +299,7 @@ type AppContextType = {
   openSettings: () => void;
   deleteAccount: (password: string) => void;
   finishOnboarding: () => void;
+  unblockUser: (blockedUserId: string) => void;
 };
 
 const AppContext = createContext<AppContextType>({
@@ -283,6 +312,7 @@ const AppContext = createContext<AppContextType>({
   openSettings: () => {},
   deleteAccount: () => {},
   finishOnboarding: () => {},
+  unblockUser: () => {},
 });
 
 export const AppStateProvider = (props: any) => {
@@ -326,6 +356,8 @@ export const AppStateProvider = (props: any) => {
     deleteAccount: (password: string) =>
       dispatch({ msg: "delete_account", password }),
     finishOnboarding: () => dispatch({ msg: "finish_onboarding" }),
+    unblockUser: (blockedUserId: string) =>
+      dispatch({ msg: "unblock_user", blockedUserId }),
   };
 
   return <AppContext.Provider value={context} {...props} />;
