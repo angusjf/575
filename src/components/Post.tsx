@@ -24,7 +24,11 @@ export const PostBox = ({
   author,
   showOptions,
 }: Omit<Post, "signature"> & {
-  showOptions: (sharingMessage: string, userId: string) => void;
+  showOptions: (
+    sharingMessage: string,
+    userId: string,
+    userName: string
+  ) => void;
 }) => {
   return (
     <TouchableOpacity
@@ -38,7 +42,8 @@ export const PostBox = ({
             haiku[2] +
             "\n~ " +
             author.username,
-          author.userId
+          author.userId,
+          author.username
         )
       }
     >

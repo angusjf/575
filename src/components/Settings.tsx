@@ -51,7 +51,7 @@ export const Settings = () => {
   const settings = useMemo(
     () => [
       { title: "Logout", onPress: logout },
-      // { title: "Unblock users", onPress: () => undefined },
+      { title: "Unblock users", onPress: () => undefined },
       {
         title: "Delete your account",
         onPress: () => setVisible(true),

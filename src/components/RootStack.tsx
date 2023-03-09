@@ -92,6 +92,7 @@ export const RootStack = () => {
             route.name === "Feed" ? (
               <HeaderRight onPress={() => openSettings()} />
             ) : null,
+          gestureEnabled: false,
         })}
       />
       <Stack.Screen

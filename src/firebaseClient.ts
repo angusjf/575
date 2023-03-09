@@ -53,7 +53,10 @@ export const getDays = async (user: User): Promise<Day[]> => {
     const db = getDatabase(firebaseApp);
     const days = await get(ref(db, "days/"));
 
-    const blockedUsers = await getBlockedUsers(user);
+    const [blockedUsers, blockingUsers] = await Promise.all([
+      getBlockedUsers(user),
+      getBlockingUsers(user),
+    ]);
 
     const json = days.toJSON();
     if (!json) throw new Error("bad json");
@@ -69,7 +72,8 @@ export const getDays = async (user: User): Promise<Day[]> => {
         }))
         .filter(
           (post) =>
-            !blockedUsers.map((user) => user[0]).includes(post.author.userId)
+            !blockedUsers.map((user) => user[0]).includes(post.author.userId) &&
+            !blockingUsers.map((user) => user[0]).includes(post.author.userId)
         ),
     }));
   } catch (e) {
@@ -101,18 +105,36 @@ export const uploadExpoPushToken = ({
   set(ref(db, `expoPushTokens/${userId}/`), token);
 };
 
-export const blockUser = async (user: User, blockedUserId: string) => {
+export const blockUser = async (
+  user: User,
+  blockedUserId: string,
+  blockedUserName: string
+) => {
   const db = getDatabase(firebaseApp);
   await Promise.all([
-    set(ref(db, `blockedUsers/${user.userId}/${blockedUserId}`), true),
-    set(ref(db, `blockedUsers/${blockedUserId}/${user.userId}`), true),
+    set(ref(db, `blocks/${user.userId}/${blockedUserId}`), blockedUserName),
+    set(ref(db, `blocked/${blockedUserId}/${user.userId}`), true),
   ]);
+};
+
+export const getBlockingUsers = async (user: User) => {
+  try {
+    const db = getDatabase(firebaseApp);
+    const blockingUsers = await get(ref(db, `blocks/${user.userId}`));
+
+    const json = blockingUsers.toJSON();
+
+    return json ? Object.entries(json) : [];
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
 };
 
 export const getBlockedUsers = async (user: User) => {
   try {
     const db = getDatabase(firebaseApp);
-    const blockedUsers = await get(ref(db, `blockedUsers/${user.userId}`));
+    const blockedUsers = await get(ref(db, `blocked/${user.userId}`));
 
     const json = blockedUsers.toJSON();
 

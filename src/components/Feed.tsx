@@ -35,7 +35,11 @@ export const Feed = () => {
 
   const days = state.days;
 
-  const showOptions = (sharingMessage: string, blockedUserId: string) => {
+  const showOptions = (
+    sharingMessage: string,
+    blockedUserId: string,
+    blockedUserName: string
+  ) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const options = ["Share", "Block User", "Cancel"];
     const destructiveButtonIndex = 1;
@@ -58,7 +62,10 @@ export const Feed = () => {
               "Are you sure you want to block this user?",
               [
                 { text: "Cancel" },
-                { text: "Block", onPress: () => blockUser(blockedUserId) },
+                {
+                  text: "Block",
+                  onPress: () => blockUser(blockedUserId, blockedUserName),
+                },
               ],
               { cancelable: true }
             );
@@ -91,7 +98,6 @@ export const Feed = () => {
           }
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => {
-            console.log(item.haiku);
             return (
               <View style={{ alignItems: "center" }}>
                 <PostBox

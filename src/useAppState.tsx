@@ -45,7 +45,7 @@ type Msg =
   | { msg: "register"; user: User }
   | { msg: "logout" }
   | { msg: "publish"; haiku: Haiku }
-  | { msg: "block_user"; blockedUserId: string }
+  | { msg: "block_user"; blockedUserId: string; blockedUserName: string }
   | { msg: "open_settings" }
   | { msg: "delete_account"; password: string }
   | { msg: "account_deleted" }
@@ -166,6 +166,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
             effect: "block_user",
             user: state.user!,
             blockedUserId: msg.blockedUserId,
+            blockedUserName: msg.blockedUserName,
           },
         ],
       ];
@@ -192,7 +193,12 @@ type Effect =
   | { effect: "logout" }
   | { effect: "load_fonts" }
   | { effect: "post"; user: User; haiku: Haiku }
-  | { effect: "block_user"; user: User; blockedUserId: string }
+  | {
+      effect: "block_user";
+      user: User;
+      blockedUserId: string;
+      blockedUserName: string;
+    }
   | { effect: "delete_user"; user: User; password: string }
   | { effect: "navigate"; route: string }
   | { effect: "register_for_notifications"; userId: string };
@@ -218,7 +224,11 @@ const runEffect =
         await post(effect.user, effect.haiku);
         return [{ msg: "load_feed", user: effect.user }];
       case "block_user":
-        await blockUser(effect.user, effect.blockedUserId);
+        await blockUser(
+          effect.user,
+          effect.blockedUserId,
+          effect.blockedUserName
+        );
         return [{ msg: "load_feed", user: effect.user }];
       case "delete_user":
         try {
@@ -256,7 +266,7 @@ type AppContextType = {
   register: (user: User) => void;
   logout: () => void;
   publish: (haiku: Haiku) => void;
-  blockUser: (blockedUserId: string) => void;
+  blockUser: (blockedUserId: string, blockedUserName: string) => void;
   refreshFeed: () => void;
   openSettings: () => void;
   deleteAccount: (password: string) => void;
@@ -265,13 +275,13 @@ type AppContextType = {
 
 const AppContext = createContext<AppContextType>({
   state: init[0],
-  register: (user: User) => {},
+  register: () => {},
   logout: () => {},
-  publish: (haiku: Haiku) => {},
-  blockUser: (blockedUserId: string) => {},
+  publish: () => {},
+  blockUser: () => {},
   refreshFeed: () => {},
   openSettings: () => {},
-  deleteAccount: (password: string) => {},
+  deleteAccount: () => {},
   finishOnboarding: () => {},
 });
 
@@ -309,8 +319,8 @@ export const AppStateProvider = (props: any) => {
     register: (user: User) => dispatch({ msg: "register", user }),
     logout: () => dispatch({ msg: "logout" }),
     publish: (haiku: Haiku) => dispatch({ msg: "publish", haiku }),
-    blockUser: (blockedUserId: string) =>
-      dispatch({ msg: "block_user", blockedUserId }),
+    blockUser: (blockedUserId: string, blockedUserName: string) =>
+      dispatch({ msg: "block_user", blockedUserId, blockedUserName }),
     refreshFeed: () => dispatch({ msg: "load_feed", user: state.user! }),
     openSettings: () => dispatch({ msg: "open_settings" }),
     deleteAccount: (password: string) =>
