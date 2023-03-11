@@ -15,6 +15,7 @@ import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { useAppState } from "../useAppState";
 import { SvgXml } from "react-native-svg";
+import { italicize } from "../italicize";
 
 const styles = StyleSheet.create({
   root: {
@@ -54,7 +55,7 @@ export const Feed = () => {
       (selectedIndex?: number) => {
         switch (selectedIndex) {
           case 0:
-            Share.share({ message: sharingMessage });
+            Share.share({ message: italicize(sharingMessage) });
             break;
           case 1:
             Alert.alert(
