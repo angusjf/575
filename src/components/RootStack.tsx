@@ -100,7 +100,19 @@ export const RootStack = () => {
         component={RegisterForm}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          headerTitle: () => (
+            <Text
+              style={{ fontFamily: fonts.PlexSerifBoldItalic, fontSize: 28 }}
+            >
+              Settings
+            </Text>
+          ),
+        }}
+      />
     </Stack.Navigator>
   );
 };

@@ -46,7 +46,9 @@ const SettingsItem = ({ title, onPress }: SettingsItemProps) => (
         justifyContent: "center",
       }}
     >
-      <Text style={{ paddingHorizontal: 22 }}>{title}</Text>
+      <Text style={{ paddingHorizontal: 22, fontFamily: fonts.PlexMonoItalic }}>
+        {title}
+      </Text>
     </TouchableOpacity>
   </View>
 );
