@@ -102,7 +102,9 @@ export const Feed = () => {
   return (
     <View style={styles.root}>
       {feedData === undefined ? (
-        <ActivityIndicator />
+        <View style={{ flexGrow: 1, justifyContent: "center" }}>
+          <ActivityIndicator />
+        </View>
       ) : (
         <FlatList
           contentContainerStyle={{ paddingTop: 50, paddingBottom: 80 }}
