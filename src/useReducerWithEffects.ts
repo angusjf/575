@@ -29,7 +29,7 @@ export function useReducerWithEffects<
     nextMsgs.forEach((promise) =>
       promise.then((resolved) => resolved.forEach(dispatch))
     );
-  }, [effects]);
+  }, [effects, runEffect]);
 
   return [state, dispatch];
 }

@@ -79,7 +79,7 @@ export const Settings = () => {
         onPress: () => setVisible(true),
       },
     ],
-    []
+    [logout, state.user?.username]
   );
 
   const BLOCKED_USERS = state.blockedUsers;

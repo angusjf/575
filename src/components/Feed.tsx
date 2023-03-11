@@ -38,6 +38,8 @@ export const Feed = () => {
 
   const days = state.days;
 
+  console.log("feed days", state.days);
+
   const showOptions = (
     sharingMessage: string,
     blockedUserId: string,
@@ -85,19 +87,21 @@ export const Feed = () => {
     setTimeout(() => setRefreshing(false), 500);
   };
 
-  const feedData: ("separator" | Post)[] | undefined = useMemo(
-    () =>
-      days !== undefined
-        ? days[days.length - 2].posts.length > 0
-          ? [
-              ...sortByTimestamp(days[days.length - 1].posts),
-              "separator",
-              ...sortByTimestamp(days[days.length - 2].posts),
-            ]
-          : sortByTimestamp(days[days.length - 1].posts)
-        : undefined,
-    []
-  );
+  const feedData: ("separator" | Post)[] | undefined = useMemo(() => {
+    if (days === undefined) {
+      return undefined;
+    }
+    if (days[days.length - 2].posts.length > 0) {
+      return [
+        ...sortByTimestamp(days[days.length - 1].posts),
+        "separator",
+        ...sortByTimestamp(days[days.length - 2].posts),
+      ];
+    }
+    return sortByTimestamp(days[days.length - 1].posts);
+  }, [days]);
+
+  console.log("feed-data ", feedData);
 
   return (
     <View style={styles.root}>

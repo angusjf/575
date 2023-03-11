@@ -346,7 +346,7 @@ export const AppStateProvider = (props: any) => {
       }
     });
     return unsubscribe;
-  }, []);
+  }, [dispatch]);
 
   const context: AppContextType = {
     state,
