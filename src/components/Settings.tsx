@@ -71,7 +71,7 @@ export const Settings = () => {
 
   const settings = useMemo(
     () => [
-      { title: "Logout", onPress: logout },
+      { title: `Logout of ${state.user?.username}`, onPress: logout },
       {
         title: "Unblock users",
         onPress: () => bottomSheetRef.current?.expand(),

@@ -61,23 +61,27 @@ export const getDays = async (user: User): Promise<Day[]> => {
     const json = days.toJSON();
     if (!json) throw new Error("bad json");
 
-    return Object.entries(json).map(([date, posts]) => ({
-      date: parseDateDbKey(date),
-      posts: Object.entries((posts as Record<string, Post> | undefined) ?? [])
-        .map(([userId, data]) => ({
-          author: data.author,
-          haiku: Object.values(data.haiku) as Haiku,
-          timestamp: data.timestamp,
-          signature: data.signature,
-        }))
-        .filter(
-          (post) =>
-            !blockedUsers.map((user) => user[0]).includes(post.author.userId) &&
-            !blockingUsers
-              .map((user) => user.userId)
-              .includes(post.author.userId)
-        ),
-    }));
+    return Object.entries(json)
+      .map(([date, posts]) => ({
+        date: parseDateDbKey(date),
+        posts: Object.entries((posts as Record<string, Post> | undefined) ?? [])
+          .map(([userId, data]) => ({
+            author: data.author,
+            haiku: Object.values(data.haiku) as Haiku,
+            timestamp: data.timestamp,
+            signature: data.signature,
+          }))
+          .filter(
+            (post) =>
+              !blockedUsers
+                .map((user) => user[0])
+                .includes(post.author.userId) &&
+              !blockingUsers
+                .map((user) => user.userId)
+                .includes(post.author.userId)
+          ),
+      }))
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
   } catch (e) {
     console.log(e);
     return [];
