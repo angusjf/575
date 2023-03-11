@@ -1,9 +1,7 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   FlatList,
-  Platform,
   SafeAreaView,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
   View,

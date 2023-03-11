@@ -168,7 +168,6 @@ const InputScreen = ({
           onChangeText={(l) => changed(2, l)}
         />
       </View>
-      <SvgXml xml={signature} />
       <View>
         <Button
           title="check & share"
