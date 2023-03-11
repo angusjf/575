@@ -68,7 +68,7 @@ export const RootStack = () => {
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ gestureEnabled: false }}>
       <Stack.Screen
         name="Onboarding"
         component={OnboardingScreen}
@@ -92,7 +92,6 @@ export const RootStack = () => {
             route.name === "Feed" ? (
               <HeaderRight onPress={() => openSettings()} />
             ) : null,
-          gestureEnabled: false,
         })}
       />
       <Stack.Screen
@@ -111,6 +110,7 @@ export const RootStack = () => {
               Settings
             </Text>
           ),
+          gestureEnabled: true,
         }}
       />
     </Stack.Navigator>
