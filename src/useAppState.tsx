@@ -87,14 +87,22 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
               ],
             ]
           : [
-              { ...state, user: state.user, loading: false },
+              {
+                ...state,
+                user: state.user,
+                loading: false,
+                blockedUsers: msg.blockedUsers,
+              },
               [
                 { effect: "hide_splash" },
                 { effect: "navigate", route: "Compose" },
               ],
             ];
       } else {
-        return [{ ...state, days: msg.days }, []];
+        return [
+          { ...state, days: msg.days, blockedUsers: msg.blockedUsers },
+          [],
+        ];
       }
     case "loaded_user":
       if (state.fonts) {

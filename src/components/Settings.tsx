@@ -24,6 +24,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
+  line: {
+    fontFamily: fonts.PlexMonoItalic,
+    fontSize: 15,
+    marginBottom: 7,
+  },
 });
 
 type SettingsItemProps = {
@@ -127,7 +132,7 @@ export const Settings = () => {
         }}
       >
         <View style={styles.contentContainer}>
-          {state.blockedUsers ? (
+          {state.blockedUsers && state.blockedUsers.length > 0 ? (
             <BottomSheetFlatList
               data={BLOCKED_USERS}
               renderItem={({ item }) => (
@@ -140,7 +145,18 @@ export const Settings = () => {
               style={{ width: "100%" }}
               horizontal={false}
             />
-          ) : null}
+          ) : (
+            <View
+              style={{
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              <Text style={styles.line}>A calm Haiku app,</Text>
+              <Text style={styles.line}>No blocked users found within,</Text>
+              <Text style={styles.line}>Peaceful user's life.</Text>
+            </View>
+          )}
         </View>
       </BottomSheet>
     </SafeAreaView>
