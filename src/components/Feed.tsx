@@ -8,14 +8,16 @@ import {
   View,
   Share,
   Alert,
+  Text,
 } from "react-native";
 import { PostBox } from "./Post";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAppState } from "../useAppState";
 import { SvgXml } from "react-native-svg";
 import { italicize } from "../italicize";
+import { Post } from "../types";
 
 const styles = StyleSheet.create({
   root: {
@@ -83,23 +85,37 @@ export const Feed = () => {
     setTimeout(() => setRefreshing(false), 500);
   };
 
+  const feedData: ("separator" | Post)[] | undefined = useMemo(
+    () =>
+      days !== undefined
+        ? [
+            ...days[days.length - 1].posts.sort(
+              (postA, postB) => postB.timestamp - postA.timestamp
+            ),
+            "separator",
+            ...days[days.length - 2].posts.sort(
+              (postA, postB) => postB.timestamp - postA.timestamp
+            ),
+          ]
+        : undefined,
+    []
+  );
+
   return (
     <View style={styles.root}>
-      {days === undefined ? (
+      {feedData === undefined ? (
         <ActivityIndicator />
       ) : (
         <FlatList
           contentContainerStyle={{ paddingTop: 50, paddingBottom: 80 }}
           style={styles.feed}
-          data={days[days.length - 1].posts.sort(
-            (postA, postB) => postB.timestamp - postA.timestamp
-          )}
+          data={feedData}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => {
-            return (
+          renderItem={({ item }) =>
+            item !== "separator" ? (
               <View style={{ alignItems: "center" }}>
                 <PostBox
                   key={item.haiku.join("") + item.author}
@@ -115,10 +131,14 @@ export const Feed = () => {
                   viewBox="0 0 500 200"
                 />
               </View>
-            );
-          }}
+            ) : (
+              <Separator />
+            )
+          }
         />
       )}
     </View>
   );
 };
+
+const Separator = () => <Text>Yesterday's Haikus</Text>;
