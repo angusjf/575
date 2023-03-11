@@ -88,15 +88,13 @@ export const Feed = () => {
   const feedData: ("separator" | Post)[] | undefined = useMemo(
     () =>
       days !== undefined
-        ? [
-            ...days[days.length - 1].posts.sort(
-              (postA, postB) => postB.timestamp - postA.timestamp
-            ),
-            "separator",
-            ...days[days.length - 2].posts.sort(
-              (postA, postB) => postB.timestamp - postA.timestamp
-            ),
-          ]
+        ? days[days.length - 2].posts.length > 0
+          ? [
+              ...sortByTimestamp(days[days.length - 1].posts),
+              "separator",
+              ...sortByTimestamp(days[days.length - 2].posts),
+            ]
+          : sortByTimestamp(days[days.length - 1].posts)
         : undefined,
     []
   );
@@ -142,3 +140,6 @@ export const Feed = () => {
 };
 
 const Separator = () => <Text>Yesterday's Haikus</Text>;
+
+const sortByTimestamp = <T extends { timestamp: number }>(xs: T[]): T[] =>
+  xs.sort((postA, postB) => postB.timestamp - postA.timestamp);
