@@ -13,11 +13,13 @@ export type Point = {
   y: number;
 };
 
+const round = (n: number): string => n.toFixed(0);
+
 const pointsToSvg = (points: Point[]) => {
   if (points.length > 0) {
     return (
-      `M ${points[0].x},${points[0].y}` +
-      points.slice(1).map((point) => ` L ${point.x},${point.y}`)
+      `M ${round(points[0].x)},${round(points[0].y)}` +
+      points.slice(1).map((point) => ` L ${round(point.x)},${round(point.y)}`)
     );
   } else {
     return "";
