@@ -102,7 +102,6 @@ export const RegisterForm = () => {
           backgroundColor: "rgb(216, 200, 200)",
           height: signatureHeight,
           width: signatureWidth,
-          marginBottom: 40,
         }}
       >
         <Whiteboard
@@ -112,7 +111,13 @@ export const RegisterForm = () => {
           strokeWidth={4}
         />
       </View>
-      <Button title="clear" onPress={() => setStrokes([])} />
+      <Button
+        title="clear"
+        onPress={() => setStrokes([])}
+        style={{
+          marginBottom: 40,
+        }}
+      />
       <HaikuLineInput
         placeholder="preferred signature"
         autoFocus
