@@ -197,7 +197,7 @@ const BlockedUser = ({
             fontFamily: fonts.PlexSerifRegular,
           }}
         >
-          x
+          ⨯
         </Text>
       </TouchableOpacity>
     </View>
