@@ -10,7 +10,7 @@ import {
   Alert,
   Text,
 } from "react-native";
-import { PostBox } from "./Post";
+import { PostBox } from "./PostBox";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
 import { useMemo, useState } from "react";
