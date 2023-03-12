@@ -18,6 +18,7 @@ import { useAppState } from "../useAppState";
 import { SvgXml } from "react-native-svg";
 import { italicize } from "../italicize";
 import { Post } from "../types";
+import { fonts } from "../font";
 
 const styles = StyleSheet.create({
   root: {
@@ -141,7 +142,20 @@ export const Feed = () => {
   );
 };
 
-const Separator = () => <Text>Yesterday's Haikus</Text>;
+const Separator = () => (
+  <View
+    style={{
+      borderColor: "lightgrey",
+      borderTopWidth: 1,
+      paddingTop: 10,
+      alignItems: "center",
+    }}
+  >
+    <Text style={{ fontFamily: fonts.PlexMonoBold, color: "#bbb" }}>
+      Yesterday's Haikus
+    </Text>
+  </View>
+);
 
 const sortByTimestamp = <T extends { timestamp: number }>(xs: T[]): T[] =>
   xs.sort((postA, postB) => postB.timestamp - postA.timestamp);
