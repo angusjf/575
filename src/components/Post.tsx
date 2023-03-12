@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: "right",
     marginTop: 5,
+    marginRight: 10,
   },
   container: {
     marginTop: 21,
