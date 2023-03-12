@@ -13,12 +13,14 @@ import {
 import { PostBox } from "./PostBox";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as Haptics from "expo-haptics";
-import { useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { useAppState } from "../useAppState";
 import { SvgXml } from "react-native-svg";
 import { italicize } from "../italicize";
 import { Post } from "../types";
 import { fonts } from "../font";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { ONBOARDING_SCREEN_NAME, RootStackParams } from "./RootStack";
 
 const styles = StyleSheet.create({
   root: {
@@ -33,9 +35,20 @@ const styles = StyleSheet.create({
   },
 });
 
-export const Feed = () => {
+type FeedParams = NativeStackScreenProps<RootStackParams, "Feed">;
+
+export const Feed: FC<FeedParams> = ({ navigation }) => {
   const { showActionSheetWithOptions } = useActionSheet();
   const { state, refreshFeed, blockUser } = useAppState();
+
+  useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        if (e.data.action.type !== "GO_BACK") return;
+        e.preventDefault();
+      }),
+    [navigation]
+  );
 
   const days = state.days;
 

@@ -24,6 +24,8 @@ export type RootStackParams = RegisterStackParams & {
   Onboarding: undefined;
 };
 
+export const ONBOARDING_SCREEN_NAME = "Onboarding";
+
 const Stack = createNativeStackNavigator<RootStackParams>();
 
 const styles = StyleSheet.create({
@@ -90,7 +92,7 @@ export const RootStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Onboarding"
+        name={ONBOARDING_SCREEN_NAME}
         component={OnboardingScreen}
         options={{ headerShown: false }}
       />

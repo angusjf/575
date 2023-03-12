@@ -1,23 +1,13 @@
 import {
-  TouchableOpacity,
-  Image,
   Text,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "../font";
-import { Feed } from "./Feed";
-import { Settings } from "./Settings";
 import { useAppState } from "../useAppState";
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from "@react-navigation/native-stack";
-import { HaikuForm } from "./HaikuForm";
-import { OnboardingScreen } from "./OnboardingScreen";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { FC, useState } from "react";
 import { Validity } from "../validity";
