@@ -127,8 +127,8 @@ export const Feed = () => {
                 />
                 <SvgXml
                   xml={item.signature}
-                  width={200}
-                  height={100}
+                  width={150}
+                  height={75}
                   style={{ marginBottom: 38 }}
                   viewBox="0 0 500 200"
                 />
