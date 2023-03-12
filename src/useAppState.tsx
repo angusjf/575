@@ -72,6 +72,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       return [{ ...state, user: msg.user }, []];
     case "set_days":
       if (!state.days) {
+        // This is when we first load the feed
         const newState = {
           ...state,
           days: msg.days,
@@ -95,6 +96,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
               ],
             ];
       } else {
+        // This is when we refresh the feed
         return [
           { ...state, days: msg.days, blockedUsers: msg.blockedUsers },
           [],
@@ -157,7 +159,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       ];
     case "logout": {
       return [
-        { ...state, fonts: true, loading: false },
+        { ...state, fonts: true, loading: false, days: undefined, user: null },
         [{ effect: "logout" }, { effect: "navigate", route: "Onboarding" }],
       ];
     }
