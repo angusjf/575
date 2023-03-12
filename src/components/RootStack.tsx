@@ -6,14 +6,20 @@ import { Settings } from "./Settings";
 import { useAppState } from "../useAppState";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HaikuForm } from "./HaikuForm";
-import { RegisterForm } from "./RegisterForm";
 import { OnboardingScreen } from "./OnboardingScreen";
+import { EmailForm, LoginForm, RegisterForm, SignForm } from "./RegisterStack";
 
-export type RootStackParams = {
+export type RegisterStackParams = {
+  Email: undefined;
+  Login: { email: string };
+  Register: { email: string };
+  Sign: { email: string; password: string };
+};
+
+export type RootStackParams = RegisterStackParams & {
   Feed: undefined;
   Settings: undefined;
   Compose: undefined;
-  Register: undefined;
   Loading: undefined;
   Onboarding: undefined;
 };
@@ -32,6 +38,17 @@ const transparent = "rgba(255, 255, 255, 0)";
 
 const headerBackground = () => (
   <LinearGradient colors={[white, white, transparent]} style={{ flex: 1 }} />
+);
+
+const ScreenTitle = ({ title }: { title: string }) => (
+  <Text
+    style={{
+      fontFamily: fonts.PlexSerifBoldItalic,
+      fontSize: 28,
+    }}
+  >
+    {title}
+  </Text>
 );
 
 const HeaderRight = ({ onPress }: { onPress: () => void }) => {
@@ -71,11 +88,31 @@ export const RootStack = () => {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ gestureEnabled: false }}>
+    <Stack.Navigator>
       <Stack.Screen
         name="Onboarding"
         component={OnboardingScreen}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Email"
+        component={EmailForm}
+        options={{ headerTitle: () => <ScreenTitle title="Email" /> }}
+      />
+      <Stack.Screen
+        name="Register"
+        component={RegisterForm}
+        options={{ headerTitle: () => <ScreenTitle title="Register" /> }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={LoginForm}
+        options={{ headerTitle: () => <ScreenTitle title="Welcome back" /> }}
+      />
+      <Stack.Screen
+        name="Sign"
+        component={SignForm}
+        options={{ headerTitle: () => <ScreenTitle title="Sign" /> }}
       />
       <Stack.Screen
         name="Compose"
@@ -84,6 +121,7 @@ export const RootStack = () => {
           headerTransparent: true,
           headerTitle: "",
           headerBackVisible: false,
+          gestureEnabled: false,
           headerRight: () =>
             route.name === "Compose" ? (
               <HeaderRight onPress={() => openSettings()} />
@@ -103,24 +141,14 @@ export const RootStack = () => {
             route.name === "Feed" ? (
               <HeaderRight onPress={() => openSettings()} />
             ) : null,
+          gestureEnabled: false,
         })}
-      />
-      <Stack.Screen
-        name="Register"
-        component={RegisterForm}
-        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Settings"
         component={Settings}
         options={{
-          headerTitle: () => (
-            <Text
-              style={{ fontFamily: fonts.PlexSerifBoldItalic, fontSize: 28 }}
-            >
-              Settings
-            </Text>
-          ),
+          headerTitle: () => <ScreenTitle title="Settings" />,
           gestureEnabled: true,
         }}
       />
