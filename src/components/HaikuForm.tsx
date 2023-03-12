@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useMemo, useReducer, useRef } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -17,6 +17,7 @@ import { valid } from "../valid";
 import { getSeason } from "../seasons";
 import { useAppState } from "../useAppState";
 import { Svg, SvgXml } from "react-native-svg";
+import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 
 type State = {
   haiku: Haiku;
@@ -72,29 +73,73 @@ export const HaikuForm = () => {
     state: { user },
   } = useAppState();
 
-  return (
-    <InputScreen
-      validity={state.validity}
-      haiku={state.haiku}
-      changed={(n, l) => dispatch({ type: "change_line", line: n, newLine: l })}
-      signature={user?.signature || "<svg></svg>"}
-      done={() => {
-        dispatch({ type: "submit" });
-        setTimeout(() => {
-          const syllables = [
-            syllable(state.haiku[0]),
-            syllable(state.haiku[1]),
-            syllable(state.haiku[2]),
-          ] as const;
+  // ref
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
-          if (valid(syllables)) {
-            publish(state.haiku);
-          } else {
-            dispatch({ type: "invalid" });
-          }
-        }, AI_WAIT_TIME);
-      }}
-    />
+  // variables
+  const snapPoints = useMemo(() => ["40%"], []);
+
+  return (
+    <>
+      <InputScreen
+        validity={state.validity}
+        haiku={state.haiku}
+        changed={(n, l) =>
+          dispatch({ type: "change_line", line: n, newLine: l })
+        }
+        signature={user?.signature || "<svg></svg>"}
+        done={() => {
+          dispatch({ type: "submit" });
+          setTimeout(() => {
+            const syllables = [
+              syllable(state.haiku[0]),
+              syllable(state.haiku[1]),
+              syllable(state.haiku[2]),
+            ] as const;
+
+            if (valid(syllables)) {
+              publish(state.haiku);
+            } else {
+              bottomSheetRef.current?.expand();
+              dispatch({ type: "invalid" });
+            }
+          }, AI_WAIT_TIME);
+        }}
+      />
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        style={{
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 4,
+          },
+          shadowOpacity: 0.3,
+          shadowRadius: 4.65,
+
+          elevation: 8,
+        }}
+      >
+        <View style={styles.contentContainer}>
+          <Text style={styles.guideTitle}>How to write a valid Haiku</Text>
+          <View style={styles.guideContainer}>
+            <Text style={styles.guideLine}>
+              1. The first and last lines have 5 syllables each.
+            </Text>
+            <Text style={styles.guideLine}>
+              2. The middle line has 7 syllables.
+            </Text>
+            <Text style={styles.guideLine}>
+              3. Traditionally, it would also incorporate a nature or seasonal
+              theme.
+            </Text>
+          </View>
+        </View>
+      </BottomSheet>
+    </>
   );
 };
 
@@ -113,6 +158,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingTop: 15,
+  },
+  guideTitle: {
+    fontFamily: fonts.PlexMonoBold,
+    fontSize: 20,
+  },
+  guideContainer: {
+    marginTop: 15,
+    paddingHorizontal: 15,
+  },
+  guideLine: {
+    fontFamily: fonts.PlexMonoItalic,
+    fontSize: 16,
+    marginTop: 10,
+    lineHeight: 28,
   },
 });
 
