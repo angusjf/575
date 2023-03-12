@@ -6,14 +6,14 @@ import { Settings } from "./Settings";
 import { useAppState } from "../useAppState";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HaikuForm } from "./HaikuForm";
-import { RegisterForm } from "./RegisterForm";
 import { OnboardingScreen } from "./OnboardingScreen";
+import { RegisterStack } from "./RegisterStack";
 
 export type RootStackParams = {
   Feed: undefined;
   Settings: undefined;
   Compose: undefined;
-  Register: undefined;
+  RegisterStack: undefined;
   Loading: undefined;
   Onboarding: undefined;
 };
@@ -68,7 +68,7 @@ export const RootStack = () => {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ gestureEnabled: false }}>
+    <Stack.Navigator>
       <Stack.Screen
         name="Onboarding"
         component={OnboardingScreen}
@@ -100,11 +100,12 @@ export const RootStack = () => {
             route.name === "Feed" ? (
               <HeaderRight onPress={() => openSettings()} />
             ) : null,
+          gestureEnabled: false,
         })}
       />
       <Stack.Screen
-        name="Register"
-        component={RegisterForm}
+        name="RegisterStack"
+        component={RegisterStack}
         options={{ headerShown: false }}
       />
       <Stack.Screen

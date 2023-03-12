@@ -209,7 +209,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "account_deleted":
       return [state, [{ effect: "navigate", route: "Onboarding" }]];
     case "finish_onboarding":
-      return [state, [{ effect: "navigate", route: "Register" }]];
+      return [state, [{ effect: "navigate", route: "RegisterStack" }]];
   }
 };
 
