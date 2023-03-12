@@ -25,7 +25,7 @@ import { convertStrokesToSvg, Stroke, Whiteboard } from "./Whiteboard";
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#f9f6f6",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
   },

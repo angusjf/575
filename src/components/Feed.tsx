@@ -21,7 +21,7 @@ import { Post } from "../types";
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: "#f9f6f6",
+    backgroundColor: "white",
     alignItems: "center",
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     paddingHorizontal: 10,

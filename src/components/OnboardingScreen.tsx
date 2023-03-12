@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "#f9f6f6",
+    backgroundColor: "white",
   },
   slideContainer: {
     width: Dimensions.get("window").width,
@@ -128,19 +128,19 @@ export const OnboardingScreen = () => {
         <View
           style={{
             ...styles.scrollIndicatorBubble,
-            backgroundColor: currentIndex === 0 ? "black" : "#f9f6f6",
+            backgroundColor: currentIndex === 0 ? "black" : "white",
           }}
         />
         <View
           style={{
             ...styles.scrollIndicatorBubble,
-            backgroundColor: currentIndex === 1 ? "black" : "#f9f6f6",
+            backgroundColor: currentIndex === 1 ? "black" : "white",
           }}
         />
         <View
           style={{
             ...styles.scrollIndicatorBubble,
-            backgroundColor: currentIndex === 2 ? "black" : "#f9f6f6",
+            backgroundColor: currentIndex === 2 ? "black" : "white",
           }}
         />
       </View>
