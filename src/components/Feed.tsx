@@ -38,8 +38,6 @@ export const Feed = () => {
 
   const days = state.days;
 
-  console.log("feed days", state.days);
-
   const showOptions = (
     sharingMessage: string,
     blockedUserId: string,
@@ -100,8 +98,6 @@ export const Feed = () => {
     }
     return sortByTimestamp(days[days.length - 1].posts);
   }, [days]);
-
-  console.log("feed-data ", feedData);
 
   return (
     <View style={styles.root}>
