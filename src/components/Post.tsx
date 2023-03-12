@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
   },
   container: {
     marginTop: 21,
+    width: "100%",
   },
 });
 

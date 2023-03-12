@@ -77,7 +77,15 @@ export const RootStack = () => {
       <Stack.Screen
         name="Compose"
         component={HaikuForm}
-        options={{ headerShown: false }}
+        options={({ route }) => ({
+          headerTransparent: true,
+          headerTitle: "",
+          headerBackVisible: false,
+          headerRight: () =>
+            route.name === "Compose" ? (
+              <HeaderRight onPress={() => openSettings()} />
+            ) : null,
+        })}
       />
       <Stack.Screen
         name="Feed"
