@@ -40,6 +40,17 @@ const headerBackground = () => (
   <LinearGradient colors={[white, white, transparent]} style={{ flex: 1 }} />
 );
 
+const ScreenTitle = ({ title }: { title: string }) => (
+  <Text
+    style={{
+      fontFamily: fonts.PlexSerifBoldItalic,
+      fontSize: 28,
+    }}
+  >
+    {title}
+  </Text>
+);
+
 const HeaderRight = ({ onPress }: { onPress: () => void }) => {
   const { state } = useAppState();
   return (
@@ -80,14 +91,26 @@ export const RootStack = () => {
         component={OnboardingScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Email" component={EmailForm} />
-      <Stack.Screen name="Register" component={RegisterForm} />
+      <Stack.Screen
+        name="Email"
+        component={EmailForm}
+        options={{ headerTitle: () => <ScreenTitle title="Email" /> }}
+      />
+      <Stack.Screen
+        name="Register"
+        component={RegisterForm}
+        options={{ headerTitle: () => <ScreenTitle title="Register" /> }}
+      />
       <Stack.Screen
         name="Login"
         component={LoginForm}
-        options={{ title: "Welcome back" }}
+        options={{ headerTitle: () => <ScreenTitle title="Welcome back" /> }}
       />
-      <Stack.Screen name="Sign" component={SignForm} />
+      <Stack.Screen
+        name="Sign"
+        component={SignForm}
+        options={{ headerTitle: () => <ScreenTitle title="Sign" /> }}
+      />
       <Stack.Screen
         name="Compose"
         component={HaikuForm}
@@ -122,13 +145,7 @@ export const RootStack = () => {
         name="Settings"
         component={Settings}
         options={{
-          headerTitle: () => (
-            <Text
-              style={{ fontFamily: fonts.PlexSerifBoldItalic, fontSize: 28 }}
-            >
-              Settings
-            </Text>
-          ),
+          headerTitle: () => <ScreenTitle title="Settings" />,
           gestureEnabled: true,
         }}
       />
