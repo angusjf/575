@@ -52,27 +52,30 @@ const ScreenTitle = ({ title }: { title: string }) => (
 );
 
 const HeaderRight = ({ onPress }: { onPress: () => void }) => {
-  const { state } = useAppState();
   return (
     <TouchableOpacity
       style={{
         marginLeft: "auto",
-        marginRight: 10,
+        marginRight: 5,
         borderColor: "black",
         borderWidth: 1,
         borderRadius: 50,
-        padding: 1,
-        backgroundColor: "white",
+        backgroundColor: "black",
+        height: 33,
+        width: 33,
+        justifyContent: "center",
+        alignItems: "center",
       }}
       onPress={onPress}
     >
-      <Image
-        source={{ uri: state.user?.avatar }}
+      <Text
         style={{
-          height: 30,
-          width: 30,
+          fontSize: 20,
+          color: "white",
         }}
-      />
+      >
+        設
+      </Text>
     </TouchableOpacity>
   );
 };
