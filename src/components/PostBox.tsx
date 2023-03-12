@@ -25,12 +25,15 @@ export const PostBox = ({
   haiku,
   author,
   showOptions,
+  isMyPost,
 }: Omit<Post, "signature"> & {
   showOptions: (
     sharingMessage: string,
     userId: string,
-    userName: string
+    userName: string,
+    isMyPost: boolean
   ) => void;
+  isMyPost: boolean;
 }) => {
   return (
     <TouchableOpacity
@@ -45,14 +48,15 @@ export const PostBox = ({
             "\n~ " +
             author.username,
           author.userId,
-          author.username
+          author.username,
+          isMyPost
         )
       }
     >
       <Text style={styles.line}>{haiku[0]}</Text>
       <Text style={styles.line}>{haiku[1]}</Text>
       <Text style={styles.line}>{haiku[2]}</Text>
-      <Text style={styles.author}>– {author.username}</Text>
+      <Text style={styles.author}>– {isMyPost ? "Me" : author.username}</Text>
     </TouchableOpacity>
   );
 };

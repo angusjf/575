@@ -42,12 +42,15 @@ export const Feed = () => {
   const showOptions = (
     sharingMessage: string,
     blockedUserId: string,
-    blockedUserName: string
+    blockedUserName: string,
+    isMyPost: boolean
   ) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const options = ["Share", "Block User", "Cancel"];
-    const destructiveButtonIndex = 1;
-    const cancelButtonIndex = 2;
+    const options = isMyPost
+      ? ["Share", "Cancel"]
+      : ["Share", "Block User", "Cancel"];
+    const destructiveButtonIndex = isMyPost ? undefined : 1;
+    const cancelButtonIndex = isMyPost ? 1 : 2;
 
     showActionSheetWithOptions(
       {
@@ -60,7 +63,7 @@ export const Feed = () => {
           case 0:
             Share.share({ message: italicize(sharingMessage) });
             break;
-          case 1:
+          case destructiveButtonIndex:
             Alert.alert(
               "Block User",
               "Are you sure you want to block this user?",
@@ -90,15 +93,29 @@ export const Feed = () => {
     if (days === undefined) {
       return undefined;
     }
+    const myHaiku = days[days.length - 1].posts.find(
+      (post) => post.author.userId === state.user?.userId
+    );
+    if (myHaiku === undefined) {
+      return undefined;
+    }
     if (days[days.length - 2].posts.length > 0) {
       return [
-        ...sortByTimestamp(days[days.length - 1].posts),
+        myHaiku,
+        ...sortByTimestamp(days[days.length - 1].posts).filter(
+          (post) => post.author.userId !== state.user?.userId
+        ),
         "separator",
         ...sortByTimestamp(days[days.length - 2].posts),
       ];
     }
-    return sortByTimestamp(days[days.length - 1].posts);
-  }, [days]);
+    return [
+      myHaiku,
+      ...sortByTimestamp(days[days.length - 1].posts).filter(
+        (post) => post.author.userId !== state.user?.userId
+      ),
+    ];
+  }, [days, state.user?.userId]);
 
   return (
     <View style={styles.root}>
@@ -124,6 +141,7 @@ export const Feed = () => {
                   haiku={item.haiku}
                   showOptions={showOptions}
                   timestamp={item.timestamp}
+                  isMyPost={item.author.userId === state.user?.userId}
                 />
                 <SvgXml
                   xml={item.signature}
