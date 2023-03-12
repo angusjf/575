@@ -7,13 +7,19 @@ import { useAppState } from "../useAppState";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HaikuForm } from "./HaikuForm";
 import { OnboardingScreen } from "./OnboardingScreen";
-import { RegisterStack } from "./RegisterStack";
+import { EmailForm, LoginForm, RegisterForm, SignForm } from "./RegisterStack";
 
-export type RootStackParams = {
+export type RegisterStackParams = {
+  Email: undefined;
+  Login: { email: string };
+  Register: { email: string };
+  Sign: { email: string; password: string };
+};
+
+export type RootStackParams = RegisterStackParams & {
   Feed: undefined;
   Settings: undefined;
   Compose: undefined;
-  RegisterStack: undefined;
   Loading: undefined;
   Onboarding: undefined;
 };
@@ -74,6 +80,14 @@ export const RootStack = () => {
         component={OnboardingScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen name="Email" component={EmailForm} />
+      <Stack.Screen name="Register" component={RegisterForm} />
+      <Stack.Screen
+        name="Login"
+        component={LoginForm}
+        options={{ title: "Welcome back" }}
+      />
+      <Stack.Screen name="Sign" component={SignForm} />
       <Stack.Screen
         name="Compose"
         component={HaikuForm}
@@ -81,6 +95,7 @@ export const RootStack = () => {
           headerTransparent: true,
           headerTitle: "",
           headerBackVisible: false,
+          gestureEnabled: false,
           headerRight: () =>
             route.name === "Compose" ? (
               <HeaderRight onPress={() => openSettings()} />
@@ -102,11 +117,6 @@ export const RootStack = () => {
             ) : null,
           gestureEnabled: false,
         })}
-      />
-      <Stack.Screen
-        name="RegisterStack"
-        component={RegisterStack}
-        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Settings"

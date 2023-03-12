@@ -33,6 +33,7 @@ import { firebaseApp } from "../firebase";
 import { firebaseUserToUser } from "../utils/user";
 import { convertStrokesToSvg, Stroke, Whiteboard } from "./Whiteboard";
 import { getUser, registerUser } from "../firebaseClient";
+import { RegisterStackParams } from "./RootStack";
 
 const styles = StyleSheet.create({
   root: {
@@ -43,35 +44,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export type RegisterStackParams = {
-  Email: undefined;
-  Login: { email: string };
-  Register: { email: string };
-  Sign: { email: string; password: string };
-};
-
-const Stack = createNativeStackNavigator<RegisterStackParams>();
-
-export const RegisterStack = () => {
-  const { state } = useAppState();
-
-  if (state.loading) {
-    return null;
-  }
-
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="Email" component={EmailForm} />
-      <Stack.Screen name="Register" component={RegisterForm} />
-      <Stack.Screen name="Login" component={LoginForm} />
-      <Stack.Screen name="Sign" component={SignForm} />
-    </Stack.Navigator>
-  );
-};
-
 type EmailFormProps = NativeStackScreenProps<RegisterStackParams, "Email">;
 
-const EmailForm: FC<EmailFormProps> = ({ navigation }) => {
+export const EmailForm: FC<EmailFormProps> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
 
@@ -128,7 +103,7 @@ type RegisterFormProps = NativeStackScreenProps<
   "Register"
 >;
 
-const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
+export const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
   const [password, setPassword] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
 
@@ -175,7 +150,7 @@ const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
 
 type LoginFormProps = NativeStackScreenProps<RegisterStackParams, "Login">;
 
-const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
+export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
   const [password, setPassword] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
   const { register } = useAppState();
@@ -231,7 +206,7 @@ type SignFormParams = NativeStackScreenProps<RegisterStackParams, "Sign">;
 const signatureHeight = 200;
 const signatureWidth = 400;
 
-const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
+export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
   const [name, setName] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
   const [strokes, setStrokes] = useState<Stroke[]>([]);
