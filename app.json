@@ -12,9 +12,12 @@
       "backgroundColor": "#f9f6f6"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/61b1e2f0-9283-48a7-97a5-26d304ca2f95"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -34,6 +37,9 @@
         "projectId": "61b1e2f0-9283-48a7-97a5-26d304ca2f95"
       }
     },
-    "owner": "fivesevenfive"
+    "owner": "fivesevenfive",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    }
   }
 }
