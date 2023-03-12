@@ -14,7 +14,7 @@ import { fonts } from "../font";
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: "#f9f6f6",
+    backgroundColor: "white",
     flex: 1,
   },
   contentContainer: {

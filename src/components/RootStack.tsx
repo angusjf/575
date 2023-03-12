@@ -45,7 +45,7 @@ const HeaderRight = ({ onPress }: { onPress: () => void }) => {
         borderWidth: 1,
         borderRadius: 50,
         padding: 1,
-        backgroundColor: "#f9f6f6",
+        backgroundColor: "white",
       }}
       onPress={onPress}
     >

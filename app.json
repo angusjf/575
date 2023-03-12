@@ -9,22 +9,20 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#f9f6f6"
+      "backgroundColor": "white"
     },
     "updates": {
       "fallbackToCacheTimeout": 0,
       "url": "https://u.expo.dev/61b1e2f0-9283-48a7-97a5-26d304ca2f95"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#f9f6f6"
+        "backgroundColor": "white"
       },
       "package": "com.fivesevenfive",
       "versionCode": 2
