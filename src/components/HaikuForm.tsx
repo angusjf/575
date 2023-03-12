@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PlexMonoItalic,
   },
   root: {
-    backgroundColor: "black",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
