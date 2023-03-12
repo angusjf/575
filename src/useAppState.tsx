@@ -159,7 +159,14 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       ];
     case "logout": {
       return [
-        { ...state, fonts: true, loading: false, days: undefined, user: null },
+        {
+          ...state,
+          fonts: true,
+          loading: false,
+          days: undefined,
+          user: null,
+          blockedUsers: undefined,
+        },
         [{ effect: "logout" }, { effect: "navigate", route: "Onboarding" }],
       ];
     }

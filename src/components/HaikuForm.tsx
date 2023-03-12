@@ -113,6 +113,7 @@ export const HaikuForm = () => {
         enablePanDownToClose
         style={{
           shadowColor: "#000",
+          backgroundColor: "white",
           shadowOffset: {
             width: 0,
             height: 4,

@@ -118,6 +118,7 @@ export const Settings = () => {
         snapPoints={snapPoints}
         enablePanDownToClose
         style={{
+          backgroundColor: "white",
           shadowColor: "#000",
           shadowOffset: {
             width: 0,
