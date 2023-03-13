@@ -147,23 +147,15 @@ export const Feed: FC<FeedParams> = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) =>
             item !== "separator" ? (
-              <View style={{ alignItems: "center" }}>
-                <PostBox
-                  key={item.haiku.join("") + item.author}
-                  author={item.author}
-                  haiku={item.haiku}
-                  showOptions={showOptions}
-                  timestamp={item.timestamp}
-                  isMyPost={item.author.userId === state.user?.userId}
-                />
-                <SvgXml
-                  xml={item.signature}
-                  width={150}
-                  height={75}
-                  style={{ marginBottom: 38 }}
-                  viewBox="0 0 500 200"
-                />
-              </View>
+              <PostBox
+                key={item.haiku.join("") + item.author}
+                author={item.author}
+                haiku={item.haiku}
+                showOptions={showOptions}
+                timestamp={item.timestamp}
+                isMyPost={item.author.userId === state.user?.userId}
+                signature={item.signature}
+              />
             ) : (
               <Separator />
             )

@@ -1,4 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SvgXml } from "react-native-svg";
 import { fonts } from "../font";
 import { Post } from "../types";
 
@@ -26,7 +27,8 @@ export const PostBox = ({
   author,
   showOptions,
   isMyPost,
-}: Omit<Post, "signature"> & {
+  signature,
+}: Post & {
   showOptions: (
     sharingMessage: string,
     userId: string,
@@ -36,27 +38,36 @@ export const PostBox = ({
   isMyPost: boolean;
 }) => {
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onLongPress={() =>
-        showOptions(
-          haiku[0] +
-            "\n" +
-            haiku[1] +
-            "\n" +
-            haiku[2] +
-            "\n~ " +
+    <View style={{ alignItems: "center" }}>
+      <TouchableOpacity
+        style={styles.container}
+        onLongPress={() =>
+          showOptions(
+            haiku[0] +
+              "\n" +
+              haiku[1] +
+              "\n" +
+              haiku[2] +
+              "\n~ " +
+              author.username,
+            author.userId,
             author.username,
-          author.userId,
-          author.username,
-          isMyPost
-        )
-      }
-    >
-      <Text style={styles.line}>{haiku[0]}</Text>
-      <Text style={styles.line}>{haiku[1]}</Text>
-      <Text style={styles.line}>{haiku[2]}</Text>
-      <Text style={styles.author}>– {isMyPost ? "Me" : author.username}</Text>
-    </TouchableOpacity>
+            isMyPost
+          )
+        }
+      >
+        <Text style={styles.line}>{haiku[0]}</Text>
+        <Text style={styles.line}>{haiku[1]}</Text>
+        <Text style={styles.line}>{haiku[2]}</Text>
+        <Text style={styles.author}>– {isMyPost ? "Me" : author.username}</Text>
+      </TouchableOpacity>
+      <SvgXml
+        xml={signature}
+        width={150}
+        height={75}
+        style={{ marginBottom: 38 }}
+        viewBox="0 0 500 200"
+      />
+    </View>
   );
 };
