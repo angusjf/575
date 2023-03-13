@@ -82,6 +82,35 @@ const HeaderRight = ({ onPress }: { onPress: () => void }) => {
   );
 };
 
+const BackButton = ({ onPress }: { onPress: () => void }) => {
+  return (
+    <TouchableOpacity
+      style={{
+        marginLeft: "auto",
+        marginRight: 5,
+        borderColor: "black",
+        borderWidth: 1,
+        borderRadius: 50,
+        backgroundColor: "black",
+        height: 33,
+        width: 33,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+      onPress={onPress}
+    >
+      <Text
+        style={{
+          fontSize: 20,
+          color: "white",
+        }}
+      >
+        ←︎
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
 export const RootStack = () => {
   const { state, openSettings } = useAppState();
 
@@ -149,10 +178,11 @@ export const RootStack = () => {
       <Stack.Screen
         name="Settings"
         component={Settings}
-        options={{
+        options={({ navigation }) => ({
           headerTitle: () => <ScreenTitle title="Settings" />,
           gestureEnabled: true,
-        }}
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+        })}
       />
     </Stack.Navigator>
   );
