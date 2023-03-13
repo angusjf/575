@@ -4,12 +4,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   View,
+  TouchableOpacity,
 } from "react-native";
 import { fonts } from "../font";
 import { useAppState } from "../useAppState";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { FC, useState } from "react";
+import { FC, useMemo, useRef, useState } from "react";
 import { Validity } from "../validity";
 import { Button } from "./Button";
 import {
@@ -24,6 +25,9 @@ import { firebaseUserToUser } from "../utils/user";
 import { convertStrokesToSvg, Stroke, Whiteboard } from "./Whiteboard";
 import { getUser, registerUser } from "../firebaseClient";
 import { RegisterStackParams } from "./RootStack";
+import { QuestionMark } from "./icons/QuestionMark";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { Erase } from "./icons/Erase";
 
 const styles = StyleSheet.create({
   root: {
@@ -31,6 +35,25 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingTop: 15,
+  },
+  guideTitle: {
+    fontFamily: fonts.PlexMonoBold,
+    fontSize: 20,
+  },
+  guideContainer: {
+    marginTop: 15,
+    paddingHorizontal: 15,
+  },
+  guideLine: {
+    fontFamily: fonts.PlexMonoItalic,
+    fontSize: 16,
+    marginTop: 10,
+    lineHeight: 28,
   },
 });
 
@@ -194,7 +217,7 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
 type SignFormParams = NativeStackScreenProps<RegisterStackParams, "Sign">;
 
 const signatureHeight = 200;
-const signatureWidth = 400;
+const signatureWidth = 350;
 
 export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
   const [name, setName] = useState("");
@@ -227,29 +250,57 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
     }
   };
 
+  // ref
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // variables
+  const snapPoints = useMemo(() => ["50%"], []);
+
   return (
     <KeyboardAvoidingView
       style={styles.root}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View>
-        <Text
-          style={{
-            fontFamily: fonts.PlexMonoItalic,
-            fontSize: 21,
-            paddingBottom: 38,
-          }}
-        >
-          how do you sign your poems?
-        </Text>
-      </View>
+      <HaikuLineInput
+        placeholder="how do you sign your poems?"
+        value={name || ""}
+        onChangeText={setName}
+        validity={validity}
+        long
+        multiline={false}
+        autoComplete="name"
+      />
       <View
         style={{
-          backgroundColor: "rgb(216, 200, 200)",
+          backgroundColor: "rgb(245, 242, 242)",
           height: signatureHeight,
           width: signatureWidth,
+          borderRadius: 7,
+          marginTop: 20,
         }}
       >
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            right: 5,
+            top: 5,
+            zIndex: 2,
+          }}
+          onPress={() => bottomSheetRef.current?.expand()}
+        >
+          <QuestionMark size={25} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            left: 5,
+            top: 5,
+            zIndex: 2,
+          }}
+          onPress={() => setStrokes([])}
+        >
+          <Erase size={25} />
+        </TouchableOpacity>
         <Whiteboard
           strokes={strokes}
           setStrokes={setStrokes}
@@ -258,25 +309,41 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         />
       </View>
       <Button
-        title="clear"
-        onPress={() => setStrokes([])}
-        style={{
-          marginBottom: 40,
-        }}
-      />
-      <HaikuLineInput
-        placeholder="preferred signature"
-        value={name || ""}
-        onChangeText={setName}
-        validity={validity}
-        long
-        autoComplete="name"
-      />
-      <Button
         title="continue"
         onPress={handleNext}
         isLoading={validity == "loading"}
       />
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        style={{
+          shadowColor: "#000",
+          backgroundColor: "white",
+          shadowOffset: {
+            width: 0,
+            height: 4,
+          },
+          shadowOpacity: 0.3,
+          shadowRadius: 4.65,
+
+          elevation: 8,
+        }}
+      >
+        <View style={styles.contentContainer}>
+          <Text style={styles.guideTitle}>Sign your Haikus</Text>
+          <View style={styles.guideContainer}>
+            <Text style={styles.guideLine}>
+              This hand-drawn signature will be displayed below your Haiku's on
+              everyone's feed.
+            </Text>
+            <Text style={styles.guideLine}>
+              Make it as unique and creative as you!
+            </Text>
+          </View>
+        </View>
+      </BottomSheet>
     </KeyboardAvoidingView>
   );
 };
