@@ -28,6 +28,7 @@ import { RegisterStackParams } from "./RootStack";
 import { QuestionMark } from "./icons/QuestionMark";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Erase } from "./icons/Erase";
+import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 
 const styles = StyleSheet.create({
   root: {
@@ -216,9 +217,6 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
 
 type SignFormParams = NativeStackScreenProps<RegisterStackParams, "Sign">;
 
-const signatureHeight = 200;
-const signatureWidth = 350;
-
 export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
   const [name, setName] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
@@ -232,8 +230,8 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
     }
     const auth = getAuth(firebaseApp);
     const signature = convertStrokesToSvg(strokes, {
-      width: signatureWidth,
-      height: signatureHeight,
+      width: SIGNATURE_HEIGHT,
+      height: SIGNATURE_WIDTH,
     });
     if (auth.currentUser === null) {
       navigation.goBack();
@@ -270,15 +268,7 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         multiline={false}
         autoComplete="name"
       />
-      <View
-        style={{
-          backgroundColor: "rgb(245, 242, 242)",
-          height: signatureHeight,
-          width: signatureWidth,
-          borderRadius: 7,
-          marginTop: 20,
-        }}
-      >
+      <View style={{ marginVertical: 20, paddingTop: 20 }}>
         <TouchableOpacity
           style={{
             position: "absolute",
@@ -301,12 +291,22 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         >
           <Erase size={25} />
         </TouchableOpacity>
-        <Whiteboard
-          strokes={strokes}
-          setStrokes={setStrokes}
-          color={"#2c2a2a"}
-          strokeWidth={4}
-        />
+        <View
+          style={{
+            backgroundColor: "rgb(245, 242, 242)",
+            height: SIGNATURE_HEIGHT,
+            width: SIGNATURE_WIDTH,
+            borderRadius: SIGNATURE_HEIGHT / 2,
+            overflow: "hidden",
+          }}
+        >
+          <Whiteboard
+            strokes={strokes}
+            setStrokes={setStrokes}
+            color={"#2c2a2a"}
+            strokeWidth={4}
+          />
+        </View>
       </View>
       <Button
         title="continue"
@@ -333,7 +333,7 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         <View style={styles.contentContainer}>
           <Text style={styles.guideTitle}>Sign your Haikus</Text>
           <View style={styles.guideContainer}>
-            <Text style={styles.guideLine}>Hand-drawn signature,</Text>
+            <Text style={styles.guideLine}>Hand-drawn self-portrait,</Text>
             <Text style={styles.guideLine}>
               Displayed with your haiku verse,
             </Text>
