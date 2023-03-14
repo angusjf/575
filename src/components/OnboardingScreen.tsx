@@ -1,4 +1,3 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useRef, useState } from "react";
 import {
   Text,
@@ -9,11 +8,10 @@ import {
   Dimensions,
   Animated,
 } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { fonts } from "../font";
 import { useAppState } from "../useAppState";
 import { Button } from "./Button";
-import { HaikuLineInput } from "./HaikuLineInput";
+import { FiveSevenFive } from "./FiveSevenFive";
 
 const styles = StyleSheet.create({
   container: {
@@ -40,10 +38,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 15,
   },
-  logo: {
-    fontFamily: fonts.PlexMonoBoldItalic,
-    fontSize: 57,
-  },
+
   getStarted: {
     fontFamily: fonts.PlexMonoItalic,
     fontSize: 21,
@@ -99,7 +94,7 @@ export const OnboardingScreen = () => {
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
   return (
     <SafeAreaView style={styles.container}>
-      <FiveSevenFive />
+      <FiveSevenFive fontSize={57} marginTop={50} />
       <FlatList
         snapToAlignment={"start"}
         snapToInterval={Dimensions.get("window").width}
@@ -155,11 +150,3 @@ export const OnboardingScreen = () => {
     </SafeAreaView>
   );
 };
-
-const FiveSevenFive = () => (
-  <View style={{ flexDirection: "row" }}>
-    <Text style={[styles.logo, { marginTop: 50 }]}>5</Text>
-    <Text style={[styles.logo, { marginTop: 65 }]}>7</Text>
-    <Text style={[styles.logo, { marginTop: 80 }]}>5</Text>
-  </View>
-);
