@@ -327,20 +327,17 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
           },
           shadowOpacity: 0.3,
           shadowRadius: 4.65,
-
           elevation: 8,
         }}
       >
         <View style={styles.contentContainer}>
           <Text style={styles.guideTitle}>Sign your Haikus</Text>
           <View style={styles.guideContainer}>
+            <Text style={styles.guideLine}>Hand-drawn signature,</Text>
             <Text style={styles.guideLine}>
-              This hand-drawn signature will be displayed below your Haiku's on
-              everyone's feed.
+              Displayed with your haiku verse,
             </Text>
-            <Text style={styles.guideLine}>
-              Make it as unique and creative as you!
-            </Text>
+            <Text style={styles.guideLine}>Unique and creative.</Text>
           </View>
         </View>
       </BottomSheet>
