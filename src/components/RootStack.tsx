@@ -8,6 +8,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HaikuForm } from "./HaikuForm";
 import { OnboardingScreen } from "./OnboardingScreen";
 import { EmailForm, LoginForm, RegisterForm, SignForm } from "./RegisterStack";
+import { FiveSevenFive } from "./FiveSevenFive";
 
 export type RegisterStackParams = {
   Email: undefined;
@@ -28,24 +29,22 @@ export const ONBOARDING_SCREEN_NAME = "Onboarding";
 
 const Stack = createNativeStackNavigator<RootStackParams>();
 
-const styles = StyleSheet.create({
-  logo: {
-    fontFamily: fonts.PlexSerifBoldItalic,
-    fontSize: 32,
-  },
-});
-
 const white = "rgba(255, 255, 255, 255)";
 const transparent = "rgba(255, 255, 255, 0)";
 
 const headerBackground = () => (
-  <LinearGradient colors={[white, white, transparent]} style={{ flex: 1 }} />
+  <LinearGradient
+    start={{ x: 0, y: 0.5 }}
+    end={{ x: 0, y: 1 }}
+    colors={[white, transparent]}
+    style={{ flex: 1 }}
+  />
 );
 
 const ScreenTitle = ({ title }: { title: string }) => (
   <Text
     style={{
-      fontFamily: fonts.PlexSerifBoldItalic,
+      fontFamily: fonts.PlexSansBoldItalic,
       fontSize: 28,
     }}
   >
@@ -176,7 +175,7 @@ export const RootStack = () => {
           headerBackVisible: false,
           headerLeft: () => null,
           headerBackground,
-          headerTitle: () => <Text style={styles.logo}>575</Text>,
+          headerTitle: () => <FiveSevenFive fontSize={27} marginTop={0} />,
           headerRight: () =>
             route.name === "Feed" ? (
               <HeaderRight onPress={() => openSettings()} />
