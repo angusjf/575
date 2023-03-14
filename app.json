@@ -15,9 +15,12 @@
       "fallbackToCacheTimeout": 0,
       "url": "https://u.expo.dev/61b1e2f0-9283-48a7-97a5-26d304ca2f95"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.fivesevenfive"
     },
     "android": {
       "adaptiveIcon": {
