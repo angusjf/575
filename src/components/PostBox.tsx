@@ -16,8 +16,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   author: {
-    fontFamily: fonts.PlexSerifBoldItalic,
     fontSize: 20,
+    fontFamily: fonts.PlexSansBoldItalic,
     paddingRight: 10,
   },
   container: {
