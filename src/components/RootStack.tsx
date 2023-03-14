@@ -128,22 +128,34 @@ export const RootStack = () => {
       <Stack.Screen
         name="Email"
         component={EmailForm}
-        options={{ headerTitle: () => <ScreenTitle title="Email" /> }}
+        options={({ navigation }) => ({
+          headerTitle: () => <ScreenTitle title="Email" />,
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+        })}
       />
       <Stack.Screen
         name="Register"
         component={RegisterForm}
-        options={{ headerTitle: () => <ScreenTitle title="Register" /> }}
+        options={({ navigation }) => ({
+          headerTitle: () => <ScreenTitle title="Register" />,
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+        })}
       />
       <Stack.Screen
         name="Login"
         component={LoginForm}
-        options={{ headerTitle: () => <ScreenTitle title="Welcome back" /> }}
+        options={({ navigation }) => ({
+          headerTitle: () => <ScreenTitle title="Welcome back" />,
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+        })}
       />
       <Stack.Screen
         name="Sign"
         component={SignForm}
-        options={{ headerTitle: () => <ScreenTitle title="Sign" /> }}
+        options={({ navigation }) => ({
+          headerTitle: () => <ScreenTitle title="Sign" />,
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+        })}
       />
       <Stack.Screen
         name="Compose"
