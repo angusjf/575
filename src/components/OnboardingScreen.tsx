@@ -9,6 +9,7 @@ import {
   Dimensions,
   Animated,
 } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { fonts } from "../font";
 import { useAppState } from "../useAppState";
 import { Button } from "./Button";
@@ -22,13 +23,14 @@ const styles = StyleSheet.create({
   },
   slideContainer: {
     width: Dimensions.get("window").width,
-    padding: 40,
+    paddingHorizontal: 40,
+    paddingBottom: 70,
     fontFamily: fonts.PlexMonoItalic,
     justifyContent: "center",
   },
   buttonContainer: {
-    borderTopColor: "black",
-    borderTopWidth: 0.5,
+    borderTopColor: "grey",
+    borderTopWidth: 0,
     width: "100%",
     alignItems: "center",
     paddingVertical: 40,
@@ -39,9 +41,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   logo: {
-    fontFamily: fonts.PlexSerifBoldItalic,
-    fontSize: 70,
-    marginTop: 50,
+    fontFamily: fonts.PlexMonoBoldItalic,
+    fontSize: 57,
   },
   getStarted: {
     fontFamily: fonts.PlexMonoItalic,
@@ -55,8 +56,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   scrollIndicatorBubble: {
-    width: 10,
-    height: 10,
+    width: 8,
+    height: 8,
     borderRadius: 5,
     backgroundColor: "black",
     borderColor: "black",
@@ -98,7 +99,7 @@ export const OnboardingScreen = () => {
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>575</Text>
+      <FiveSevenFive />
       <FlatList
         snapToAlignment={"start"}
         snapToInterval={Dimensions.get("window").width}
@@ -144,15 +145,21 @@ export const OnboardingScreen = () => {
           }}
         />
       </View>
-      <View style={styles.buttonContainer}>
-        <Text style={styles.getStarted}>Get Started</Text>
-        <HaikuLineInput
-          placeholder="how do you sign your work"
-          long
-          validity="unchecked"
-          onPressIn={finishOnboarding}
-        />
-      </View>
+      <Button
+        onPress={finishOnboarding}
+        title="Get Started"
+        style={{
+          marginBottom: 17,
+        }}
+      />
     </SafeAreaView>
   );
 };
+
+const FiveSevenFive = () => (
+  <View style={{ flexDirection: "row" }}>
+    <Text style={[styles.logo, { marginTop: 50 }]}>5</Text>
+    <Text style={[styles.logo, { marginTop: 65 }]}>7</Text>
+    <Text style={[styles.logo, { marginTop: 80 }]}>5</Text>
+  </View>
+);
