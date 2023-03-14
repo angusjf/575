@@ -25,6 +25,6 @@ export const FiveSevenFive = ({
 
 const styles = StyleSheet.create({
   logo: {
-    fontFamily: fonts.PlexMonoBoldItalic,
+    fontFamily: fonts.PlexSansBoldItalic,
   },
 });

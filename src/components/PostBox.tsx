@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   author: {
-    fontFamily: fonts.PlexSerifBoldItalic,
+    fontFamily: fonts.PlexSansBoldItalic,
     fontSize: 15,
     textAlign: "right",
     marginTop: 5,
