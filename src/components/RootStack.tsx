@@ -1,4 +1,4 @@
-import { TouchableOpacity, Image, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, Text, StyleSheet, Platform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "../font";
 import { Feed } from "./Feed";
@@ -119,7 +119,14 @@ export const RootStack = () => {
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={({ navigation }) => ({
+        headerLeft: () => {
+          if (Platform.OS === "ios")
+            return <BackButton onPress={() => navigation.goBack()} />;
+        },
+      })}
+    >
       <Stack.Screen
         name={ONBOARDING_SCREEN_NAME}
         component={OnboardingScreen}
@@ -153,6 +160,7 @@ export const RootStack = () => {
           headerTitle: "",
           headerBackVisible: false,
           gestureEnabled: false,
+          headerLeft: () => null,
           headerRight: () =>
             route.name === "Compose" ? (
               <HeaderRight onPress={() => openSettings()} />
@@ -166,6 +174,7 @@ export const RootStack = () => {
           headerTransparent: true,
           headerTitleAlign: "center",
           headerBackVisible: false,
+          headerLeft: () => null,
           headerBackground,
           headerTitle: () => <Text style={styles.logo}>575</Text>,
           headerRight: () =>
@@ -178,11 +187,10 @@ export const RootStack = () => {
       <Stack.Screen
         name="Settings"
         component={Settings}
-        options={({ navigation }) => ({
+        options={{
           headerTitle: () => <ScreenTitle title="Settings" />,
           gestureEnabled: true,
-          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
-        })}
+        }}
       />
     </Stack.Navigator>
   );

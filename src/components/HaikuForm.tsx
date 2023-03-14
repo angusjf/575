@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useRef } from "react";
+import { FC, useEffect, useMemo, useReducer, useRef } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -16,8 +16,9 @@ import { format } from "date-fns";
 import { valid } from "../valid";
 import { getSeason } from "../seasons";
 import { useAppState } from "../useAppState";
-import { Svg, SvgXml } from "react-native-svg";
-import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParams } from "./RootStack";
 
 type State = {
   haiku: Haiku;
@@ -62,11 +63,22 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-export const HaikuForm = () => {
+type FeedParams = NativeStackScreenProps<RootStackParams, "Compose">;
+
+export const HaikuForm: FC<FeedParams> = ({ navigation }) => {
   const [state, dispatch] = useReducer(reducer, {
     haiku: defaultHaiku,
     validity: "unchecked",
   });
+
+  useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        if (e.data.action.type !== "GO_BACK") return;
+        e.preventDefault();
+      }),
+    [navigation]
+  );
 
   const {
     publish,
