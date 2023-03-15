@@ -26,7 +26,10 @@
         "backgroundColor": "white"
       },
       "package": "com.fivesevenfive",
-      "versionCode": 3
+      "versionCode": 3,
+      "android": {
+        "googleServicesFile": "./google-services.json"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
