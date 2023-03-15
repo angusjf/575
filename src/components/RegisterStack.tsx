@@ -89,7 +89,10 @@ export const EmailForm: FC<EmailFormProps> = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.root}>
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <HaikuLineInput
         placeholder="the email address you use"
         value={email || ""}
@@ -135,7 +138,10 @@ export const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.root}>
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <HaikuLineInput
         placeholder="a secret password"
         value={password || ""}
@@ -188,7 +194,10 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.root}>
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <HaikuLineInput
         placeholder="a secret password"
         value={password || ""}
