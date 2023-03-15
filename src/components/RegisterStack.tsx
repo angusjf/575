@@ -102,6 +102,7 @@ export const EmailForm: FC<EmailFormProps> = ({ navigation }) => {
         autoComplete="email"
         importantForAutofill="yes"
         autoFocus
+        multiline={false}
       />
       <Button
         title="continue"
@@ -121,17 +122,13 @@ export const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
   const [password, setPassword] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (password === "") {
       setValidity("invalid");
       return;
     }
-    const auth = getAuth(firebaseApp);
     try {
-      setValidity("loading");
-      await createUserWithEmailAndPassword(auth, route.params.email, password);
-      setValidity("unchecked");
-      navigation.navigate("Sign", { email: route.params.email, password });
+      navigation.navigate("Sign", { ...route.params, password });
     } catch (error: any) {
       setValidity("invalid");
     }
@@ -233,12 +230,17 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
       width: SIGNATURE_HEIGHT,
       height: SIGNATURE_WIDTH,
     });
-    if (auth.currentUser === null) {
-      navigation.goBack();
-      return;
-    }
     try {
       setValidity("loading");
+      console.log(route.params);
+      await createUserWithEmailAndPassword(
+        auth,
+        route.params.email,
+        route.params.password
+      );
+      if (auth.currentUser === null) {
+        throw new Error("No user");
+      }
       await updateProfile(auth.currentUser, { displayName: name });
       await registerUser(firebaseUserToUser(auth.currentUser, signature));
       register(firebaseUserToUser(auth.currentUser, signature));
