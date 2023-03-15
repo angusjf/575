@@ -7,7 +7,6 @@ import {
   View,
 } from "react-native";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { syllable } from "syllable";
 import { Validity } from "../Validity";
 import { fonts } from "../font";
 import { Haiku } from "../types";
@@ -19,6 +18,7 @@ import { useAppState } from "../useAppState";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParams } from "./RootStack";
+import { syllableWithDigits } from "./syllable";
 
 type State = {
   haiku: Haiku;
@@ -104,9 +104,9 @@ export const HaikuForm: FC<FeedParams> = ({ navigation }) => {
           dispatch({ type: "submit" });
           setTimeout(() => {
             const syllables = [
-              syllable(state.haiku[0]),
-              syllable(state.haiku[1]),
-              syllable(state.haiku[2]),
+              syllableWithDigits(state.haiku[0]),
+              syllableWithDigits(state.haiku[1]),
+              syllableWithDigits(state.haiku[2]),
             ] as const;
 
             if (valid(syllables)) {
