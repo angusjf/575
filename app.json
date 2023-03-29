@@ -27,9 +27,7 @@
       },
       "package": "com.fivesevenfive",
       "versionCode": 3,
-      "android": {
-        "googleServicesFile": "./google-services.json"
-      }
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
