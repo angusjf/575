@@ -5,6 +5,7 @@ import {
   Platform,
   View,
   TouchableOpacity,
+  Linking,
 } from "react-native";
 import { fonts } from "../font";
 import { useAppState } from "../useAppState";
@@ -28,7 +29,7 @@ import { RegisterStackParams } from "./RootStack";
 import { QuestionMark } from "./icons/QuestionMark";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Erase } from "./icons/Erase";
-import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
+import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH, TOS_URL } from "../utils/consts";
 
 const styles = StyleSheet.create({
   root: {
@@ -55,6 +56,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
     lineHeight: 28,
+  },
+  tos: {
+    fontFamily: fonts.PlexMonoItalic,
+    fontSize: 10,
+    marginTop: 15,
+    maxWidth: 200,
+    textAlign: "center",
+    textDecorationLine: "underline",
   },
 });
 
@@ -267,10 +276,7 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
   const snapPoints = useMemo(() => ["50%"], []);
 
   return (
-    <KeyboardAvoidingView
-      style={styles.root}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+    <View style={styles.root}>
       <HaikuLineInput
         placeholder="how do you sign your poems?"
         value={name || ""}
@@ -321,10 +327,15 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         </View>
       </View>
       <Button
-        title="continue"
+        title="finish"
         onPress={handleNext}
         isLoading={validity == "loading"}
       />
+      <TouchableOpacity onPress={() => Linking.openURL(TOS_URL)}>
+        <Text style={styles.tos}>
+          By registering, you are accepting 575's terms of service.
+        </Text>
+      </TouchableOpacity>
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
@@ -353,6 +364,6 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
           </View>
         </View>
       </BottomSheet>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
