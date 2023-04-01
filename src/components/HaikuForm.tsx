@@ -19,6 +19,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParams } from "./RootStack";
 import { syllableWithDigits } from "./syllable";
+import { nth } from "../utils/nth";
 
 type State = {
   haiku: Haiku;
@@ -94,6 +95,7 @@ export const HaikuForm: FC<FeedParams> = ({ navigation }) => {
   return (
     <>
       <InputScreen
+        streak={user?.streak}
         validity={state.validity}
         haiku={state.haiku}
         changed={(n, l) =>
@@ -161,7 +163,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: fonts.PlexMonoItalic,
     marginTop: 15,
-    marginBottom: 25,
+    marginBottom: 15,
   },
   date: {
     fontFamily: fonts.PlexMonoItalic,
@@ -202,6 +204,7 @@ const DateToday = () => (
 );
 
 const InputScreen = ({
+  streak,
   haiku,
   changed,
   done,
@@ -213,6 +216,7 @@ const InputScreen = ({
   done: () => void;
   validity: Validity;
   signature: string;
+  streak: number | undefined;
 }) => {
   return (
     <KeyboardAvoidingView
@@ -222,6 +226,13 @@ const InputScreen = ({
       <View>
         <DateToday />
         <Text style={styles.intro}>Compose today's haiku</Text>
+        {streak && streak > 1 ? (
+          <Text style={{ fontFamily: fonts.PlexMonoItalic, paddingBottom: 45 }}>
+            Your {nth(streak + 1)} day of dedicated practice
+          </Text>
+        ) : (
+          <></>
+        )}
       </View>
       <View>
         <HaikuLineInput

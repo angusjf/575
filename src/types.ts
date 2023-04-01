@@ -15,6 +15,7 @@ export type User = {
   email: string;
   avatar: string;
   signature: string;
+  streak: number;
 };
 
 export type BlockedUser = {

@@ -55,7 +55,7 @@ export const getUser = async (firebaseUser: FirebaseUser): Promise<User> => {
     streak: number;
   };
 
-  return firebaseUserToUser(firebaseUser, user.signature);
+  return firebaseUserToUser(firebaseUser, user.signature, user.streak);
 };
 
 export const getDays = async (user: User): Promise<Day[]> => {

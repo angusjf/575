@@ -187,7 +187,7 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
       );
       const poet = await getUser(user.user);
       setValidity("unchecked");
-      register(firebaseUserToUser(user.user, poet.signature));
+      register(firebaseUserToUser(user.user, poet.signature, 0));
     } catch (error: any) {
       setValidity("invalid");
     }
@@ -251,8 +251,9 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         throw new Error("No user");
       }
       await updateProfile(auth.currentUser, { displayName: name });
-      await registerUser(firebaseUserToUser(auth.currentUser, signature));
-      register(firebaseUserToUser(auth.currentUser, signature));
+      const user = firebaseUserToUser(auth.currentUser, signature, 0);
+      await registerUser(user);
+      register(user);
       setValidity("unchecked");
     } catch (error: any) {
       setValidity("invalid");
