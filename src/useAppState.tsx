@@ -3,10 +3,10 @@ import { firebaseApp } from "./firebase";
 import {
   blockUser,
   deleteAccount,
-  getBlockedUsers,
   getBlockingUsers,
   getDays,
   getUser,
+  incStreak,
   post,
   unblockUser,
   uploadExpoPushToken,
@@ -259,6 +259,7 @@ const runEffect =
         return [{ msg: "fonts_loaded" }];
       case "post":
         await post(effect.user, effect.haiku);
+        incStreak(effect.user.userId);
         return [{ msg: "load_feed", user: effect.user }];
       case "block_user":
         await blockUser(
