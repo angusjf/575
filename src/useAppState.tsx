@@ -8,6 +8,7 @@ import {
   getUser,
   incStreak,
   post,
+  reportUser,
   unblockUser,
   uploadExpoPushToken,
 } from "./firebaseClient";
@@ -49,7 +50,12 @@ type Msg =
   | { msg: "register"; user: User }
   | { msg: "logout" }
   | { msg: "publish"; haiku: Haiku }
-  | { msg: "block_user"; blockedUserId: string; blockedUserName: string }
+  | {
+      msg: "block_user";
+      blockedUserId: string;
+      blockedUserName: string;
+      report: boolean;
+    }
   | { msg: "open_settings" }
   | { msg: "delete_account"; password: string }
   | { msg: "account_deleted" }
@@ -192,6 +198,15 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
             blockedUserId: msg.blockedUserId,
             blockedUserName: msg.blockedUserName,
           },
+          ...(msg.report
+            ? [
+                {
+                  effect: "report_user" as const,
+                  reporterId: state.user!.userId,
+                  badGuyId: msg.blockedUserId,
+                },
+              ]
+            : []),
         ],
       ];
     case "unblock_user":
@@ -237,7 +252,8 @@ type Effect =
   | { effect: "delete_user"; user: User; password: string }
   | { effect: "navigate"; route: string }
   | { effect: "register_for_notifications"; userId: string }
-  | { effect: "unblock_user"; user: User; blockedUserId: string };
+  | { effect: "unblock_user"; user: User; blockedUserId: string }
+  | { effect: "report_user"; reporterId: string; badGuyId: string };
 
 const runEffect =
   (navigate: (route: string) => void) =>
@@ -286,6 +302,12 @@ const runEffect =
           uploadExpoPushToken({ userId: effect.userId, token });
         }
         return [];
+      case "report_user":
+        reportUser({
+          reporterId: effect.reporterId,
+          badGuyId: effect.badGuyId,
+        });
+        return [];
       case "navigate":
         navigate(effect.route);
         return [];
@@ -308,7 +330,11 @@ type AppContextType = {
   register: (user: User) => void;
   logout: () => void;
   publish: (haiku: Haiku) => void;
-  blockUser: (blockedUserId: string, blockedUserName: string) => void;
+  blockUser: (
+    blockedUserId: string,
+    blockedUserName: string,
+    report: boolean
+  ) => void;
   refreshFeed: () => void;
   openSettings: () => void;
   deleteAccount: (password: string) => void;
@@ -363,8 +389,12 @@ export const AppStateProvider = (props: any) => {
     register: (user: User) => dispatch({ msg: "register", user }),
     logout: () => dispatch({ msg: "logout" }),
     publish: (haiku: Haiku) => dispatch({ msg: "publish", haiku }),
-    blockUser: (blockedUserId: string, blockedUserName: string) =>
-      dispatch({ msg: "block_user", blockedUserId, blockedUserName }),
+    blockUser: (
+      blockedUserId: string,
+      blockedUserName: string,
+      report: boolean
+    ) =>
+      dispatch({ msg: "block_user", blockedUserId, blockedUserName, report }),
     refreshFeed: () => dispatch({ msg: "load_feed", user: state.user! }),
     openSettings: () => dispatch({ msg: "open_settings" }),
     deleteAccount: (password: string) =>
