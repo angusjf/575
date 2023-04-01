@@ -1,10 +1,18 @@
+import { endOfYesterday } from "date-fns";
 import {
   EmailAuthProvider,
   getAuth,
   reauthenticateWithCredential,
   User as FirebaseUser,
 } from "firebase/auth";
-import { getDatabase, ref, set, get, remove, child } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  remove,
+  increment,
+} from "firebase/database";
 import { firebaseApp } from "./firebase";
 import { Haiku, Day, User, Post, BlockedUser } from "./types";
 import { dateDbKey, parseDateDbKey } from "./utils/date";
@@ -36,6 +44,7 @@ export const registerUser = async (user: User) => {
     username: user.username,
     registeredAt: Date.now(),
     signature: user.signature,
+    streak: 0,
   });
 };
 
@@ -43,6 +52,7 @@ export const getUser = async (firebaseUser: FirebaseUser): Promise<User> => {
   const db = getDatabase(firebaseApp);
   const user = (await get(ref(db, `users/${firebaseUser.uid}`))).toJSON() as {
     signature: string;
+    streak: number;
   };
 
   return firebaseUserToUser(firebaseUser, user.signature);
@@ -106,9 +116,20 @@ export const uploadExpoPushToken = ({
   userId: string;
   token: string;
 }) => {
-  console.log(`expoPushTokens/${userId}/`);
   const db = getDatabase(firebaseApp);
   set(ref(db, `expoPushTokens/${userId}/`), token);
+};
+
+export const incStreak = async (userId: string) => {
+  const db = getDatabase(firebaseApp);
+  const yesterday = endOfYesterday();
+  const yesterdayPost = await get(
+    ref(db, `days/${dateDbKey(yesterday)}/${userId}`)
+  );
+  await set(
+    ref(db, `users/${userId}/streak`),
+    yesterdayPost === null ? 0 : increment(1)
+  );
 };
 
 export const blockUser = async (
