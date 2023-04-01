@@ -4,7 +4,14 @@ import {
   reauthenticateWithCredential,
   User as FirebaseUser,
 } from "firebase/auth";
-import { getDatabase, ref, set, get, remove, child } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  remove,
+  increment,
+} from "firebase/database";
 import { firebaseApp } from "./firebase";
 import { Haiku, Day, User, Post, BlockedUser } from "./types";
 import { dateDbKey, parseDateDbKey } from "./utils/date";
@@ -109,6 +116,11 @@ export const uploadExpoPushToken = ({
   console.log(`expoPushTokens/${userId}/`);
   const db = getDatabase(firebaseApp);
   set(ref(db, `expoPushTokens/${userId}/`), token);
+};
+
+export const incStreak = async (userId: string) => {
+  const db = getDatabase(firebaseApp);
+  await set(ref(db, `user/${userId}/likes`), increment(1));
 };
 
 export const blockUser = async (
