@@ -3,6 +3,15 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 
 export async function registerForPushNotificationsAsync() {
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 50, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
   let token;
   if (Device.isDevice) {
     const { status: existingStatus } =
@@ -20,15 +29,6 @@ export async function registerForPushNotificationsAsync() {
     console.log(token);
   } else {
     alert("Must use physical device for Push Notifications");
-  }
-
-  if (Platform.OS === "android") {
-    Notifications.setNotificationChannelAsync("default", {
-      name: "default",
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 50, 250],
-      lightColor: "#FF231F7C",
-    });
   }
 
   return token;
