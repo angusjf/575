@@ -1,3 +1,4 @@
+import { endOfYesterday } from "date-fns";
 import {
   EmailAuthProvider,
   getAuth,
@@ -119,7 +120,14 @@ export const uploadExpoPushToken = ({
 
 export const incStreak = async (userId: string) => {
   const db = getDatabase(firebaseApp);
-  await set(ref(db, `user/${userId}/likes`), increment(1));
+  const yesterday = endOfYesterday();
+  const yesterdayPost = await get(
+    ref(db, `days/${dateDbKey(yesterday)}/${userId}`)
+  );
+  await set(
+    ref(db, `user/${userId}/streak`),
+    yesterdayPost === null ? 0 : increment(1)
+  );
 };
 
 export const blockUser = async (
