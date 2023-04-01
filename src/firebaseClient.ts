@@ -113,7 +113,6 @@ export const uploadExpoPushToken = ({
   userId: string;
   token: string;
 }) => {
-  console.log(`expoPushTokens/${userId}/`);
   const db = getDatabase(firebaseApp);
   set(ref(db, `expoPushTokens/${userId}/`), token);
 };
