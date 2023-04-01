@@ -12,6 +12,7 @@ import {
   get,
   remove,
   increment,
+  push,
 } from "firebase/database";
 import { firebaseApp } from "./firebase";
 import { Haiku, Day, User, Post, BlockedUser } from "./types";
@@ -45,6 +46,20 @@ export const registerUser = async (user: User) => {
     registeredAt: Date.now(),
     signature: user.signature,
     streak: 0,
+  });
+};
+
+export const reportUser = async ({
+  reporterId,
+  badGuyId,
+}: {
+  reporterId: string;
+  badGuyId: string;
+}) => {
+  const db = getDatabase(firebaseApp);
+  push(ref(db, `reports`), {
+    reporterId,
+    badGuyId,
   });
 };
 
