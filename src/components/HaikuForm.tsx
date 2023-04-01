@@ -18,7 +18,7 @@ import { useAppState } from "../useAppState";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParams } from "./RootStack";
-import { syllableWithDigits } from "./syllable";
+import { customSyllables } from "./syllable";
 import { nth } from "../utils/nth";
 
 type State = {
@@ -106,9 +106,9 @@ export const HaikuForm: FC<FeedParams> = ({ navigation }) => {
           dispatch({ type: "submit" });
           setTimeout(() => {
             const syllables = [
-              syllableWithDigits(state.haiku[0]),
-              syllableWithDigits(state.haiku[1]),
-              syllableWithDigits(state.haiku[2]),
+              customSyllables(state.haiku[0]),
+              customSyllables(state.haiku[1]),
+              customSyllables(state.haiku[2]),
             ] as const;
 
             if (valid(syllables)) {

@@ -9,7 +9,7 @@ import {
 import { Validity } from "../Validity";
 import { fonts } from "../font";
 import { useState } from "react";
-import { syllableWithDigits } from "./syllable";
+import { customSyllables } from "./syllable";
 
 const styles = StyleSheet.create({
   input: {
@@ -28,7 +28,7 @@ export const HaikuLineInput = (
   const [focused, setIsFocused] = useState(false);
   const invalid =
     props.validity === "invalid" &&
-    syllableWithDigits(props.value || "") !== (props.long ? 7 : 5);
+    customSyllables(props.value || "") !== (props.long ? 7 : 5);
 
   return (
     <View style={{ flexDirection: "row" }}>
@@ -59,7 +59,7 @@ export const HaikuLineInput = (
           width: 10,
         }}
       >
-        {syllableWithDigits(props.value || "")}
+        {customSyllables(props.value || "")}
       </Text>
     </View>
   );
