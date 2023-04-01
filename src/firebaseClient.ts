@@ -44,6 +44,7 @@ export const registerUser = async (user: User) => {
     username: user.username,
     registeredAt: Date.now(),
     signature: user.signature,
+    streak: 0,
   });
 };
 
@@ -51,6 +52,7 @@ export const getUser = async (firebaseUser: FirebaseUser): Promise<User> => {
   const db = getDatabase(firebaseApp);
   const user = (await get(ref(db, `users/${firebaseUser.uid}`))).toJSON() as {
     signature: string;
+    streak: number;
   };
 
   return firebaseUserToUser(firebaseUser, user.signature);
@@ -125,7 +127,7 @@ export const incStreak = async (userId: string) => {
     ref(db, `days/${dateDbKey(yesterday)}/${userId}`)
   );
   await set(
-    ref(db, `user/${userId}/streak`),
+    ref(db, `users/${userId}/streak`),
     yesterdayPost === null ? 0 : increment(1)
   );
 };
