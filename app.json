@@ -2,7 +2,7 @@
   "expo": {
     "name": "fivesevenfive",
     "slug": "575",
-    "version": "4.0.0",
+    "version": "6.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "notification": {
@@ -29,7 +29,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.fivesevenfive",
-      "versionCode": 4,
+      "versionCode": 6,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
