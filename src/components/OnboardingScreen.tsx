@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
 const ONBOARDING_SLIDES = [
   {
     id: "0",
-    line1: "a haiku app⁵",
+    line1: "tiny haiku app⁵",
     line2: "to help you write a poem⁷",
     line3: "every single day⁵",
   },
