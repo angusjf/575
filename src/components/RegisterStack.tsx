@@ -11,13 +11,14 @@ import { fonts } from "../font";
 import { useAppState } from "../useAppState";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { FC, useMemo, useRef, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { Validity } from "../validity";
 import { Button } from "./Button";
 import {
   createUserWithEmailAndPassword,
   fetchSignInMethodsForEmail,
   getAuth,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     lineHeight: 28,
   },
-  tos: {
+  smallLinkText: {
     fontFamily: fonts.PlexMonoItalic,
     fontSize: 10,
     marginTop: 15,
@@ -179,6 +180,7 @@ type LoginFormProps = NativeStackScreenProps<RegisterStackParams, "Login">;
 export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
   const [password, setPassword] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
+  const [passwordResetTime, setPasswordResetTime] = useState(0);
   const { register } = useAppState();
 
   const handleNext = async () => {
@@ -201,6 +203,30 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
       setValidity("invalid");
     }
   };
+
+  const handlePasswordReset = async () => {
+    if (passwordResetTime > 0) {
+      return;
+    }
+    const auth = getAuth(firebaseApp);
+    try {
+      console.log("sending password reset email");
+      sendPasswordResetEmail(auth, route.params.email);
+      setPasswordResetTime(60);
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (passwordResetTime === 0) {
+      return;
+    }
+    const interval = setInterval(() => {
+      setPasswordResetTime((time) => time - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [passwordResetTime]);
 
   return (
     <KeyboardAvoidingView
@@ -226,6 +252,13 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
         onPress={handleNext}
         isLoading={validity == "loading"}
       />
+      <TouchableOpacity onPress={handlePasswordReset}>
+        <Text style={styles.smallLinkText}>
+          {passwordResetTime === 0
+            ? "Forgot password? Tap here to reset it."
+            : `Check your email for a password reset link. Retry in ${passwordResetTime}s`}
+        </Text>
+      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 };
@@ -332,7 +365,7 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         isLoading={validity == "loading"}
       />
       <TouchableOpacity onPress={() => Linking.openURL(TOS_URL)}>
-        <Text style={styles.tos}>
+        <Text style={styles.smallLinkText}>
           By registering, you are accepting 575's terms of service.
         </Text>
       </TouchableOpacity>
