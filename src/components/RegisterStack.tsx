@@ -66,6 +66,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     textDecorationLine: "underline",
   },
+  errorMessage: {
+    fontFamily: fonts.PlexMonoItalic,
+    fontSize: 10,
+    marginTop: 15,
+    maxWidth: 200,
+    textAlign: "center",
+    color: "red",
+  },
 });
 
 type EmailFormProps = NativeStackScreenProps<RegisterStackParams, "Email">;
@@ -134,9 +142,15 @@ type RegisterFormProps = NativeStackScreenProps<
 export const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
   const [password, setPassword] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleNext = () => {
     if (password === "") {
+      setValidity("invalid");
+      return;
+    }
+    if (password.length < 6) {
+      setErrorMessage("password must be at least 6 characters");
       setValidity("invalid");
       return;
     }
@@ -166,6 +180,11 @@ export const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
         importantForAutofill="yes"
         autoFocus
       />
+      {errorMessage !== "" && (
+        <View>
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+        </View>
+      )}
       <Button
         title="continue"
         onPress={handleNext}
@@ -180,6 +199,7 @@ type LoginFormProps = NativeStackScreenProps<RegisterStackParams, "Login">;
 export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
   const [password, setPassword] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
+  const [errorMessage, setErrorMessage] = useState("");
   const [passwordResetTime, setPasswordResetTime] = useState(0);
   const { register } = useAppState();
 
@@ -200,6 +220,9 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
       setValidity("unchecked");
       register(firebaseUserToUser(user.user, poet.signature, 0));
     } catch (error: any) {
+      if (error.code === "auth/wrong-password") {
+        setErrorMessage("wrong password");
+      }
       setValidity("invalid");
     }
   };
@@ -247,6 +270,11 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
         importantForAutofill="yes"
         autoFocus
       />
+      {errorMessage !== "" && (
+        <View>
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+        </View>
+      )}
       <Button
         title="continue"
         onPress={handleNext}
