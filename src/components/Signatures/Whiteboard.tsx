@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
 import { decamelize } from "humps";
+// @ts-expect-error
+import DOMParser from "react-native-html-parser";
 
 export type Point = {
   x: number;
@@ -29,6 +31,30 @@ const pointsToSvg = (points: Point[]) => {
 export type Stroke = {
   attributes: Record<string, string | number>;
   type: string;
+};
+
+export const convertSvgToStrokes = (svg: string): Stroke[] => {
+  const parser = new DOMParser.DOMParser();
+  const doc = parser.parseFromString(svg, "image/svg+xml");
+  if (!doc) return [];
+  const strokes: Stroke[] = [];
+  const g = doc.getElementsByTagName("g")[0];
+  if (g) {
+    for (let i = 0; i < g.childNodes.length; i++) {
+      const child = g.childNodes[i];
+      if (!child.attributes) continue;
+      const attributes: Record<string, string | number> = {};
+      for (let j = 0; j < child.attributes.length; j++) {
+        const attribute = child.attributes[j];
+        attributes[attribute.name] = attribute.value;
+      }
+      strokes.push({
+        attributes,
+        type: child.tagName,
+      });
+    }
+  }
+  return strokes;
 };
 
 export const convertStrokesToSvg = (
@@ -115,12 +141,14 @@ export const Whiteboard = ({
     <View style={styles.svgContainer} {...panResponder.panHandlers}>
       <Svg style={styles.drawSurface}>
         <G>
-          {previousStrokes.map((stroke) => (
-            <Path
-              {...stroke.attributes}
-              key={JSON.stringify(stroke.attributes)}
-            />
-          ))}
+          {previousStrokes.map((stroke) => {
+            return (
+              <Path
+                {...stroke.attributes}
+                key={JSON.stringify(stroke.attributes)}
+              />
+            );
+          })}
           <Path
             d={pointsToSvg(currentPoints)}
             stroke={color}

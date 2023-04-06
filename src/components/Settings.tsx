@@ -11,6 +11,15 @@ import { useAppState } from "../useAppState";
 import Dialog from "react-native-dialog";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { fonts } from "../font";
+import { Signature } from "./Signatures/Signature";
+import {
+  convertStrokesToSvg,
+  convertSvgToStrokes,
+  Stroke,
+} from "./Signatures/Whiteboard";
+import { SvgXml } from "react-native-svg";
+import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
+import { Button } from "./Button";
 
 const styles = StyleSheet.create({
   root: {
@@ -26,6 +35,16 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PlexMonoItalic,
     fontSize: 15,
     marginBottom: 7,
+  },
+  signatureContainer: {
+    borderRadius: 50,
+    borderWidth: 0.5,
+    borderColor: "#000",
+    marginRight: 10,
+    overflow: "hidden",
+    backgroundColor: "transparent",
+    height: 40,
+    width: 40,
   },
 });
 
@@ -57,29 +76,58 @@ const SettingsItem = ({ title, onPress }: SettingsItemProps) => (
 );
 
 export const Settings = () => {
-  const { logout, deleteAccount, state, unblockUser } = useAppState();
+  const { logout, deleteAccount, state, unblockUser, updateSignature } =
+    useAppState();
   const [visible, setVisible] = useState(false);
   const [password, setPassword] = useState("");
 
-  // ref
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const unblockSheetRef = useRef<BottomSheet>(null);
+  const unblockSnapPoints = useMemo(() => ["50%", "60%"], []);
 
-  // variables
-  const snapPoints = useMemo(() => ["50%", "60%"], []);
+  const signatureSheetRef = useRef<BottomSheet>(null);
+  const signatureSheetSnapPoints = useMemo(() => ["65%"], []);
+
+  const closeSheets = () => {
+    unblockSheetRef.current?.close();
+    signatureSheetRef.current?.close();
+  };
 
   const settings = useMemo(
     () => [
-      { title: `Logout of ${state.user?.username}`, onPress: logout },
+      {
+        title: `Edit self-portrait`,
+        onPress: () => {
+          closeSheets();
+          signatureSheetRef.current?.expand();
+        },
+      },
+      {
+        title: `Logout of ${state.user?.username}`,
+        onPress: () => {
+          closeSheets();
+          logout();
+        },
+      },
       {
         title: "Unblock users",
-        onPress: () => bottomSheetRef.current?.expand(),
+        onPress: () => {
+          closeSheets();
+          unblockSheetRef.current?.expand();
+        },
       },
       {
         title: "Delete your account",
-        onPress: () => setVisible(true),
+        onPress: () => {
+          closeSheets();
+          setVisible(true);
+        },
       },
     ],
     [logout, state.user?.username]
+  );
+
+  const [strokes, setStrokes] = useState<Stroke[]>(
+    convertSvgToStrokes(state.user?.signature ?? "") || []
   );
 
   const BLOCKED_USERS = state.blockedUsers;
@@ -113,9 +161,54 @@ export const Settings = () => {
         />
       </Dialog.Container>
       <BottomSheet
-        ref={bottomSheetRef}
+        ref={signatureSheetRef}
+        snapPoints={signatureSheetSnapPoints}
+        bottomInset={46}
+        detached={true}
+        style={{
+          marginHorizontal: 20,
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+
+          elevation: 8,
+          backgroundColor: "white",
+          borderRadius: 15,
+        }}
+        enablePanDownToClose
+        enableContentPanningGesture={false}
         index={-1}
-        snapPoints={snapPoints}
+      >
+        <View style={{ alignItems: "center" }}>
+          <Signature
+            strokes={strokes}
+            setStrokes={setStrokes}
+            showGuide={false}
+          />
+        </View>
+        <Button
+          title="update"
+          onPress={() => {
+            updateSignature(
+              convertStrokesToSvg(strokes, {
+                width: SIGNATURE_WIDTH,
+                height: SIGNATURE_HEIGHT,
+              })
+            );
+            signatureSheetRef.current?.close();
+          }}
+          style={{ marginTop: 5 }}
+        />
+      </BottomSheet>
+
+      <BottomSheet
+        ref={unblockSheetRef}
+        index={-1}
+        snapPoints={unblockSnapPoints}
         enablePanDownToClose
         style={{
           backgroundColor: "white",

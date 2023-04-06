@@ -10,6 +10,7 @@ import {
   post,
   reportUser,
   unblockUser,
+  updateSignature,
   uploadExpoPushToken,
 } from "./firebaseClient";
 import { loadFonts } from "./font";
@@ -65,6 +66,7 @@ type Msg =
   | { msg: "account_deleted" }
   | { msg: "finish_onboarding" }
   | { msg: "unblock_user"; blockedUserId: string }
+  | { msg: "update_signature"; signature: string }
   | { msg: "network_checked"; reachable: boolean }
   | { msg: "app_state_changed"; appState: AppStateStatus };
 
@@ -232,6 +234,18 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
           },
         ],
       ];
+    case "update_signature":
+      if (!state.user) return [state, []];
+      return [
+        { ...state, user: { ...state.user, signature: msg.signature } },
+        [
+          {
+            effect: "update_signature",
+            signature: msg.signature,
+            user: state.user,
+          },
+        ],
+      ];
     case "open_settings":
       return [
         { ...state, user: state.user },
@@ -286,6 +300,7 @@ type Effect =
   | { effect: "navigate"; route: string }
   | { effect: "register_for_notifications"; userId: string }
   | { effect: "unblock_user"; user: User; blockedUserId: string }
+  | { effect: "update_signature"; user: User; signature: string }
   | { effect: "report_user"; reporterId: string; badGuyId: string };
 
 const runEffect =
@@ -327,6 +342,9 @@ const runEffect =
         return [{ msg: "load_feed", user: effect.user }];
       case "unblock_user":
         await unblockUser(effect.user, effect.blockedUserId);
+        return [{ msg: "load_feed", user: effect.user }];
+      case "update_signature":
+        await updateSignature(effect.user, effect.signature);
         return [{ msg: "load_feed", user: effect.user }];
       case "delete_user":
         try {
@@ -382,6 +400,7 @@ type AppContextType = {
   deleteAccount: (password: string) => void;
   finishOnboarding: () => void;
   unblockUser: (blockedUserId: string) => void;
+  updateSignature: (signature: string) => void;
 };
 
 const AppContext = createContext<AppContextType>({
@@ -395,6 +414,7 @@ const AppContext = createContext<AppContextType>({
   deleteAccount: () => {},
   finishOnboarding: () => {},
   unblockUser: () => {},
+  updateSignature: () => {},
 });
 
 export const AppStateProvider = (props: any) => {
@@ -451,6 +471,8 @@ export const AppStateProvider = (props: any) => {
     finishOnboarding: () => dispatch({ msg: "finish_onboarding" }),
     unblockUser: (blockedUserId: string) =>
       dispatch({ msg: "unblock_user", blockedUserId }),
+    updateSignature: (signature: string) =>
+      dispatch({ msg: "update_signature", signature }),
   };
 
   return <AppContext.Provider value={context} {...props} />;

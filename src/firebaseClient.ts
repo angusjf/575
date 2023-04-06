@@ -49,6 +49,11 @@ export const registerUser = async (user: User) => {
   });
 };
 
+export const updateSignature = async (user: User, signature: string) => {
+  const db = getDatabase(firebaseApp);
+  set(ref(db, `users/${user.userId}/signature`), signature);
+};
+
 export const reportUser = async ({
   reporterId,
   badGuyId,

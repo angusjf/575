@@ -11,7 +11,7 @@ import { fonts } from "../font";
 import { useAppState } from "../useAppState";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Validity } from "../validity";
 import { Button } from "./Button";
 import {
@@ -24,13 +24,11 @@ import {
 } from "firebase/auth";
 import { firebaseApp } from "../firebase";
 import { firebaseUserToUser } from "../utils/user";
-import { convertStrokesToSvg, Stroke, Whiteboard } from "./Whiteboard";
+import { convertStrokesToSvg, Stroke } from "./Signatures/Whiteboard";
 import { getUser, registerUser } from "../firebaseClient";
 import { RegisterStackParams } from "./RootStack";
-import { QuestionMark } from "./icons/QuestionMark";
-import BottomSheet from "@gorhom/bottom-sheet";
-import { Erase } from "./icons/Erase";
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH, TOS_URL } from "../utils/consts";
+import { Signature } from "./Signatures/Signature";
 
 const styles = StyleSheet.create({
   root: {
@@ -330,12 +328,6 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
     }
   };
 
-  // ref
-  const bottomSheetRef = useRef<BottomSheet>(null);
-
-  // variables
-  const snapPoints = useMemo(() => ["50%"], []);
-
   return (
     <View style={styles.root}>
       <HaikuLineInput
@@ -347,46 +339,7 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         multiline={false}
         autoComplete="name"
       />
-      <View style={{ marginVertical: 20, paddingTop: 20 }}>
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            right: 5,
-            top: 5,
-            zIndex: 2,
-          }}
-          onPress={() => bottomSheetRef.current?.expand()}
-        >
-          <QuestionMark size={25} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            left: 5,
-            top: 5,
-            zIndex: 2,
-          }}
-          onPress={() => setStrokes([])}
-        >
-          <Erase size={25} />
-        </TouchableOpacity>
-        <View
-          style={{
-            backgroundColor: "rgb(245, 242, 242)",
-            height: SIGNATURE_HEIGHT,
-            width: SIGNATURE_WIDTH,
-            borderRadius: SIGNATURE_HEIGHT / 2,
-            overflow: "hidden",
-          }}
-        >
-          <Whiteboard
-            strokes={strokes}
-            setStrokes={setStrokes}
-            color={"#2c2a2a"}
-            strokeWidth={4}
-          />
-        </View>
-      </View>
+      <Signature strokes={strokes} setStrokes={setStrokes} />
       <Button
         title="finish"
         onPress={handleNext}
@@ -397,34 +350,6 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
           By registering, you are accepting 575's terms of service.
         </Text>
       </TouchableOpacity>
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        style={{
-          shadowColor: "#000",
-          backgroundColor: "white",
-          shadowOffset: {
-            width: 0,
-            height: 4,
-          },
-          shadowOpacity: 0.3,
-          shadowRadius: 4.65,
-          elevation: 8,
-        }}
-      >
-        <View style={styles.contentContainer}>
-          <Text style={styles.guideTitle}>Sign your Haikus</Text>
-          <View style={styles.guideContainer}>
-            <Text style={styles.guideLine}>Hand-drawn self-portrait,</Text>
-            <Text style={styles.guideLine}>
-              Displayed with your haiku verse,
-            </Text>
-            <Text style={styles.guideLine}>Unique and creative.</Text>
-          </View>
-        </View>
-      </BottomSheet>
     </View>
   );
 };
