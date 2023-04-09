@@ -21,4 +21,7 @@ const pronounced: Partial<Record<string, string>> = {
   "&": "and",
   "%": "percent",
   "£": "pounds",
+  $: "dollars",
+  "@": "at",
+  "+": "plus",
 };
