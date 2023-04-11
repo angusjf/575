@@ -16,6 +16,7 @@ import { loadFonts } from "./font";
 import { BlockedUser, Day, Haiku, User } from "./types";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
+import * as Network from "expo-network";
 import { useReducerWithEffects } from "./useReducerWithEffects";
 import { createContext, useContext, useEffect } from "react";
 import { isToday } from "date-fns";
@@ -60,7 +61,8 @@ type Msg =
   | { msg: "delete_account"; password: string }
   | { msg: "account_deleted" }
   | { msg: "finish_onboarding" }
-  | { msg: "unblock_user"; blockedUserId: string };
+  | { msg: "unblock_user"; blockedUserId: string }
+  | { msg: "network_checked"; reachable: boolean };
 
 const hasPostedToday = (user: User, days: Day[]): boolean =>
   days
@@ -234,11 +236,14 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       return [state, [{ effect: "navigate", route: "Onboarding" }]];
     case "finish_onboarding":
       return [state, [{ effect: "navigate", route: "Email" }]];
+    case "network_checked":
+      return [state, []];
   }
 };
 
 type Effect =
   | { effect: "hide_splash" }
+  | { effect: "check_network_status" }
   | { effect: "get_days"; user: User }
   | { effect: "logout" }
   | { effect: "load_fonts" }
@@ -259,6 +264,14 @@ const runEffect =
   (navigate: (route: string) => void) =>
   async (effect: Effect): Promise<Msg[]> => {
     switch (effect.effect) {
+      case "check_network_status":
+        const networkState = await Network.getNetworkStateAsync();
+        return [
+          {
+            msg: "network_checked",
+            reachable: !!networkState.isInternetReachable,
+          },
+        ];
       case "hide_splash":
         await SplashScreen.hideAsync();
         return [];
