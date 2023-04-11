@@ -243,7 +243,14 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       // TODO
       return [state, []];
     case "app_state_changed":
-      // TODO
+      if (msg.appState === "active") {
+        // the app re-opened...
+        // if sun has set and risen,
+        // move back to compose
+        if (state.user && state.days) {
+          hasPostedToday(state.user, state.days);
+        }
+      }
       return [state, []];
   }
 };
