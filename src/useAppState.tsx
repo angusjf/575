@@ -243,6 +243,10 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "network_checked":
       return [{ ...state, offline: !msg.reachable }, []];
     case "app_state_changed":
+      if (state.offline) {
+        // if you reopen the app, check the network status again
+        return [state, [{ effect: "check_network_status" }]];
+      }
       if (msg.appState === "active") {
         // the app re-opened...
         // if sun has set and risen,
