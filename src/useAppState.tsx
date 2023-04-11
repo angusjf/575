@@ -41,6 +41,7 @@ type State = {
   user: User | null | undefined;
   days: Day[] | undefined;
   blockedUsers: BlockedUser[] | undefined;
+  offline: boolean | undefined;
 };
 
 type Msg =
@@ -240,8 +241,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "finish_onboarding":
       return [state, [{ effect: "navigate", route: "Email" }]];
     case "network_checked":
-      // TODO
-      return [state, []];
+      return [{ ...state, offline: !msg.reachable }, []];
     case "app_state_changed":
       if (msg.appState === "active") {
         // the app re-opened...
@@ -352,8 +352,9 @@ const init: [State, Effect[]] = [
     days: undefined,
     user: undefined,
     blockedUsers: undefined,
+    offline: undefined,
   },
-  [{ effect: "load_fonts" }],
+  [{ effect: "load_fonts" }, { effect: "check_network_status" }],
 ];
 
 type AppContextType = {
