@@ -247,11 +247,16 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         // the app re-opened...
         // if sun has set and risen,
         // move back to compose
-        if (state.user && state.days) {
-          hasPostedToday(state.user, state.days);
+        if (
+          state.user &&
+          state.days &&
+          hasPostedToday(state.user, state.days)
+        ) {
+          return [state, [{ effect: "navigate", route: "Compose" }]];
         }
+      } else {
+        return [state, []];
       }
-      return [state, []];
   }
 };
 
