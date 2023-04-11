@@ -22,6 +22,8 @@ import { createContext, useContext, useEffect } from "react";
 import { isToday } from "date-fns";
 import { useNavigation } from "@react-navigation/native";
 import { registerForPushNotificationsAsync } from "./components/useNotifications";
+import { AppState } from "react-native";
+import { AppStateStatus } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -62,7 +64,8 @@ type Msg =
   | { msg: "account_deleted" }
   | { msg: "finish_onboarding" }
   | { msg: "unblock_user"; blockedUserId: string }
-  | { msg: "network_checked"; reachable: boolean };
+  | { msg: "network_checked"; reachable: boolean }
+  | { msg: "app_state_changed"; appState: AppStateStatus };
 
 const hasPostedToday = (user: User, days: Day[]): boolean =>
   days
@@ -237,6 +240,10 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
     case "finish_onboarding":
       return [state, [{ effect: "navigate", route: "Email" }]];
     case "network_checked":
+      // TODO
+      return [state, []];
+    case "app_state_changed":
+      // TODO
       return [state, []];
   }
 };
@@ -376,6 +383,13 @@ export const AppStateProvider = (props: any) => {
     runEffect(navigate),
     init
   );
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (appState) =>
+      dispatch({ msg: "app_state_changed", appState })
+    );
+    return () => sub.remove();
+  });
 
   useEffect(() => {
     const auth = getAuth(firebaseApp);
