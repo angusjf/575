@@ -254,9 +254,8 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         ) {
           return [state, [{ effect: "navigate", route: "Compose" }]];
         }
-      } else {
-        return [state, []];
       }
+      return [state, []];
   }
 };
 
