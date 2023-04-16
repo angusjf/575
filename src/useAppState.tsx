@@ -134,12 +134,12 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         return [{ ...state, fonts: false, user: msg.user }, []];
       }
     case "fonts_loaded":
-      if (state.offline) {
-        return [
-          { ...state, loading: false },
-          [{ effect: "hide_splash" }, { effect: "navigate", route: "Compose" }],
-        ];
-      }
+      // if (state.offline) { TODO - OFFLINE
+      //   return [
+      //     { ...state, loading: false },
+      //     [{ effect: "hide_splash" }, { effect: "navigate", route: "Compose" }],
+      //   ];
+      // }
       if (state.user !== undefined) {
         if (state.user === null) {
           return [
