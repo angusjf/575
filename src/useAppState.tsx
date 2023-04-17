@@ -260,7 +260,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         if (
           state.user &&
           state.days &&
-          hasPostedToday(state.user, state.days)
+          !hasPostedToday(state.user, state.days)
         ) {
           return [state, [{ effect: "navigate", route: "Compose" }]];
         }
