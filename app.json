@@ -29,7 +29,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.fivesevenfive",
-      "versionCode": 8,
+      "versionCode": 9,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
