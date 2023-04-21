@@ -4,11 +4,13 @@ import { fonts } from "../font";
 import { Post } from "../types";
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 import { timestampToRelative } from "../utils/date";
+import { LikeButton } from "./LikeButton";
 
 const styles = StyleSheet.create({
   wrapper: {
     alignItems: "center",
     marginBottom: 45,
+    maxWidth: "100%",
   },
   line: {
     fontFamily: fonts.PlexMonoItalic,
@@ -25,6 +27,30 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   header: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  signatureContainer: {
+    borderRadius: 50,
+    borderWidth: 0.5,
+    borderColor: "#000",
+    marginRight: 10,
+    overflow: "hidden",
+    backgroundColor: "transparent",
+  },
+  headerInfo: {
+    alignItems: "flex-start",
+  },
+  postTime: {
+    fontFamily: fonts.PlexMonoItalic,
+    fontSize: 10,
+  },
+  bottomBar: {
+    marginTop: 10,
+    flexDirection: "row",
+    width: "100%",
+    alignItems: "center",
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
@@ -99,6 +125,16 @@ export const PostBox = ({
         <Text style={styles.line}>{haiku[1]}</Text>
         <Text style={styles.line}>{haiku[2]}</Text>
       </TouchableOpacity>
+      <View style={styles.bottomBar}>
+        <LikeButton
+          isLiked={!isMyPost}
+          toggleLike={() => {}}
+          disabled={isMyPost}
+        />
+        <Text style={{ fontFamily: fonts.PlexMonoBold, marginLeft: 5 }}>
+          {Math.floor(Math.random() * 100)}
+        </Text>
+      </View>
     </View>
   );
 };

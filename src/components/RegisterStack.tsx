@@ -347,7 +347,15 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         multiline={false}
         autoComplete="name"
       />
-      <View style={{ marginVertical: 20, paddingTop: 20 }}>
+      <View
+        style={{
+          backgroundColor: "rgb(245, 242, 242)",
+          height: SIGNATURE_HEIGHT,
+          width: SIGNATURE_WIDTH,
+          borderRadius: 10,
+          marginTop: 20,
+        }}
+      >
         <TouchableOpacity
           style={{
             position: "absolute",

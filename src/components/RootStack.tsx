@@ -136,6 +136,7 @@ export const RootStack = () => {
         component={EmailForm}
         options={({ navigation }) => ({
           headerTitle: () => <ScreenTitle title="Email" />,
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
         })}
       />
       <Stack.Screen
@@ -143,6 +144,7 @@ export const RootStack = () => {
         component={RegisterForm}
         options={({ navigation }) => ({
           headerTitle: () => <ScreenTitle title="Register" />,
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
         })}
       />
       <Stack.Screen
@@ -150,6 +152,7 @@ export const RootStack = () => {
         component={LoginForm}
         options={({ navigation }) => ({
           headerTitle: () => <ScreenTitle title="Welcome back" />,
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
         })}
       />
       <Stack.Screen
@@ -157,6 +160,7 @@ export const RootStack = () => {
         component={SignForm}
         options={({ navigation }) => ({
           headerTitle: () => <ScreenTitle title="Sign" />,
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
         })}
       />
       <Stack.Screen
