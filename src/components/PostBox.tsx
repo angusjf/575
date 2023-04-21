@@ -18,10 +18,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   author: {
-    fontFamily: fonts.PlexSerifBoldItalic,
-    fontSize: 15,
-    textAlign: "right",
-    marginTop: 5,
+    fontSize: 20,
+    fontFamily: fonts.PlexSansBoldItalic,
     paddingRight: 10,
   },
   container: {
@@ -53,6 +51,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     alignItems: "center",
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  signatureContainer: {
+    borderRadius: 50,
+    borderWidth: 0.5,
+    borderColor: "#000",
+    marginRight: 10,
+    overflow: "hidden",
+    backgroundColor: "transparent",
+  },
+  headerInfo: {
+    alignItems: "flex-start",
+  },
+  postTime: {
+    fontFamily: fonts.PlexMonoItalic,
+    fontSize: 10,
   },
 });
 

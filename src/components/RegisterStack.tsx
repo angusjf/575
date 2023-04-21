@@ -5,18 +5,20 @@ import {
   Platform,
   View,
   TouchableOpacity,
+  Linking,
 } from "react-native";
 import { fonts } from "../font";
 import { useAppState } from "../useAppState";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { FC, useMemo, useRef, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { Validity } from "../validity";
 import { Button } from "./Button";
 import {
   createUserWithEmailAndPassword,
   fetchSignInMethodsForEmail,
   getAuth,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
@@ -28,7 +30,7 @@ import { RegisterStackParams } from "./RootStack";
 import { QuestionMark } from "./icons/QuestionMark";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Erase } from "./icons/Erase";
-import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
+import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH, TOS_URL } from "../utils/consts";
 
 const styles = StyleSheet.create({
   root: {
@@ -55,6 +57,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
     lineHeight: 28,
+  },
+  smallLinkText: {
+    fontFamily: fonts.PlexMonoItalic,
+    fontSize: 10,
+    marginTop: 15,
+    maxWidth: 200,
+    textAlign: "center",
+    textDecorationLine: "underline",
+  },
+  errorMessage: {
+    fontFamily: fonts.PlexMonoItalic,
+    fontSize: 10,
+    marginTop: 15,
+    maxWidth: 200,
+    textAlign: "center",
+    color: "red",
   },
 });
 
@@ -89,7 +107,10 @@ export const EmailForm: FC<EmailFormProps> = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.root}>
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <HaikuLineInput
         placeholder="the email address you use"
         value={email || ""}
@@ -102,6 +123,7 @@ export const EmailForm: FC<EmailFormProps> = ({ navigation }) => {
         autoComplete="email"
         importantForAutofill="yes"
         autoFocus
+        multiline={false}
       />
       <Button
         title="continue"
@@ -120,25 +142,30 @@ type RegisterFormProps = NativeStackScreenProps<
 export const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
   const [password, setPassword] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (password === "") {
       setValidity("invalid");
       return;
     }
-    const auth = getAuth(firebaseApp);
+    if (password.length < 6) {
+      setErrorMessage("password must be at least 6 characters");
+      setValidity("invalid");
+      return;
+    }
     try {
-      setValidity("loading");
-      await createUserWithEmailAndPassword(auth, route.params.email, password);
-      setValidity("unchecked");
-      navigation.navigate("Sign", { email: route.params.email, password });
+      navigation.navigate("Sign", { ...route.params, password });
     } catch (error: any) {
       setValidity("invalid");
     }
   };
 
   return (
-    <KeyboardAvoidingView style={styles.root}>
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <HaikuLineInput
         placeholder="a secret password"
         value={password || ""}
@@ -153,6 +180,11 @@ export const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
         importantForAutofill="yes"
         autoFocus
       />
+      {errorMessage !== "" && (
+        <View>
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+        </View>
+      )}
       <Button
         title="continue"
         onPress={handleNext}
@@ -167,6 +199,8 @@ type LoginFormProps = NativeStackScreenProps<RegisterStackParams, "Login">;
 export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
   const [password, setPassword] = useState("");
   const [validity, setValidity] = useState<Validity>("unchecked");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [passwordResetTime, setPasswordResetTime] = useState(0);
   const { register } = useAppState();
 
   const handleNext = async () => {
@@ -184,14 +218,44 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
       );
       const poet = await getUser(user.user);
       setValidity("unchecked");
-      register(firebaseUserToUser(user.user, poet.signature));
+      register(firebaseUserToUser(user.user, poet.signature, 0));
     } catch (error: any) {
+      if (error.code === "auth/wrong-password") {
+        setErrorMessage("wrong password");
+      }
       setValidity("invalid");
     }
   };
 
+  const handlePasswordReset = async () => {
+    if (passwordResetTime > 0) {
+      return;
+    }
+    const auth = getAuth(firebaseApp);
+    try {
+      console.log("sending password reset email");
+      sendPasswordResetEmail(auth, route.params.email);
+      setPasswordResetTime(60);
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (passwordResetTime === 0) {
+      return;
+    }
+    const interval = setInterval(() => {
+      setPasswordResetTime((time) => time - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [passwordResetTime]);
+
   return (
-    <KeyboardAvoidingView style={styles.root}>
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <HaikuLineInput
         placeholder="a secret password"
         value={password || ""}
@@ -206,11 +270,23 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
         importantForAutofill="yes"
         autoFocus
       />
+      {errorMessage !== "" && (
+        <View>
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+        </View>
+      )}
       <Button
         title="continue"
         onPress={handleNext}
         isLoading={validity == "loading"}
       />
+      <TouchableOpacity onPress={handlePasswordReset}>
+        <Text style={styles.smallLinkText}>
+          {passwordResetTime === 0
+            ? "Forgot password? Tap here to reset it."
+            : `Check your email for a password reset link. Retry in ${passwordResetTime}s`}
+        </Text>
+      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 };
@@ -233,15 +309,21 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
       width: SIGNATURE_HEIGHT,
       height: SIGNATURE_WIDTH,
     });
-    if (auth.currentUser === null) {
-      navigation.goBack();
-      return;
-    }
     try {
       setValidity("loading");
+      console.log(route.params);
+      await createUserWithEmailAndPassword(
+        auth,
+        route.params.email,
+        route.params.password
+      );
+      if (auth.currentUser === null) {
+        throw new Error("No user");
+      }
       await updateProfile(auth.currentUser, { displayName: name });
-      await registerUser(firebaseUserToUser(auth.currentUser, signature));
-      register(firebaseUserToUser(auth.currentUser, signature));
+      const user = firebaseUserToUser(auth.currentUser, signature, 0);
+      await registerUser(user);
+      register(user);
       setValidity("unchecked");
     } catch (error: any) {
       setValidity("invalid");
@@ -255,10 +337,7 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
   const snapPoints = useMemo(() => ["50%"], []);
 
   return (
-    <KeyboardAvoidingView
-      style={styles.root}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+    <View style={styles.root}>
       <HaikuLineInput
         placeholder="how do you sign your poems?"
         value={name || ""}
@@ -299,18 +378,33 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         >
           <Erase size={25} />
         </TouchableOpacity>
-        <Whiteboard
-          strokes={strokes}
-          setStrokes={setStrokes}
-          color={"#2c2a2a"}
-          strokeWidth={4}
-        />
+        <View
+          style={{
+            backgroundColor: "rgb(245, 242, 242)",
+            height: SIGNATURE_HEIGHT,
+            width: SIGNATURE_WIDTH,
+            borderRadius: SIGNATURE_HEIGHT / 2,
+            overflow: "hidden",
+          }}
+        >
+          <Whiteboard
+            strokes={strokes}
+            setStrokes={setStrokes}
+            color={"#2c2a2a"}
+            strokeWidth={4}
+          />
+        </View>
       </View>
       <Button
-        title="continue"
+        title="finish"
         onPress={handleNext}
         isLoading={validity == "loading"}
       />
+      <TouchableOpacity onPress={() => Linking.openURL(TOS_URL)}>
+        <Text style={styles.smallLinkText}>
+          By registering, you are accepting 575's terms of service.
+        </Text>
+      </TouchableOpacity>
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
@@ -325,23 +419,20 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
           },
           shadowOpacity: 0.3,
           shadowRadius: 4.65,
-
           elevation: 8,
         }}
       >
         <View style={styles.contentContainer}>
           <Text style={styles.guideTitle}>Sign your Haikus</Text>
           <View style={styles.guideContainer}>
+            <Text style={styles.guideLine}>Hand-drawn self-portrait,</Text>
             <Text style={styles.guideLine}>
-              This hand-drawn signature will be displayed below your Haiku's on
-              everyone's feed.
+              Displayed with your haiku verse,
             </Text>
-            <Text style={styles.guideLine}>
-              Make it as unique and creative as you!
-            </Text>
+            <Text style={styles.guideLine}>Unique and creative.</Text>
           </View>
         </View>
       </BottomSheet>
-    </KeyboardAvoidingView>
+    </View>
   );
 };

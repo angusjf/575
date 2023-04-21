@@ -21,6 +21,7 @@ import { Post } from "../types";
 import { fonts } from "../font";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ONBOARDING_SCREEN_NAME, RootStackParams } from "./RootStack";
+import { reportUser } from "../firebaseClient";
 
 const styles = StyleSheet.create({
   root: {
@@ -60,10 +61,10 @@ export const Feed: FC<FeedParams> = ({ navigation }) => {
   ) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const options = isMyPost
-      ? ["Share", "Cancel"]
-      : ["Share", "Block User", "Cancel"];
-    const destructiveButtonIndex = isMyPost ? undefined : 1;
-    const cancelButtonIndex = isMyPost ? 1 : 2;
+      ? ["Share" as const, "Cancel" as const]
+      : ["Share" as const, "Block or Report User" as const, "Cancel" as const];
+    const destructiveButtonIndex = options.indexOf("Block or Report User");
+    const cancelButtonIndex = options.indexOf("Cancel");
 
     showActionSheetWithOptions(
       {
@@ -72,20 +73,28 @@ export const Feed: FC<FeedParams> = ({ navigation }) => {
         destructiveButtonIndex,
       },
       (selectedIndex?: number) => {
-        switch (selectedIndex) {
-          case 0:
+        switch (options[selectedIndex!]!) {
+          case "Share":
             Share.share({ message: italicize(sharingMessage) });
             break;
-          case destructiveButtonIndex:
+          case "Block or Report User":
             Alert.alert(
               "Block User",
               "Are you sure you want to block this user?",
               [
-                { text: "Cancel" },
                 {
-                  text: "Block",
-                  onPress: () => blockUser(blockedUserId, blockedUserName),
+                  text: "Block User",
+                  onPress: () =>
+                    blockUser(blockedUserId, blockedUserName, false),
                 },
+                {
+                  text: "Block User and Report",
+                  onPress: () => {
+                    blockUser(blockedUserId, blockedUserName, true);
+                  },
+                  style: "destructive",
+                },
+                { text: "Cancel", style: "cancel" },
               ],
               { cancelable: true }
             );

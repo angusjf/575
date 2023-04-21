@@ -194,7 +194,7 @@ const BlockedUser = ({
         <Text
           style={{
             fontSize: 30,
-            fontFamily: fonts.PlexSerifRegular,
+            fontFamily: fonts.PlexMonoBold,
           }}
         >
           ⨯

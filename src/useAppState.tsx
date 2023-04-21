@@ -3,11 +3,12 @@ import { firebaseApp } from "./firebase";
 import {
   blockUser,
   deleteAccount,
-  getBlockedUsers,
   getBlockingUsers,
   getDays,
   getUser,
+  incStreak,
   post,
+  reportUser,
   unblockUser,
   uploadExpoPushToken,
 } from "./firebaseClient";
@@ -15,11 +16,14 @@ import { loadFonts } from "./font";
 import { BlockedUser, Day, Haiku, User } from "./types";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
+import * as Network from "expo-network";
 import { useReducerWithEffects } from "./useReducerWithEffects";
 import { createContext, useContext, useEffect } from "react";
 import { isToday } from "date-fns";
 import { useNavigation } from "@react-navigation/native";
 import { registerForPushNotificationsAsync } from "./components/useNotifications";
+import { AppState } from "react-native";
+import { AppStateStatus } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -37,6 +41,7 @@ type State = {
   user: User | null | undefined;
   days: Day[] | undefined;
   blockedUsers: BlockedUser[] | undefined;
+  offline: boolean | undefined;
 };
 
 type Msg =
@@ -49,12 +54,19 @@ type Msg =
   | { msg: "register"; user: User }
   | { msg: "logout" }
   | { msg: "publish"; haiku: Haiku }
-  | { msg: "block_user"; blockedUserId: string; blockedUserName: string }
+  | {
+      msg: "block_user";
+      blockedUserId: string;
+      blockedUserName: string;
+      report: boolean;
+    }
   | { msg: "open_settings" }
   | { msg: "delete_account"; password: string }
   | { msg: "account_deleted" }
   | { msg: "finish_onboarding" }
-  | { msg: "unblock_user"; blockedUserId: string };
+  | { msg: "unblock_user"; blockedUserId: string }
+  | { msg: "network_checked"; reachable: boolean }
+  | { msg: "app_state_changed"; appState: AppStateStatus };
 
 const hasPostedToday = (user: User, days: Day[]): boolean =>
   days
@@ -122,6 +134,12 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
         return [{ ...state, fonts: false, user: msg.user }, []];
       }
     case "fonts_loaded":
+      // if (state.offline) { TODO - OFFLINE
+      //   return [
+      //     { ...state, loading: false },
+      //     [{ effect: "hide_splash" }, { effect: "navigate", route: "Compose" }],
+      //   ];
+      // }
       if (state.user !== undefined) {
         if (state.user === null) {
           return [
@@ -192,6 +210,15 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
             blockedUserId: msg.blockedUserId,
             blockedUserName: msg.blockedUserName,
           },
+          ...(msg.report
+            ? [
+                {
+                  effect: "report_user" as const,
+                  reporterId: state.user!.userId,
+                  badGuyId: msg.blockedUserId,
+                },
+              ]
+            : []),
         ],
       ];
     case "unblock_user":
@@ -219,11 +246,32 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
       return [state, [{ effect: "navigate", route: "Onboarding" }]];
     case "finish_onboarding":
       return [state, [{ effect: "navigate", route: "Email" }]];
+    case "network_checked":
+      return [{ ...state, offline: !msg.reachable }, []];
+    case "app_state_changed":
+      if (state.offline) {
+        // if you reopen the app, check the network status again
+        return [state, [{ effect: "check_network_status" }]];
+      }
+      if (msg.appState === "active") {
+        // the app re-opened...
+        // if sun has set and risen,
+        // move back to compose
+        if (
+          state.user &&
+          state.days &&
+          !hasPostedToday(state.user, state.days)
+        ) {
+          return [state, [{ effect: "navigate", route: "Compose" }]];
+        }
+      }
+      return [state, []];
   }
 };
 
 type Effect =
   | { effect: "hide_splash" }
+  | { effect: "check_network_status" }
   | { effect: "get_days"; user: User }
   | { effect: "logout" }
   | { effect: "load_fonts" }
@@ -237,12 +285,21 @@ type Effect =
   | { effect: "delete_user"; user: User; password: string }
   | { effect: "navigate"; route: string }
   | { effect: "register_for_notifications"; userId: string }
-  | { effect: "unblock_user"; user: User; blockedUserId: string };
+  | { effect: "unblock_user"; user: User; blockedUserId: string }
+  | { effect: "report_user"; reporterId: string; badGuyId: string };
 
 const runEffect =
   (navigate: (route: string) => void) =>
   async (effect: Effect): Promise<Msg[]> => {
     switch (effect.effect) {
+      case "check_network_status":
+        const networkState = await Network.getNetworkStateAsync();
+        return [
+          {
+            msg: "network_checked",
+            reachable: !!networkState.isInternetReachable,
+          },
+        ];
       case "hide_splash":
         await SplashScreen.hideAsync();
         return [];
@@ -259,6 +316,7 @@ const runEffect =
         return [{ msg: "fonts_loaded" }];
       case "post":
         await post(effect.user, effect.haiku);
+        incStreak(effect.user.userId);
         return [{ msg: "load_feed", user: effect.user }];
       case "block_user":
         await blockUser(
@@ -285,6 +343,12 @@ const runEffect =
           uploadExpoPushToken({ userId: effect.userId, token });
         }
         return [];
+      case "report_user":
+        reportUser({
+          reporterId: effect.reporterId,
+          badGuyId: effect.badGuyId,
+        });
+        return [];
       case "navigate":
         navigate(effect.route);
         return [];
@@ -298,8 +362,9 @@ const init: [State, Effect[]] = [
     days: undefined,
     user: undefined,
     blockedUsers: undefined,
+    offline: undefined,
   },
-  [{ effect: "load_fonts" }],
+  [{ effect: "load_fonts" }, { effect: "check_network_status" }],
 ];
 
 type AppContextType = {
@@ -307,7 +372,11 @@ type AppContextType = {
   register: (user: User) => void;
   logout: () => void;
   publish: (haiku: Haiku) => void;
-  blockUser: (blockedUserId: string, blockedUserName: string) => void;
+  blockUser: (
+    blockedUserId: string,
+    blockedUserName: string,
+    report: boolean
+  ) => void;
   refreshFeed: () => void;
   openSettings: () => void;
   deleteAccount: (password: string) => void;
@@ -338,6 +407,13 @@ export const AppStateProvider = (props: any) => {
   );
 
   useEffect(() => {
+    const sub = AppState.addEventListener("change", (appState) =>
+      dispatch({ msg: "app_state_changed", appState })
+    );
+    return () => sub.remove();
+  });
+
+  useEffect(() => {
     const auth = getAuth(firebaseApp);
 
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
@@ -362,8 +438,12 @@ export const AppStateProvider = (props: any) => {
     register: (user: User) => dispatch({ msg: "register", user }),
     logout: () => dispatch({ msg: "logout" }),
     publish: (haiku: Haiku) => dispatch({ msg: "publish", haiku }),
-    blockUser: (blockedUserId: string, blockedUserName: string) =>
-      dispatch({ msg: "block_user", blockedUserId, blockedUserName }),
+    blockUser: (
+      blockedUserId: string,
+      blockedUserName: string,
+      report: boolean
+    ) =>
+      dispatch({ msg: "block_user", blockedUserId, blockedUserName, report }),
     refreshFeed: () => dispatch({ msg: "load_feed", user: state.user! }),
     openSettings: () => dispatch({ msg: "open_settings" }),
     deleteAccount: (password: string) =>

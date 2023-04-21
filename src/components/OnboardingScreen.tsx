@@ -1,4 +1,3 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useRef, useState } from "react";
 import {
   Text,
@@ -12,7 +11,7 @@ import {
 import { fonts } from "../font";
 import { useAppState } from "../useAppState";
 import { Button } from "./Button";
-import { HaikuLineInput } from "./HaikuLineInput";
+import { FiveSevenFive } from "./FiveSevenFive";
 
 const styles = StyleSheet.create({
   container: {
@@ -22,13 +21,14 @@ const styles = StyleSheet.create({
   },
   slideContainer: {
     width: Dimensions.get("window").width,
-    padding: 40,
+    paddingHorizontal: 40,
+    paddingBottom: 70,
     fontFamily: fonts.PlexMonoItalic,
     justifyContent: "center",
   },
   buttonContainer: {
-    borderTopColor: "black",
-    borderTopWidth: 0.5,
+    borderTopColor: "grey",
+    borderTopWidth: 0,
     width: "100%",
     alignItems: "center",
     paddingVertical: 40,
@@ -38,11 +38,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 15,
   },
-  logo: {
-    fontFamily: fonts.PlexSerifBoldItalic,
-    fontSize: 70,
-    marginTop: 50,
-  },
+
   getStarted: {
     fontFamily: fonts.PlexMonoItalic,
     fontSize: 21,
@@ -55,8 +51,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   scrollIndicatorBubble: {
-    width: 10,
-    height: 10,
+    width: 8,
+    height: 8,
     borderRadius: 5,
     backgroundColor: "black",
     borderColor: "black",
@@ -67,7 +63,7 @@ const styles = StyleSheet.create({
 const ONBOARDING_SLIDES = [
   {
     id: "0",
-    line1: "a haiku app⁵",
+    line1: "tiny haiku app⁵",
     line2: "to help you write a poem⁷",
     line3: "every single day⁵",
   },
@@ -98,7 +94,7 @@ export const OnboardingScreen = () => {
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>575</Text>
+      <FiveSevenFive fontSize={57} marginTop={50} />
       <FlatList
         snapToAlignment={"start"}
         snapToInterval={Dimensions.get("window").width}
@@ -144,15 +140,13 @@ export const OnboardingScreen = () => {
           }}
         />
       </View>
-      <View style={styles.buttonContainer}>
-        <Text style={styles.getStarted}>Get Started</Text>
-        <HaikuLineInput
-          placeholder="how do you sign your work"
-          long
-          validity="unchecked"
-          onPressIn={finishOnboarding}
-        />
-      </View>
+      <Button
+        onPress={finishOnboarding}
+        title="Get Started"
+        style={{
+          marginBottom: 17,
+        }}
+      />
     </SafeAreaView>
   );
 };

@@ -17,6 +17,8 @@ export const timestampToRelative = (timestamp: number) => {
     return `${Math.round(timeDiffInMins)} mins ago`;
   } else if (timeDiffInDays < 1) {
     return `${Math.round(timeDiffInHours)} hours ago`;
+  } else if (timeDiffInDays == 1) {
+    return `1 day ago`;
   } else {
     return `${Math.round(timeDiffInDays)} days ago`;
   }

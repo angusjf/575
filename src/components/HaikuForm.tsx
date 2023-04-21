@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useRef } from "react";
+import { FC, useEffect, useMemo, useReducer, useRef } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,7 +7,6 @@ import {
   View,
 } from "react-native";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { syllable } from "syllable";
 import { Validity } from "../Validity";
 import { fonts } from "../font";
 import { Haiku } from "../types";
@@ -16,8 +15,11 @@ import { format } from "date-fns";
 import { valid } from "../valid";
 import { getSeason } from "../seasons";
 import { useAppState } from "../useAppState";
-import { Svg, SvgXml } from "react-native-svg";
-import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParams } from "./RootStack";
+import { customSyllables } from "./syllable";
+import { nth } from "../utils/nth";
 
 type State = {
   haiku: Haiku;
@@ -62,11 +64,22 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-export const HaikuForm = () => {
+type FeedParams = NativeStackScreenProps<RootStackParams, "Compose">;
+
+export const HaikuForm: FC<FeedParams> = ({ navigation }) => {
   const [state, dispatch] = useReducer(reducer, {
     haiku: defaultHaiku,
     validity: "unchecked",
   });
+
+  useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        if (e.data.action.type !== "GO_BACK") return;
+        e.preventDefault();
+      }),
+    [navigation]
+  );
 
   const {
     publish,
@@ -82,6 +95,7 @@ export const HaikuForm = () => {
   return (
     <>
       <InputScreen
+        streak={user?.streak}
         validity={state.validity}
         haiku={state.haiku}
         changed={(n, l) =>
@@ -92,9 +106,9 @@ export const HaikuForm = () => {
           dispatch({ type: "submit" });
           setTimeout(() => {
             const syllables = [
-              syllable(state.haiku[0]),
-              syllable(state.haiku[1]),
-              syllable(state.haiku[2]),
+              customSyllables(state.haiku[0]),
+              customSyllables(state.haiku[1]),
+              customSyllables(state.haiku[2]),
             ] as const;
 
             if (valid(syllables)) {
@@ -149,7 +163,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: fonts.PlexMonoItalic,
     marginTop: 15,
-    marginBottom: 25,
+    marginBottom: 15,
   },
   date: {
     fontFamily: fonts.PlexMonoItalic,
@@ -190,6 +204,7 @@ const DateToday = () => (
 );
 
 const InputScreen = ({
+  streak,
   haiku,
   changed,
   done,
@@ -201,6 +216,7 @@ const InputScreen = ({
   done: () => void;
   validity: Validity;
   signature: string;
+  streak: number | undefined;
 }) => {
   return (
     <KeyboardAvoidingView
@@ -210,6 +226,13 @@ const InputScreen = ({
       <View>
         <DateToday />
         <Text style={styles.intro}>Compose today's haiku</Text>
+        {streak && streak > 1 ? (
+          <Text style={{ fontFamily: fonts.PlexMonoItalic, paddingBottom: 45 }}>
+            Your {nth(streak + 1)} day of dedicated practice
+          </Text>
+        ) : (
+          <></>
+        )}
       </View>
       <View>
         <HaikuLineInput

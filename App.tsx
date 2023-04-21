@@ -1,5 +1,6 @@
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 import { LogBox } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { RootStack } from "./src/components/RootStack";
@@ -12,6 +13,7 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
         <AppStateProvider>
+          <StatusBar style="dark" />
           <ActionSheetProvider>
             <RootStack />
           </ActionSheetProvider>

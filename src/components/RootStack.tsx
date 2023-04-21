@@ -1,4 +1,4 @@
-import { TouchableOpacity, Image, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, Text, StyleSheet, Platform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "../font";
 import { Feed } from "./Feed";
@@ -8,6 +8,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HaikuForm } from "./HaikuForm";
 import { OnboardingScreen } from "./OnboardingScreen";
 import { EmailForm, LoginForm, RegisterForm, SignForm } from "./RegisterStack";
+import { FiveSevenFive } from "./FiveSevenFive";
 
 export type RegisterStackParams = {
   Email: undefined;
@@ -28,24 +29,22 @@ export const ONBOARDING_SCREEN_NAME = "Onboarding";
 
 const Stack = createNativeStackNavigator<RootStackParams>();
 
-const styles = StyleSheet.create({
-  logo: {
-    fontFamily: fonts.PlexSerifBoldItalic,
-    fontSize: 32,
-  },
-});
-
 const white = "rgba(255, 255, 255, 255)";
 const transparent = "rgba(255, 255, 255, 0)";
 
 const headerBackground = () => (
-  <LinearGradient colors={[white, white, transparent]} style={{ flex: 1 }} />
+  <LinearGradient
+    start={{ x: 0, y: 0.5 }}
+    end={{ x: 0, y: 1 }}
+    colors={[white, transparent]}
+    style={{ flex: 1 }}
+  />
 );
 
 const ScreenTitle = ({ title }: { title: string }) => (
   <Text
     style={{
-      fontFamily: fonts.PlexSerifBoldItalic,
+      fontFamily: fonts.PlexSansBoldItalic,
       fontSize: 28,
     }}
   >
@@ -119,7 +118,14 @@ export const RootStack = () => {
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={({ navigation }) => ({
+        headerLeft: () => {
+          if (Platform.OS === "ios")
+            return <BackButton onPress={() => navigation.goBack()} />;
+        },
+      })}
+    >
       <Stack.Screen
         name={ONBOARDING_SCREEN_NAME}
         component={OnboardingScreen}
@@ -165,6 +171,7 @@ export const RootStack = () => {
           headerTitle: "",
           headerBackVisible: false,
           gestureEnabled: false,
+          headerLeft: () => null,
           headerRight: () =>
             route.name === "Compose" ? (
               <HeaderRight onPress={() => openSettings()} />
@@ -178,8 +185,9 @@ export const RootStack = () => {
           headerTransparent: true,
           headerTitleAlign: "center",
           headerBackVisible: false,
+          headerLeft: () => null,
           headerBackground,
-          headerTitle: () => <Text style={styles.logo}>575</Text>,
+          headerTitle: () => <FiveSevenFive fontSize={27} marginTop={0} />,
           headerRight: () =>
             route.name === "Feed" ? (
               <HeaderRight onPress={() => openSettings()} />
@@ -190,11 +198,10 @@ export const RootStack = () => {
       <Stack.Screen
         name="Settings"
         component={Settings}
-        options={({ navigation }) => ({
+        options={{
           headerTitle: () => <ScreenTitle title="Settings" />,
           gestureEnabled: true,
-          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
-        })}
+        }}
       />
     </Stack.Navigator>
   );
