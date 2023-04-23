@@ -4,6 +4,7 @@ import { fonts } from "../font";
 import { Post } from "../types";
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 import { timestampToRelative } from "../utils/date";
+import { memo } from "react";
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const PostBox = ({
+const PostBoxNoMemo = ({
   haiku,
   author,
   showOptions,
@@ -102,3 +103,5 @@ export const PostBox = ({
     </View>
   );
 };
+
+export const PostBox = memo(PostBoxNoMemo);
