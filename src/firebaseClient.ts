@@ -112,12 +112,12 @@ export const getDays = async (user: User): Promise<Day[]> => {
   try {
     const db = getDatabase(firebaseApp);
 
-    const dateToday = new Date();
-    const dateYesterday = subDays(dateToday, 1);
+    const keyToday = dateDbKey(new Date());
+    const keyYesterday = dateDbKey(subDays(new Date(), 1));
 
     const [today, yesterday] = await Promise.all([
-      get(ref(db, `days/${dateDbKey(dateToday)}`)),
-      get(ref(db, `days/${dateDbKey(dateYesterday)}`)),
+      get(ref(db, `days/${keyToday}`)),
+      get(ref(db, `days/${keyYesterday}`)),
     ]);
 
     const [blockedUsers, blockingUsers] = await Promise.all([
@@ -125,7 +125,10 @@ export const getDays = async (user: User): Promise<Day[]> => {
       getBlockingUsers(user),
     ]);
 
-    const json = { ...today.toJSON(), ...yesterday.toJSON() };
+    const json = {
+      [keyToday]: today.toJSON(),
+      [keyYesterday]: yesterday.toJSON(),
+    };
     if (!json) throw new Error("bad json");
 
     return Object.entries(json)
