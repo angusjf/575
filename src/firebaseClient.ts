@@ -1,4 +1,4 @@
-import { endOfYesterday } from "date-fns";
+import { endOfYesterday, subDays } from "date-fns";
 import {
   EmailAuthProvider,
   getAuth,
@@ -109,14 +109,21 @@ export const getUser = async (firebaseUser: FirebaseUser): Promise<User> => {
 export const getDays = async (user: User): Promise<Day[]> => {
   try {
     const db = getDatabase(firebaseApp);
-    const days = await get(ref(db, "days/"));
+
+    const dateToday = new Date();
+    const dateYesterday = subDays(dateToday, 1);
+
+    const [today, yesterday] = await Promise.all([
+      get(ref(db, `days/${dateDbKey(dateToday)}`)),
+      get(ref(db, `days/${dateDbKey(dateYesterday)}`)),
+    ]);
 
     const [blockedUsers, blockingUsers] = await Promise.all([
       getBlockedUsers(user),
       getBlockingUsers(user),
     ]);
 
-    const json = days.toJSON();
+    const json = { ...today.toJSON(), ...yesterday.toJSON() };
     if (!json) throw new Error("bad json");
 
     return Object.entries(json)
