@@ -60,7 +60,9 @@ export const sendNotifications = async () => {
   const todaysHaikus = (
     await get(ref(db, `days/${dateDbKey(new Date())}`))
   ).toJSON();
-  const posters: string[] = Object.entries(todaysHaikus).map(([x, _]) => x);
+  const posters: string[] = Object.entries(
+    todaysHaikus as Record<string, string>
+  ).map(([x, _]) => x);
 
   const slackers: string[] = Object.entries(tokens!)
     .filter(([userId, _]) => !posters.includes(userId))
