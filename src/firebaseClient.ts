@@ -49,6 +49,11 @@ export const registerUser = async (user: User) => {
   });
 };
 
+export const updateSignature = async (user: User, signature: string) => {
+  const db = getDatabase(firebaseApp);
+  set(ref(db, `users/${user.userId}/signature`), signature);
+};
+
 export const reportUser = async ({
   reporterId,
   badGuyId,
@@ -198,4 +203,9 @@ export const unblockUser = async (user: User, blockedUserId: string) => {
     remove(ref(db, `blocks/${user.userId}/${blockedUserId}`)),
     remove(ref(db, `blocked/${blockedUserId}/${user.userId}`)),
   ]);
+};
+
+export const updateUsername = async (user: User, username: string) => {
+  const db = getDatabase(firebaseApp);
+  await set(ref(db, `users/${user.userId}/username`), username);
 };
