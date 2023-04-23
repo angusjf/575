@@ -76,9 +76,18 @@ const SettingsItem = ({ title, onPress }: SettingsItemProps) => (
 );
 
 export const Settings = () => {
-  const { logout, deleteAccount, state, unblockUser, updateSignature } =
-    useAppState();
+  const {
+    logout,
+    deleteAccount,
+    state,
+    unblockUser,
+    updateSignature,
+    updateUsername,
+  } = useAppState();
   const [visible, setVisible] = useState(false);
+  const [isUpdateUsernameDialogOpen, setIsUpdateUsernameDialogOpen] =
+    useState(false);
+  const [newUsername, setNewUsername] = useState(state.user?.username ?? "");
   const [password, setPassword] = useState("");
 
   const unblockSheetRef = useRef<BottomSheet>(null);
@@ -95,6 +104,13 @@ export const Settings = () => {
   const settings = useMemo(
     () => [
       {
+        title: `Edit username (${state.user?.username})`,
+        onPress: () => {
+          closeSheets();
+          setIsUpdateUsernameDialogOpen(true);
+        },
+      },
+      {
         title: `Edit self-portrait`,
         onPress: () => {
           closeSheets();
@@ -102,17 +118,17 @@ export const Settings = () => {
         },
       },
       {
-        title: `Logout of ${state.user?.username}`,
-        onPress: () => {
-          closeSheets();
-          logout();
-        },
-      },
-      {
         title: "Unblock users",
         onPress: () => {
           closeSheets();
           unblockSheetRef.current?.expand();
+        },
+      },
+      {
+        title: `Logout of ${state.user?.username}`,
+        onPress: () => {
+          closeSheets();
+          logout();
         },
       },
       {
@@ -137,6 +153,26 @@ export const Settings = () => {
         data={settings}
         renderItem={({ item }) => <SettingsItem {...item} />}
       />
+      <Dialog.Container visible={isUpdateUsernameDialogOpen}>
+        <Dialog.Title>Update username</Dialog.Title>
+        <Dialog.Input
+          multiline={false}
+          value={newUsername}
+          onChangeText={setNewUsername}
+        />
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => setIsUpdateUsernameDialogOpen(false)}
+        />
+        <Dialog.Button
+          onPress={() => {
+            updateUsername(newUsername);
+            setIsUpdateUsernameDialogOpen(false);
+          }}
+          label="Update"
+          bold
+        />
+      </Dialog.Container>
       <Dialog.Container visible={visible}>
         <Dialog.Title>Delete Account</Dialog.Title>
         <Dialog.Description>
