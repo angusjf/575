@@ -54,6 +54,34 @@ export const updateSignature = async (user: User, signature: string) => {
   set(ref(db, `users/${user.userId}/signature`), signature);
 };
 
+export const sendNotifications = async () => {
+  const db = getDatabase(firebaseApp);
+  const tokens = (await get(ref(db, `expoPushTokens`))).toJSON();
+  const todaysHaikus = (
+    await get(ref(db, `days/${dateDbKey(new Date())}`))
+  ).toJSON();
+  const posters: string[] = Object.entries(todaysHaikus).map(([x, _]) => x);
+
+  const slackers: string[] = Object.entries(tokens!)
+    .filter(([userId, _]) => !posters.includes(userId))
+    .map(([_, token]) => token);
+
+  slackers.forEach((slacker) => {
+    const body = JSON.stringify({
+      to: slacker,
+      title: "⚠️ It's time to 575 ⚠️",
+      body: "Compose your haiku now and see what the world is saying",
+    });
+    fetch("https://exp.host/--/api/v2/push/send", {
+      body,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    });
+  });
+};
+
 export const reportUser = async ({
   reporterId,
   badGuyId,
