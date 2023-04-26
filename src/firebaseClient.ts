@@ -3,6 +3,7 @@ import {
   EmailAuthProvider,
   getAuth,
   reauthenticateWithCredential,
+  updateProfile,
   User as FirebaseUser,
 } from "firebase/auth";
 import {
@@ -247,5 +248,11 @@ export const unblockUser = async (user: User, blockedUserId: string) => {
 
 export const updateUsername = async (user: User, username: string) => {
   const db = getDatabase(firebaseApp);
-  await set(ref(db, `users/${user.userId}/username`), username);
+  const auth = getAuth(firebaseApp);
+  Promise.all([
+    await set(ref(db, `users/${user.userId}/username`), username),
+    await updateProfile(auth.currentUser!, {
+      displayName: username,
+    }),
+  ]);
 };
