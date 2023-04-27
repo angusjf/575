@@ -69,11 +69,11 @@ export const sendNotifications = async () => {
     .filter(([userId, _]) => !posters.includes(userId))
     .map(([_, token]) => token);
 
-  slackers.forEach((slacker) => {
+  [...new Set(slackers)].forEach((slacker) => {
     const body = JSON.stringify({
       to: slacker,
-      title: "⚠️ It's time to 575 ⚠️",
-      body: "Compose your haiku now and see what the world is saying",
+      title: "",
+      body: "",
     });
     fetch("https://exp.host/--/api/v2/push/send", {
       body,
