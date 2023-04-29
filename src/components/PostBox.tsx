@@ -5,6 +5,7 @@ import { Post } from "../types";
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 import { timestampToRelative } from "../utils/date";
 import { memo } from "react";
+import { Verified } from "./icons/Verified";
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -75,7 +76,13 @@ const PostBoxNoMemo = ({
           />
         </View>
         <View style={styles.headerInfo}>
-          <Text style={styles.author}>{isMyPost ? "Me" : author.username}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.author}>
+              {isMyPost ? "Me" : author.username}
+            </Text>
+            <Verified size={20} />
+          </View>
+
           <Text style={styles.postTime}>{timestampToRelative(timestamp)}</Text>
         </View>
       </View>
