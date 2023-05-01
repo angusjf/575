@@ -1,10 +1,36 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SvgXml } from "react-native-svg";
 import { fonts } from "../font";
 import { Post } from "../types";
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 import { timestampToRelative } from "../utils/date";
-import { memo } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
+import Animated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import BottomSheet from "@gorhom/bottom-sheet";
+
+type Reaction = string;
+
+const ReactionDrawing = ({ reaction }: { reaction: Reaction }) => {
+  return (
+    <View
+      style={{ paddingHorizontal: 10, width: 100, height: 100, borderWidth: 1 }}
+    >
+      <Text>{reaction}</Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -24,6 +50,10 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 10,
     width: "100%",
+  },
+  selected: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
   },
   header: {
     width: "100%",
@@ -54,6 +84,8 @@ const PostBoxNoMemo = ({
   isMyPost,
   signature,
   timestamp,
+  open,
+  onPress,
 }: Post & {
   showOptions: (
     sharingMessage: string,
@@ -62,9 +94,32 @@ const PostBoxNoMemo = ({
     isMyPost: boolean
   ) => void;
   isMyPost: boolean;
+  open: boolean;
+  onPress: () => void;
 }) => {
+  const openAnim = useSharedValue(open ? 1 : 0);
+  console.log(openAnim.value);
+
+  const selected = useAnimatedStyle(() => {
+    return {
+      paddingBottom: interpolate(
+        openAnim.value,
+        [0, 1],
+        [0, 2 * 120],
+        Extrapolate.EXTEND
+      ),
+    };
+  });
+
+  useEffect(() => {
+    openAnim.value = withSpring(open ? 1 : 0, {
+      velocity: 7,
+      restSpeedThreshold: 4,
+    });
+  }, [open]);
+
   return (
-    <View style={styles.wrapper}>
+    <Animated.View style={[styles.wrapper, selected, { overflow: "hidden" }]}>
       <View style={styles.header}>
         <View style={styles.signatureContainer}>
           <SvgXml
@@ -81,6 +136,7 @@ const PostBoxNoMemo = ({
       </View>
       <TouchableOpacity
         style={styles.container}
+        onPress={onPress}
         onLongPress={() =>
           showOptions(
             haiku[0] +
@@ -100,8 +156,68 @@ const PostBoxNoMemo = ({
         <Text style={styles.line}>{haiku[1]}</Text>
         <Text style={styles.line}>{haiku[2]}</Text>
       </TouchableOpacity>
-    </View>
+      {(open || openAnim.value > 0) && (
+        <View style={{ position: "absolute", top: 170 }}>
+          <FlatList
+            renderItem={(reaction) =>
+              reaction.item === "+" ? (
+                <AddReaction />
+              ) : (
+                <ReactionDrawing reaction={reaction.item} />
+              )
+            }
+            numColumns={3}
+            data={[
+              "something here",
+              "something more",
+              "something here",
+              "something more",
+              "something here",
+              "something more",
+              "+",
+            ]}
+          />
+        </View>
+      )}
+    </Animated.View>
   );
 };
+
+function AddReaction() {
+  const ref = useRef<BottomSheet>(null);
+  const snaps = useMemo(() => ["50%", "60%"], []);
+  return (
+    <TouchableOpacity onPress={() => ref.current?.collapse()}>
+      <BottomSheet
+        ref={ref}
+        snapPoints={snaps}
+        bottomInset={46}
+        detached={true}
+        style={{
+          marginHorizontal: 20,
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+
+          elevation: 8,
+          backgroundColor: "white",
+          borderRadius: 15,
+        }}
+        enablePanDownToClose
+        enableContentPanningGesture={false}
+        index={-1}
+      >
+        <View>
+          <Text>Gl</Text>
+        </View>
+      </BottomSheet>
+      <Text>+</Text>
+    </TouchableOpacity>
+  );
+}
 
 export const PostBox = memo(PostBoxNoMemo);
