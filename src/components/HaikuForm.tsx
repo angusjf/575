@@ -247,7 +247,7 @@ const InputScreen = ({
           value={haiku[1]}
           onChangeText={(l) => changed(1, l)}
           validity={validity}
-          long
+          length
         />
         <HaikuLineInput
           placeholder="A lovely sunset."

@@ -10,7 +10,7 @@ import { fonts } from "../font";
 import { Post } from "../types";
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 import { timestampToRelative } from "../utils/date";
-import { memo, useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import Animated, {
   Extrapolate,
   interpolate,
@@ -19,15 +19,21 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { HaikuLineInput } from "./HaikuLineInput";
+import { Button } from "./Button";
+import { SmallButton } from "./SmallButton";
 
-type Reaction = string;
+type Reaction = { author: string; comment: string };
 
 const ReactionDrawing = ({ reaction }: { reaction: Reaction }) => {
   return (
-    <View
-      style={{ paddingHorizontal: 10, width: 100, height: 100, borderWidth: 1 }}
-    >
-      <Text>{reaction}</Text>
+    <View style={{ flexDirection: "row" }}>
+      <Text style={{ marginRight: 10, fontFamily: fonts.PlexSansBoldItalic }}>
+        {reaction.author}
+      </Text>
+      <Text style={{ fontFamily: fonts.PlexMonoItalic }}>
+        {reaction.comment}
+      </Text>
     </View>
   );
 };
@@ -106,16 +112,13 @@ const PostBoxNoMemo = ({
         openAnim.value,
         [0, 1],
         [0, 2 * 120],
-        Extrapolate.EXTEND
+        Extrapolate.CLAMP
       ),
     };
   });
 
   useEffect(() => {
-    openAnim.value = withSpring(open ? 1 : 0, {
-      velocity: 7,
-      restSpeedThreshold: 4,
-    });
+    openAnim.value = withSpring(open ? 1 : 0);
   }, [open]);
 
   return (
@@ -159,24 +162,16 @@ const PostBoxNoMemo = ({
       {(open || openAnim.value > 0) && (
         <View style={{ position: "absolute", top: 170 }}>
           <FlatList
-            renderItem={(reaction) =>
-              reaction.item === "+" ? (
-                <AddReaction />
-              ) : (
-                <ReactionDrawing reaction={reaction.item} />
-              )
-            }
-            numColumns={3}
+            renderItem={(reaction) => (
+              <ReactionDrawing reaction={reaction.item} />
+            )}
             data={[
-              "something here",
-              "something more",
-              "something here",
-              "something more",
-              "something here",
-              "something more",
-              "+",
+              { author: "angus", comment: "really nice" },
+              { author: "dan", comment: "a good poem" },
+              { author: "rohan", comment: "fantastic" },
             ]}
           />
+          <AddReaction />
         </View>
       )}
     </Animated.View>
@@ -184,39 +179,14 @@ const PostBoxNoMemo = ({
 };
 
 function AddReaction() {
-  const ref = useRef<BottomSheet>(null);
-  const snaps = useMemo(() => ["50%", "60%"], []);
+  const [comment, setComment] = useState("");
   return (
-    <TouchableOpacity onPress={() => ref.current?.collapse()}>
-      <BottomSheet
-        ref={ref}
-        snapPoints={snaps}
-        bottomInset={46}
-        detached={true}
-        style={{
-          marginHorizontal: 20,
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-
-          elevation: 8,
-          backgroundColor: "white",
-          borderRadius: 15,
-        }}
-        enablePanDownToClose
-        enableContentPanningGesture={false}
-        index={-1}
-      >
-        <View>
-          <Text>Gl</Text>
-        </View>
-      </BottomSheet>
-      <Text>+</Text>
-    </TouchableOpacity>
+    <View style={{ flexDirection: "row" }}>
+      <View>
+        <HaikuLineInput onChangeText={setComment} value={comment} />
+      </View>
+      <SmallButton>言</SmallButton>
+    </View>
   );
 }
 
