@@ -161,6 +161,7 @@ export const Feed: FC<FeedParams> = ({ navigation }) => {
                 key={item.haiku.join("") + item.author}
                 author={item.author}
                 haiku={item.haiku}
+                comments={item.comments}
                 showOptions={showOptions}
                 timestamp={item.timestamp}
                 isMyPost={item.author.userId === state.user?.userId}

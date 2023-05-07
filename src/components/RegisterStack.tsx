@@ -114,7 +114,7 @@ export const EmailForm: FC<EmailFormProps> = ({ navigation }) => {
         value={email || ""}
         onChangeText={setEmail}
         validity={validity}
-        length
+        length={7}
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
@@ -169,7 +169,7 @@ export const RegisterForm: FC<RegisterFormProps> = ({ navigation, route }) => {
         value={password || ""}
         onChangeText={setPassword}
         validity={validity}
-        length
+        length={7}
         secureTextEntry={true}
         multiline={false}
         autoCapitalize="none"
@@ -259,7 +259,7 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
         value={password || ""}
         onChangeText={setPassword}
         validity={validity}
-        length
+        length={7}
         secureTextEntry={true}
         multiline={false}
         autoCapitalize="none"
@@ -335,7 +335,7 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         value={name || ""}
         onChangeText={setName}
         validity={validity}
-        length
+        length={7}
         multiline={false}
         autoComplete="name"
       />

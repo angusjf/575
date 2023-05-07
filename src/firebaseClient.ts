@@ -28,6 +28,7 @@ export const post = async (user: User, haiku: Haiku) => {
     timestamp: Date.now(),
     author: user,
     signature: user.signature,
+    comments: [],
   };
 
   await set(ref(db, `days/${dateDbKey(new Date())}/${user.userId}`), post);
@@ -141,6 +142,7 @@ export const getDays = async (user: User): Promise<Day[]> => {
             haiku: Object.values(data.haiku) as Haiku,
             timestamp: data.timestamp,
             signature: data.signature,
+            comments: data.comments ?? [],
           }))
           .filter(
             (post) =>
