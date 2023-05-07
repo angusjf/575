@@ -22,6 +22,7 @@
     "expo-font": "~11.0.1",
     "expo-haptics": "~12.0.1",
     "expo-linear-gradient": "~12.0.1",
+    "expo-network": "~5.0.0",
     "expo-notifications": "~0.17.0",
     "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.2",
@@ -31,7 +32,7 @@
     "humps": "^2.0.1",
     "react": "18.1.0",
     "react-dom": "18.1.0",
-    "react-native": "0.70.5",
+    "react-native": "^0.70.5",
     "react-native-dialog": "^9.3.0",
     "react-native-gesture-handler": "~2.8.0",
     "react-native-html-parser": "^0.1.0",
@@ -39,9 +40,8 @@
     "react-native-screens": "~3.18.0",
     "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.9",
-    "syllable": "^5.0.1",
-    "expo-updates": "~0.15.6",
-    "expo-network": "~5.0.0"
+    "swr": "^2.1.5",
+    "syllable": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
