@@ -4,6 +4,11 @@ export const customSyllables = (str: string) =>
   syllable(pronounced.reduce((s, [from, to]) => s.replace(from, to), str));
 
 const pronounced: [string | RegExp, string][] = [
+  ["100", "one hundred"],
+  ["10", "ten"],
+  ["11", "eleven"],
+  ["12", "twelve"],
+  ["99", "ninety nine"],
   ["0", "zero"],
   ["1", "one"],
   ["2", "two"],
@@ -23,4 +28,5 @@ const pronounced: [string | RegExp, string][] = [
   [/ruined/i, "ru ined"],
   [/BST/, "B S T"],
   [/poems/i, "po ems"],
+  [/reunited/i, "re united"],
 ];
