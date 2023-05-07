@@ -222,9 +222,10 @@ function AddReaction({ postComment }: { postComment: (c: string) => void }) {
   };
 
   return (
-    <View style={{ flexDirection: "row" }}>
-      <View>
+    <View style={{ flexDirection: "row", marginTop: 5 }}>
+      <View style={{ marginRight: 12 }}>
         <HaikuLineInput
+          placeholder="leave a thought..."
           ref={ref}
           validity={validity}
           onChangeText={setComment}
@@ -232,7 +233,9 @@ function AddReaction({ postComment }: { postComment: (c: string) => void }) {
           onSubmitEditing={done}
         />
       </View>
-      <SmallButton onPress={done}>言</SmallButton>
+      <SmallButton style={{ marginTop: 5 }} onPress={done}>
+        言
+      </SmallButton>
     </View>
   );
 }
