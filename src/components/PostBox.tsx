@@ -115,6 +115,8 @@ const PostBoxNoMemo = ({
 
   const openAnim = useSharedValue(open ? 1 : 0);
 
+  const [h, setH] = useState(0);
+
   const { state } = useAppState();
 
   const selected = useAnimatedStyle(() => {
@@ -122,7 +124,7 @@ const PostBoxNoMemo = ({
       paddingBottom: interpolate(
         openAnim.value,
         [0, 1],
-        [0, 4 * 60],
+        [0, h + styles.wrapper.marginBottom],
         Extrapolate.CLAMP
       ),
     };
@@ -171,26 +173,34 @@ const PostBoxNoMemo = ({
         <Text style={styles.line}>{haiku[2]}</Text>
       </TouchableOpacity>
       {(open || openAnim.value > 0) && (
-        <View style={{ position: "absolute", top: 170 }}>
+        <View
+          style={{ position: "absolute", top: 170 }}
+          onLayout={({ nativeEvent }) => setH(nativeEvent.layout.height)}
+        >
           <FlatList
             renderItem={(comment) => <CommentLine comment={comment.item} />}
             data={comments}
           />
-          <AddReaction
-            postComment={(comment) => {
-              const user = state.user;
-              if (user) {
-                setComments((old) => [
-                  ...old,
-                  { author: user.username || "me", comment },
-                ]);
-                addComment(author, timestamp, {
-                  comment,
-                  author: user.username,
-                });
-              }
-            }}
-          />
+          {comments.filter(({ author }) => author === state.user?.username)
+            .length === 0 ? (
+            <AddReaction
+              postComment={(comment) => {
+                const user = state.user;
+                if (user) {
+                  setComments((old) => [
+                    ...old,
+                    { author: user.username || "me", comment },
+                  ]);
+                  addComment(author, timestamp, {
+                    comment,
+                    author: user.username,
+                  });
+                }
+              }}
+            />
+          ) : (
+            <></>
+          )}
         </View>
       )}
     </Animated.View>
@@ -198,18 +208,13 @@ const PostBoxNoMemo = ({
 };
 
 function AddReaction({ postComment }: { postComment: (c: string) => void }) {
-  const [comment, setComment] = useState<string | false>("");
+  const [comment, setComment] = useState<string>("");
   const [validity, setValid] = useState<Validity>("unchecked");
   const ref = useRef<TextInput>(null);
-
-  if (comment === false) {
-    return <></>;
-  }
 
   const done = () => {
     if (customSyllables(comment) == 3) {
       postComment(comment);
-      setComment(false);
     } else {
       setValid("invalid");
       ref.current?.blur();
