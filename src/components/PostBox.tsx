@@ -111,6 +111,8 @@ const PostBoxNoMemo = ({
   open: boolean;
   onPress: () => void;
 }) => {
+  const [comments, setComments] = useState(() => toComments(initialComments));
+
   const openAnim = useSharedValue(open ? 1 : 0);
 
   const { state } = useAppState();
@@ -120,7 +122,7 @@ const PostBoxNoMemo = ({
       paddingBottom: interpolate(
         openAnim.value,
         [0, 1],
-        [0, 2 * 120],
+        [0, 4 * 60],
         Extrapolate.CLAMP
       ),
     };
@@ -129,8 +131,6 @@ const PostBoxNoMemo = ({
   useEffect(() => {
     openAnim.value = withSpring(open ? 1 : 0);
   }, [open, openAnim]);
-
-  const [comments, setComments] = useState(() => toComments(initialComments));
 
   return (
     <Animated.View style={[styles.wrapper, selected, { overflow: "hidden" }]}>
