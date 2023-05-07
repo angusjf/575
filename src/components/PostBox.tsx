@@ -1,10 +1,43 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SvgXml } from "react-native-svg";
 import { fonts } from "../font";
-import { Post } from "../types";
+import { Comment, Post } from "../types";
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 import { timestampToRelative } from "../utils/date";
-import { memo } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+import Animated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import { HaikuLineInput } from "./HaikuLineInput";
+import { SmallButton } from "./SmallButton";
+import { useAppState } from "../useAppState";
+import { Validity } from "../validity";
+import { customSyllables } from "./syllable";
+import { addComment } from "../firebaseClient";
+
+const CommentLine = ({ comment }: { comment: Comment }) => {
+  return (
+    <View style={{ flexDirection: "row" }}>
+      <Text style={{ fontFamily: fonts.PlexMonoItalic }}>
+        {comment.comment}{" "}
+      </Text>
+      <Text style={{ marginRight: 10, fontFamily: fonts.PlexSansBoldItalic }}>
+        ~ {comment.author}
+      </Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -24,6 +57,10 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 10,
     width: "100%",
+  },
+  selected: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
   },
   header: {
     width: "100%",
@@ -47,6 +84,12 @@ const styles = StyleSheet.create({
   },
 });
 
+const toComments = (cs: Record<string, string>): Comment[] =>
+  Object.entries(cs).map(([author, comment]) => ({
+    author,
+    comment,
+  }));
+
 const PostBoxNoMemo = ({
   haiku,
   author,
@@ -54,6 +97,9 @@ const PostBoxNoMemo = ({
   isMyPost,
   signature,
   timestamp,
+  open,
+  onPress,
+  comments: initialComments,
 }: Post & {
   showOptions: (
     sharingMessage: string,
@@ -62,9 +108,34 @@ const PostBoxNoMemo = ({
     isMyPost: boolean
   ) => void;
   isMyPost: boolean;
+  open: boolean;
+  onPress: () => void;
 }) => {
+  const [comments, setComments] = useState(() => toComments(initialComments));
+
+  const openAnim = useSharedValue(open ? 1 : 0);
+
+  const [h, setH] = useState(0);
+
+  const { state } = useAppState();
+
+  const selected = useAnimatedStyle(() => {
+    return {
+      paddingBottom: interpolate(
+        openAnim.value,
+        [0, 1],
+        [0, h + styles.wrapper.marginBottom],
+        Extrapolate.CLAMP
+      ),
+    };
+  });
+
+  useEffect(() => {
+    openAnim.value = withSpring(open ? 1 : 0);
+  }, [open, openAnim]);
+
   return (
-    <View style={styles.wrapper}>
+    <Animated.View style={[styles.wrapper, selected, { overflow: "hidden" }]}>
       <View style={styles.header}>
         <View style={styles.signatureContainer}>
           <SvgXml
@@ -81,6 +152,7 @@ const PostBoxNoMemo = ({
       </View>
       <TouchableOpacity
         style={styles.container}
+        onPress={onPress}
         onLongPress={() =>
           showOptions(
             haiku[0] +
@@ -100,8 +172,72 @@ const PostBoxNoMemo = ({
         <Text style={styles.line}>{haiku[1]}</Text>
         <Text style={styles.line}>{haiku[2]}</Text>
       </TouchableOpacity>
-    </View>
+      {(open || openAnim.value > 0) && (
+        <View
+          style={{ position: "absolute", top: 170 }}
+          onLayout={({ nativeEvent }) => setH(nativeEvent.layout.height)}
+        >
+          <FlatList
+            renderItem={(comment) => <CommentLine comment={comment.item} />}
+            data={comments}
+          />
+          {comments.filter(({ author }) => author === state.user?.username)
+            .length === 0 ? (
+            <AddReaction
+              postComment={(comment) => {
+                const user = state.user;
+                if (user) {
+                  setComments((old) => [
+                    ...old,
+                    { author: user.username || "me", comment },
+                  ]);
+                  addComment(author, timestamp, {
+                    comment,
+                    author: user.username,
+                  });
+                }
+              }}
+            />
+          ) : (
+            <></>
+          )}
+        </View>
+      )}
+    </Animated.View>
   );
 };
+
+function AddReaction({ postComment }: { postComment: (c: string) => void }) {
+  const [comment, setComment] = useState<string>("");
+  const [validity, setValid] = useState<Validity>("unchecked");
+  const ref = useRef<TextInput>(null);
+
+  const done = () => {
+    if (customSyllables(comment) == 3) {
+      postComment(comment);
+    } else {
+      setValid("invalid");
+      ref.current?.blur();
+    }
+  };
+
+  return (
+    <View style={{ flexDirection: "row", marginTop: 5 }}>
+      <View style={{ marginRight: 12 }}>
+        <HaikuLineInput
+          placeholder="leave a thought..."
+          ref={ref}
+          validity={validity}
+          onChangeText={setComment}
+          value={comment}
+          onSubmitEditing={done}
+        />
+      </View>
+      <SmallButton style={{ marginTop: 5 }} onPress={done}>
+        言
+      </SmallButton>
+    </View>
+  );
+}
 
 export const PostBox = memo(PostBoxNoMemo);

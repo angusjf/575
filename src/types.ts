@@ -2,11 +2,14 @@ export type Haiku = [string, string, string];
 
 export type Day = { date: Date; posts: Post[] };
 
+export type Comment = { author: string; comment: string };
+
 export type Post = {
   haiku: Haiku;
   author: User;
   signature: string;
   timestamp: number;
+  comments: Record<string, string>;
 };
 
 export type User = {

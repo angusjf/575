@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { Validity } from "../Validity";
+import { Validity } from "../validity";
 import { fonts } from "../font";
 import { Haiku } from "../types";
 import { Button } from "./Button";
@@ -241,19 +241,21 @@ const InputScreen = ({
           onChangeText={(l) => changed(0, l)}
           validity={validity}
           autoFocus
+          length={5}
         />
         <HaikuLineInput
           placeholder="these brilliant-hued hibiscus -"
           value={haiku[1]}
           onChangeText={(l) => changed(1, l)}
           validity={validity}
-          long
+          length={7}
         />
         <HaikuLineInput
           placeholder="A lovely sunset."
           value={haiku[2]}
           validity={validity}
           onChangeText={(l) => changed(2, l)}
+          length={5}
         />
       </View>
       <View>

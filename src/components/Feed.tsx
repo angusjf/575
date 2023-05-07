@@ -41,6 +41,7 @@ type FeedParams = NativeStackScreenProps<RootStackParams, "Feed">;
 export const Feed: FC<FeedParams> = ({ navigation }) => {
   const { showActionSheetWithOptions } = useActionSheet();
   const { state, refreshFeed, blockUser } = useAppState();
+  const [openedHaiku, setOpenedHaiku] = useState<string | null>(null);
 
   useEffect(
     () =>
@@ -160,10 +161,22 @@ export const Feed: FC<FeedParams> = ({ navigation }) => {
                 key={item.haiku.join("") + item.author}
                 author={item.author}
                 haiku={item.haiku}
+                comments={item.comments}
                 showOptions={showOptions}
                 timestamp={item.timestamp}
                 isMyPost={item.author.userId === state.user?.userId}
                 signature={item.signature}
+                open={item.author.userId + item.timestamp === openedHaiku}
+                onPress={() => {
+                  setOpenedHaiku((current) => {
+                    const id = item.author.userId + item.timestamp;
+                    if (current === id) {
+                      return null;
+                    } else {
+                      return id;
+                    }
+                  });
+                }}
               />
             ) : (
               <Separator />
