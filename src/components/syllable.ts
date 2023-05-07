@@ -8,6 +8,7 @@ export const customSyllables = (str: string) =>
     .reduce((acc, x) => acc + x, 0);
 
 const pronounced: Partial<Record<string, string>> = {
+  ruined: "ru ined",
   "0": "zero",
   "1": "one",
   "2": "two",
