@@ -28,7 +28,7 @@ export const post = async (user: User, haiku: Haiku) => {
     timestamp: Date.now(),
     author: user,
     signature: user.signature,
-    comments: [],
+    comments: {},
   };
 
   await set(ref(db, `days/${dateDbKey(new Date())}/${user.userId}`), post);

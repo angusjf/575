@@ -9,7 +9,7 @@ export type Post = {
   author: User;
   signature: string;
   timestamp: number;
-  comments: Comment[];
+  comments: Record<string, string>;
 };
 
 export type User = {

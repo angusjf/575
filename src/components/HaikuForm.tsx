@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { Validity } from "../Validity";
+import { Validity } from "../validity";
 import { fonts } from "../font";
 import { Haiku } from "../types";
 import { Button } from "./Button";

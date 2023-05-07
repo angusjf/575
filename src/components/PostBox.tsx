@@ -83,6 +83,12 @@ const styles = StyleSheet.create({
   },
 });
 
+const toComments = (cs: Record<string, string>): Comment[] =>
+  Object.entries(cs).map(([author, comment]) => ({
+    author,
+    comment,
+  }));
+
 const PostBoxNoMemo = ({
   haiku,
   author,
@@ -123,7 +129,9 @@ const PostBoxNoMemo = ({
     openAnim.value = withSpring(open ? 1 : 0);
   }, [open, openAnim]);
 
-  const [comments, setComments] = useState(initialComments);
+  const [comments, setComments] = useState(() => toComments(initialComments));
+
+  console.log(comments);
 
   return (
     <Animated.View style={[styles.wrapper, selected, { overflow: "hidden" }]}>
@@ -186,7 +194,7 @@ const PostBoxNoMemo = ({
 function AddReaction({ postComment }: { postComment: (c: string) => void }) {
   const [comment, setComment] = useState<string | false>("");
   const [validity, setValid] = useState<Validity>("unchecked");
-  const ref = useRef<TextInput>();
+  const ref = useRef<TextInput>(null);
 
   if (comment === false) {
     return <></>;
