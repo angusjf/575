@@ -24,6 +24,7 @@ import { SmallButton } from "./SmallButton";
 import { useAppState } from "../useAppState";
 import { Validity } from "../validity";
 import { customSyllables } from "./syllable";
+import { addComment } from "../firebaseClient";
 
 const CommentLine = ({ comment }: { comment: Comment }) => {
   return (
@@ -131,8 +132,6 @@ const PostBoxNoMemo = ({
 
   const [comments, setComments] = useState(() => toComments(initialComments));
 
-  console.log(comments);
-
   return (
     <Animated.View style={[styles.wrapper, selected, { overflow: "hidden" }]}>
       <View style={styles.header}>
@@ -178,12 +177,19 @@ const PostBoxNoMemo = ({
             data={comments}
           />
           <AddReaction
-            postComment={(comment) =>
-              setComments((old) => [
-                ...old,
-                { author: state.user?.username || "me", comment },
-              ])
-            }
+            postComment={(comment) => {
+              const user = state.user;
+              if (user) {
+                setComments((old) => [
+                  ...old,
+                  { author: user.username || "me", comment },
+                ]);
+                addComment(author, timestamp, {
+                  comment,
+                  author: user.username,
+                });
+              }
+            }}
           />
         </View>
       )}

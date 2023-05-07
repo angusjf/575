@@ -16,7 +16,7 @@ import {
   push,
 } from "firebase/database";
 import { firebaseApp } from "./firebase";
-import { Haiku, Day, User, Post, BlockedUser } from "./types";
+import { Haiku, Day, User, Post, BlockedUser, Comment } from "./types";
 import { dateDbKey, parseDateDbKey } from "./utils/date";
 import { firebaseUserToUser } from "./utils/user";
 
@@ -54,6 +54,24 @@ export const registerUser = async (user: User) => {
 export const updateSignature = async (user: User, signature: string) => {
   const db = getDatabase(firebaseApp);
   set(ref(db, `users/${user.userId}/signature`), signature);
+};
+
+export const addComment = async (
+  commentee: User,
+  timestamp: number,
+  comment: Comment
+) => {
+  const db = getDatabase(firebaseApp);
+  console.log(comment);
+  set(
+    ref(
+      db,
+      `days/${dateDbKey(new Date(timestamp))}/${commentee.userId}/comments/${
+        comment.author
+      }/`
+    ),
+    comment.comment
+  );
 };
 
 export const sendNotifications = async () => {
