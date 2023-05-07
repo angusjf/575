@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useReducer, useRef } from "react";
+import { FC, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -20,6 +20,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParams } from "./RootStack";
 import { customSyllables } from "./syllable";
 import { nth } from "../utils/nth";
+import * as Location from "expo-location";
 
 type State = {
   haiku: Haiku;
@@ -92,9 +93,13 @@ export const HaikuForm: FC<FeedParams> = ({ navigation }) => {
   // variables
   const snapPoints = useMemo(() => ["40%"], []);
 
+  const [location, setLocation] = useState<string>();
+
   return (
     <>
       <InputScreen
+        location={location}
+        setLocation={setLocation}
         streak={user?.streak}
         validity={state.validity}
         haiku={state.haiku}
@@ -203,6 +208,22 @@ const DateToday = () => (
   </Text>
 );
 
+const getLocationName = async () => {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== "granted") {
+    throw new Error("Permission to access location was denied");
+  }
+
+  const location = await Location.getCurrentPositionAsync({});
+  const geocode = await Location.reverseGeocodeAsync(location.coords);
+
+  const name = geocode[0].name;
+  if (!name) {
+    throw new Error("location with no name");
+  }
+  return name;
+};
+
 const InputScreen = ({
   streak,
   haiku,
@@ -210,6 +231,8 @@ const InputScreen = ({
   done,
   signature,
   validity,
+  location,
+  setLocation,
 }: {
   haiku: Haiku;
   changed: (n: 0 | 1 | 2, l: string) => void;
@@ -217,6 +240,8 @@ const InputScreen = ({
   validity: Validity;
   signature: string;
   streak: number | undefined;
+  location: string | undefined;
+  setLocation: (location: string) => void;
 }) => {
   return (
     <KeyboardAvoidingView
@@ -225,6 +250,11 @@ const InputScreen = ({
     >
       <View>
         <DateToday />
+        {location && (
+          <Text style={{ fontFamily: fonts.PlexMonoItalic, paddingTop: 7 }}>
+            {location}
+          </Text>
+        )}
         <Text style={styles.intro}>Compose today's haiku</Text>
         {streak && streak > 1 ? (
           <Text style={{ fontFamily: fonts.PlexMonoItalic, paddingBottom: 45 }}>
@@ -263,6 +293,12 @@ const InputScreen = ({
           title="check & share"
           isLoading={validity === "loading"}
           onPress={done}
+          style={{ marginTop: 30 }}
+        />
+        <Button
+          title="置"
+          isLoading={validity === "loading"}
+          onPress={() => getLocationName().then(setLocation)}
           style={{ marginTop: 30 }}
         />
         {__DEV__ && (
