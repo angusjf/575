@@ -62,7 +62,6 @@ export const addComment = async (
   comment: Comment
 ) => {
   const db = getDatabase(firebaseApp);
-  console.log(comment);
   set(
     ref(
       db,
@@ -190,7 +189,7 @@ export const deleteAccount = async (password: string) => {
   await auth.currentUser?.delete();
 };
 
-export const uploadExpoPushToken = ({
+export const uploadExpoPushToken = async ({
   userId,
   token,
 }: {
@@ -198,7 +197,7 @@ export const uploadExpoPushToken = ({
   token: string;
 }) => {
   const db = getDatabase(firebaseApp);
-  set(ref(db, `expoPushTokens/${userId}/`), token);
+  await set(ref(db, `expoPushTokens/${userId}/`), token);
 };
 
 export const incStreak = async (userId: string) => {
