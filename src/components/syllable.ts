@@ -29,4 +29,5 @@ const pronounced: [string | RegExp, string][] = [
   [/BST/, "B S T"],
   [/poems/i, "po ems"],
   [/reunited/i, "re united"],
+  [/else/i, "els"],
 ];

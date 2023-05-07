@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Validity } from "../validity";
 import { fonts } from "../font";
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 import { customSyllables } from "./syllable";
 
 const styles = StyleSheet.create({
@@ -22,45 +22,47 @@ const styles = StyleSheet.create({
   },
 });
 
-export const HaikuLineInput = (
-  props: TextInputProps & { length?: number; validity: Validity }
-) => {
-  const [focused, setIsFocused] = useState(false);
-  const invalid =
-    props.validity === "invalid" &&
-    customSyllables(props.value || "") !== props.length;
+export const HaikuLineInput = forwardRef(
+  (props: TextInputProps & { length?: number; validity: Validity }) => {
+    const [focused, setIsFocused] = useState(false);
+    const invalid =
+      props.validity === "invalid" &&
+      customSyllables(props.value || "") !== props.length;
 
-  return (
-    <View style={{ flexDirection: "row" }}>
-      <TextInput
-        multiline
-        editable={props.validity !== "loading"}
-        autoCapitalize="none"
-        style={{
-          ...styles.input,
-          ...(focused
-            ? {}
-            : {
-                borderBottomColor: focused
-                  ? "grey"
-                  : invalid
-                  ? "red"
-                  : "lightgrey",
-              }),
-          width: props.length == 7 ? 330 : 250,
-        }}
-        {...props}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-      />
-      <Text
-        style={{
-          color: focused || invalid ? "black" : "transparent",
-          width: 10,
-        }}
-      >
-        {customSyllables(props.value || "")}
-      </Text>
-    </View>
-  );
-};
+    return (
+      <View style={{ flexDirection: "row" }}>
+        <TextInput
+          multiline
+          editable={props.validity !== "loading"}
+          autoCapitalize="none"
+          style={{
+            ...styles.input,
+            ...(focused
+              ? {}
+              : {
+                  borderBottomColor: focused
+                    ? "grey"
+                    : invalid
+                    ? "red"
+                    : "lightgrey",
+                }),
+            width: props.length == 7 ? 330 : 250,
+          }}
+          {...props}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        />
+        <Text
+          style={{
+            color: focused || invalid ? "black" : "transparent",
+            width: 10,
+          }}
+        >
+          {customSyllables(props.value || "")}
+        </Text>
+      </View>
+    );
+  }
+);
+
+HaikuLineInput.displayName = "HaikuLineInput";

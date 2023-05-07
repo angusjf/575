@@ -2,6 +2,7 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -22,6 +23,9 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { HaikuLineInput } from "./HaikuLineInput";
 import { Button } from "./Button";
 import { SmallButton } from "./SmallButton";
+import { useAppState } from "../useAppState";
+import { Validity } from "../validity";
+import { customSyllables } from "./syllable";
 
 type Reaction = { author: string; comment: string };
 
@@ -104,7 +108,8 @@ const PostBoxNoMemo = ({
   onPress: () => void;
 }) => {
   const openAnim = useSharedValue(open ? 1 : 0);
-  console.log(openAnim.value);
+
+  const { state } = useAppState();
 
   const selected = useAnimatedStyle(() => {
     return {
@@ -119,7 +124,13 @@ const PostBoxNoMemo = ({
 
   useEffect(() => {
     openAnim.value = withSpring(open ? 1 : 0);
-  }, [open]);
+  }, [open, openAnim]);
+
+  const [comments, setComments] = useState([
+    { author: "angus", comment: "really nice" },
+    { author: "dan", comment: "a good poem" },
+    { author: "rohan", comment: "fantastic" },
+  ]);
 
   return (
     <Animated.View style={[styles.wrapper, selected, { overflow: "hidden" }]}>
@@ -165,27 +176,53 @@ const PostBoxNoMemo = ({
             renderItem={(reaction) => (
               <ReactionDrawing reaction={reaction.item} />
             )}
-            data={[
-              { author: "angus", comment: "really nice" },
-              { author: "dan", comment: "a good poem" },
-              { author: "rohan", comment: "fantastic" },
-            ]}
+            data={comments}
           />
-          <AddReaction />
+          <AddReaction
+            postComment={(comment) =>
+              setComments((old) => [
+                ...old,
+                { author: state.user?.username || "me", comment },
+              ])
+            }
+          />
         </View>
       )}
     </Animated.View>
   );
 };
 
-function AddReaction() {
-  const [comment, setComment] = useState("");
+function AddReaction({ postComment }: { postComment: (c: string) => void }) {
+  const [comment, setComment] = useState<string | false>("");
+  const [validity, setValid] = useState<Validity>("unchecked");
+  const ref = useRef<TextInput>();
+
+  if (comment === false) {
+    return <></>;
+  }
+
+  const done = () => {
+    if (customSyllables(comment) == 3) {
+      postComment(comment);
+      setComment(false);
+    } else {
+      setValid("invalid");
+      ref.current?.blur();
+    }
+  };
+
   return (
     <View style={{ flexDirection: "row" }}>
       <View>
-        <HaikuLineInput onChangeText={setComment} value={comment} />
+        <HaikuLineInput
+          ref={ref}
+          validity={validity}
+          onChangeText={setComment}
+          value={comment}
+          onSubmitEditing={done}
+        />
       </View>
-      <SmallButton>言</SmallButton>
+      <SmallButton onPress={done}>言</SmallButton>
     </View>
   );
 }
