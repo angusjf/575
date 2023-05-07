@@ -5,16 +5,12 @@ import { Post } from "../types";
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 import { timestampToRelative } from "../utils/date";
 import { memo } from "react";
+import { HaikuLine } from "./HaikuLine";
 
 const styles = StyleSheet.create({
   wrapper: {
     alignItems: "center",
     marginBottom: 45,
-  },
-  line: {
-    fontFamily: fonts.PlexMonoItalic,
-    fontSize: 20,
-    marginBottom: 5,
   },
   author: {
     fontSize: 20,
@@ -96,9 +92,9 @@ const PostBoxNoMemo = ({
           )
         }
       >
-        <Text style={styles.line}>{haiku[0]}</Text>
-        <Text style={styles.line}>{haiku[1]}</Text>
-        <Text style={styles.line}>{haiku[2]}</Text>
+        <HaikuLine text={haiku[0]} />
+        <HaikuLine text={haiku[1]} />
+        <HaikuLine text={haiku[2]} />
       </TouchableOpacity>
     </View>
   );
