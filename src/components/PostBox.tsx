@@ -28,11 +28,11 @@ type Reaction = { author: string; comment: string };
 const ReactionDrawing = ({ reaction }: { reaction: Reaction }) => {
   return (
     <View style={{ flexDirection: "row" }}>
-      <Text style={{ marginRight: 10, fontFamily: fonts.PlexSansBoldItalic }}>
-        {reaction.author}
-      </Text>
       <Text style={{ fontFamily: fonts.PlexMonoItalic }}>
-        {reaction.comment}
+        {reaction.comment}{" "}
+      </Text>
+      <Text style={{ marginRight: 10, fontFamily: fonts.PlexSansBoldItalic }}>
+        ~ {reaction.author}
       </Text>
     </View>
   );
