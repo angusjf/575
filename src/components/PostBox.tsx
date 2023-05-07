@@ -8,10 +8,10 @@ import {
 } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { fonts } from "../font";
-import { Post } from "../types";
+import { Comment, Post } from "../types";
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 import { timestampToRelative } from "../utils/date";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import Animated, {
   Extrapolate,
   interpolate,
@@ -19,24 +19,20 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import BottomSheet from "@gorhom/bottom-sheet";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { Button } from "./Button";
 import { SmallButton } from "./SmallButton";
 import { useAppState } from "../useAppState";
 import { Validity } from "../validity";
 import { customSyllables } from "./syllable";
 
-type Reaction = { author: string; comment: string };
-
-const ReactionDrawing = ({ reaction }: { reaction: Reaction }) => {
+const CommentLine = ({ comment }: { comment: Comment }) => {
   return (
     <View style={{ flexDirection: "row" }}>
       <Text style={{ fontFamily: fonts.PlexMonoItalic }}>
-        {reaction.comment}{" "}
+        {comment.comment}{" "}
       </Text>
       <Text style={{ marginRight: 10, fontFamily: fonts.PlexSansBoldItalic }}>
-        ~ {reaction.author}
+        ~ {comment.author}
       </Text>
     </View>
   );
@@ -96,6 +92,7 @@ const PostBoxNoMemo = ({
   timestamp,
   open,
   onPress,
+  comments: initialComments,
 }: Post & {
   showOptions: (
     sharingMessage: string,
@@ -126,11 +123,7 @@ const PostBoxNoMemo = ({
     openAnim.value = withSpring(open ? 1 : 0);
   }, [open, openAnim]);
 
-  const [comments, setComments] = useState([
-    { author: "angus", comment: "really nice" },
-    { author: "dan", comment: "a good poem" },
-    { author: "rohan", comment: "fantastic" },
-  ]);
+  const [comments, setComments] = useState(initialComments);
 
   return (
     <Animated.View style={[styles.wrapper, selected, { overflow: "hidden" }]}>
@@ -173,9 +166,7 @@ const PostBoxNoMemo = ({
       {(open || openAnim.value > 0) && (
         <View style={{ position: "absolute", top: 170 }}>
           <FlatList
-            renderItem={(reaction) => (
-              <ReactionDrawing reaction={reaction.item} />
-            )}
+            renderItem={(comment) => <CommentLine comment={comment.item} />}
             data={comments}
           />
           <AddReaction
