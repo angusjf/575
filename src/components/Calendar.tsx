@@ -12,16 +12,16 @@ import Animated, {
 import { fonts } from "../font";
 import { getSeason } from "../seasons";
 import { Haiku, PastHaiku } from "../types";
-import { parseDateDbKey } from "../utils/date";
+import { MONTHS, parseDateDbKey } from "../utils/date";
 import { HaikuLine } from "./HaikuLine";
 
 const styles = StyleSheet.create({
   wrapper: {
     alignItems: "center",
-    marginVertical: 25,
+    marginVertical: 20,
   },
   dayCard: {
-    marginHorizontal: 5,
+    margin: 5,
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
@@ -66,7 +66,17 @@ const styles = StyleSheet.create({
   },
 });
 
-const DayCard = ({ date, didPost, onSelect, isSelected }: any) => (
+const DayCard = ({
+  date,
+  didPost,
+  onSelect,
+  isSelected,
+}: {
+  date: Date;
+  didPost: boolean;
+  onSelect: () => void;
+  isSelected: boolean;
+}) => (
   <TouchableOpacity
     style={[
       styles.dayCard,
@@ -85,7 +95,7 @@ const DayCard = ({ date, didPost, onSelect, isSelected }: any) => (
       {date.getDate()}
     </Text>
     <Text style={[styles.month, { color: isSelected ? "white" : "black" }]}>
-      {date.toLocaleString("default", { month: "short" })}
+      {MONTHS[date.getMonth()]}
     </Text>
   </TouchableOpacity>
 );
@@ -101,7 +111,7 @@ export const Calendar = ({ pastHaikus }: { pastHaikus: PastHaiku[] }) => {
       height: interpolate(
         openAnim.value,
         [0, 1],
-        [0, 2 * 50],
+        [0, 2 * 70],
         Extrapolate.CLAMP
       ),
     };

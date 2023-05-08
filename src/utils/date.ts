@@ -23,3 +23,18 @@ export const timestampToRelative = (timestamp: number) => {
     return `${Math.round(timeDiffInDays)} days ago`;
   }
 };
+
+export const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "June",
+  "July",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
+];
