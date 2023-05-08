@@ -260,7 +260,12 @@ const InputScreen = ({
         >
           <DateToday />
           {location ? (
-            <SmallButton onPress={() => setLocation(undefined)}>⨯</SmallButton>
+            <SmallButton
+              textStyle={{ fontFamily: fonts.PlexSansBoldItalic }}
+              onPress={() => setLocation(undefined)}
+            >
+              ❌
+            </SmallButton>
           ) : (
             <SmallButton
               onPress={() =>
@@ -316,7 +321,7 @@ const InputScreen = ({
           title="check & share"
           isLoading={validity === "loading"}
           onPress={done}
-          style={{ marginTop: 30 }}
+          style={{ marginTop: 50 }}
         />
       </View>
     </KeyboardAvoidingView>
