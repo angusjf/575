@@ -142,7 +142,7 @@ export const Settings = () => {
 
   return (
     <SafeAreaView style={styles.root}>
-      <Calendar author={state.user?.username ?? ""} />
+      <Calendar pastHaikus={state.user?.pastHaikus ?? []} />
       <FlatList
         data={settings}
         renderItem={({ item, index }) => (

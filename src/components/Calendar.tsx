@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Animated, {
@@ -10,6 +10,9 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { fonts } from "../font";
+import { getSeason } from "../seasons";
+import { Haiku, PastHaiku } from "../types";
+import { parseDateDbKey } from "../utils/date";
 import { HaikuLine } from "./HaikuLine";
 
 const styles = StyleSheet.create({
@@ -63,138 +66,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const DAYS = [
-  {
-    day: 29,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 28,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 27,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 26,
-    month: "Apr",
-    season: "Spring",
-    didPost: false,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 25,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 24,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 23,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 22,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 21,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 20,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-  {
-    day: 19,
-    month: "Apr",
-    season: "Spring",
-    didPost: true,
-    haiku: [
-      "one two three four five",
-      "one two three four five six sev",
-      "one two three four five",
-    ],
-  },
-];
-
-const DayCard = ({
-  day,
-  month,
-  season,
-  didPost,
-  onSelect,
-  isSelected,
-}: any) => (
+const DayCard = ({ date, didPost, onSelect, isSelected }: any) => (
   <TouchableOpacity
     style={[
       styles.dayCard,
@@ -207,18 +79,18 @@ const DayCard = ({
     onPress={onSelect}
   >
     <Text style={[styles.season, { color: isSelected ? "white" : "black" }]}>
-      {season}
+      {getSeason(date)}
     </Text>
     <Text style={[styles.date, { color: isSelected ? "white" : "black" }]}>
-      {day}
+      {date.getDate()}
     </Text>
     <Text style={[styles.month, { color: isSelected ? "white" : "black" }]}>
-      {month}
+      {date.toLocaleString("default", { month: "short" })}
     </Text>
   </TouchableOpacity>
 );
 
-export const Calendar = ({ author }: { author: string }) => {
+export const Calendar = ({ pastHaikus }: { pastHaikus: PastHaiku[] }) => {
   const [selectedDay, setSelectedDay] = useState<number | undefined>(undefined);
   const [open, setOpen] = useState(false);
 
@@ -239,10 +111,27 @@ export const Calendar = ({ author }: { author: string }) => {
     openAnim.value = withSpring(open ? 1 : 0);
   }, [open, openAnim]);
 
+  const days = useMemo(
+    () =>
+      Object.entries(pastHaikus)
+        .map(([dayKey, value]) => {
+          const date = parseDateDbKey(dayKey);
+          const didPost = true;
+          return {
+            date,
+            didPost,
+            haiku: Object.values(value.haiku) as Haiku,
+            username: value.username,
+          };
+        })
+        .sort((a, b) => b.date.getTime() - a.date.getTime()),
+    [pastHaikus]
+  );
+
   return (
     <View style={styles.wrapper}>
       <FlatList
-        data={DAYS}
+        data={days}
         renderItem={({ item, index }) => (
           <DayCard
             {...item}
@@ -268,10 +157,10 @@ export const Calendar = ({ author }: { author: string }) => {
       <Animated.View style={[selected, styles.selectedDayHaikuContainer]}>
         {selectedDay !== undefined && (open || openAnim.value > 0) ? (
           <>
-            <HaikuLine text={DAYS[selectedDay].haiku[0]} size="small" />
-            <HaikuLine text={DAYS[selectedDay].haiku[1]} size="small" />
-            <HaikuLine text={DAYS[selectedDay].haiku[2]} size="small" />
-            <Text style={styles.author}>~ {author}</Text>
+            <HaikuLine text={days[selectedDay].haiku[0]} size="small" />
+            <HaikuLine text={days[selectedDay].haiku[1]} size="small" />
+            <HaikuLine text={days[selectedDay].haiku[2]} size="small" />
+            <Text style={styles.author}>~ {days[selectedDay].username}</Text>
           </>
         ) : (
           <></>

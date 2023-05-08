@@ -16,7 +16,7 @@ import {
   push,
 } from "firebase/database";
 import { firebaseApp } from "./firebase";
-import { Haiku, Day, User, Post, BlockedUser } from "./types";
+import { Haiku, Day, User, Post, BlockedUser, PastHaiku } from "./types";
 import { dateDbKey, parseDateDbKey } from "./utils/date";
 import { firebaseUserToUser } from "./utils/user";
 
@@ -104,9 +104,15 @@ export const getUser = async (firebaseUser: FirebaseUser): Promise<User> => {
   const user = (await get(ref(db, `users/${firebaseUser.uid}`))).toJSON() as {
     signature: string;
     streak: number;
+    pastHaikus: PastHaiku[];
   };
 
-  return firebaseUserToUser(firebaseUser, user.signature, user.streak);
+  return firebaseUserToUser(
+    firebaseUser,
+    user.signature,
+    user.streak,
+    user.pastHaikus ?? []
+  );
 };
 
 export const getDays = async (user: User): Promise<Day[]> => {
