@@ -216,7 +216,7 @@ export const LoginForm: FC<LoginFormProps> = ({ navigation, route }) => {
       );
       const poet = await getUser(user.user);
       setValidity("unchecked");
-      register(firebaseUserToUser(user.user, poet.signature, 0));
+      register(firebaseUserToUser(user.user, poet.signature, 0, []));
     } catch (error: any) {
       if (error.code === "auth/wrong-password") {
         setErrorMessage("wrong password");
@@ -319,7 +319,7 @@ export const SignForm: FC<SignFormParams> = ({ navigation, route }) => {
         throw new Error("No user");
       }
       await updateProfile(auth.currentUser, { displayName: name });
-      const user = firebaseUserToUser(auth.currentUser, signature, 0);
+      const user = firebaseUserToUser(auth.currentUser, signature, 0, []);
       await registerUser(user);
       register(user);
       setValidity("unchecked");
