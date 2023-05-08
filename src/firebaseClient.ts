@@ -16,7 +16,15 @@ import {
   push,
 } from "firebase/database";
 import { firebaseApp } from "./firebase";
-import { Haiku, Day, User, Post, BlockedUser, PastHaiku } from "./types";
+import {
+  Haiku,
+  Day,
+  User,
+  Post,
+  BlockedUser,
+  PastHaiku,
+  Comment,
+} from "./types";
 import { dateDbKey, parseDateDbKey } from "./utils/date";
 import { firebaseUserToUser } from "./utils/user";
 
@@ -28,6 +36,7 @@ export const post = async (user: User, haiku: Haiku) => {
     timestamp: Date.now(),
     author: user,
     signature: user.signature,
+    comments: {},
   };
 
   await set(ref(db, `days/${dateDbKey(new Date())}/${user.userId}`), post);
@@ -53,6 +62,23 @@ export const registerUser = async (user: User) => {
 export const updateSignature = async (user: User, signature: string) => {
   const db = getDatabase(firebaseApp);
   set(ref(db, `users/${user.userId}/signature`), signature);
+};
+
+export const addComment = async (
+  commentee: User,
+  timestamp: number,
+  comment: Comment
+) => {
+  const db = getDatabase(firebaseApp);
+  set(
+    ref(
+      db,
+      `days/${dateDbKey(new Date(timestamp))}/${commentee.userId}/comments/${
+        comment.author
+      }/`
+    ),
+    comment.comment
+  );
 };
 
 export const sendNotifications = async () => {
@@ -147,6 +173,7 @@ export const getDays = async (user: User): Promise<Day[]> => {
             haiku: Object.values(data.haiku) as Haiku,
             timestamp: data.timestamp,
             signature: data.signature,
+            comments: data.comments ?? [],
           }))
           .filter(
             (post) =>
@@ -176,7 +203,7 @@ export const deleteAccount = async (password: string) => {
   await auth.currentUser?.delete();
 };
 
-export const uploadExpoPushToken = ({
+export const uploadExpoPushToken = async ({
   userId,
   token,
 }: {
@@ -184,7 +211,7 @@ export const uploadExpoPushToken = ({
   token: string;
 }) => {
   const db = getDatabase(firebaseApp);
-  set(ref(db, `expoPushTokens/${userId}/`), token);
+  await set(ref(db, `expoPushTokens/${userId}/`), token);
 };
 
 export const incStreak = async (userId: string) => {

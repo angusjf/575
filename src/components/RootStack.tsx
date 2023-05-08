@@ -9,6 +9,7 @@ import { HaikuForm } from "./HaikuForm";
 import { OnboardingScreen } from "./OnboardingScreen";
 import { EmailForm, LoginForm, RegisterForm, SignForm } from "./RegisterStack";
 import { FiveSevenFive } from "./FiveSevenFive";
+import { SmallButton } from "./SmallButton";
 
 export type RegisterStackParams = {
   Email: undefined;
@@ -52,64 +53,6 @@ const ScreenTitle = ({ title }: { title: string }) => (
   </Text>
 );
 
-const HeaderRight = ({ onPress }: { onPress: () => void }) => {
-  return (
-    <TouchableOpacity
-      style={{
-        marginLeft: "auto",
-        marginRight: 5,
-        borderColor: "black",
-        borderWidth: 1,
-        borderRadius: 50,
-        backgroundColor: "black",
-        height: 33,
-        width: 33,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-      onPress={onPress}
-    >
-      <Text
-        style={{
-          fontSize: 20,
-          color: "white",
-        }}
-      >
-        設
-      </Text>
-    </TouchableOpacity>
-  );
-};
-
-const BackButton = ({ onPress }: { onPress: () => void }) => {
-  return (
-    <TouchableOpacity
-      style={{
-        marginLeft: "auto",
-        marginRight: 5,
-        borderColor: "black",
-        borderWidth: 1,
-        borderRadius: 50,
-        backgroundColor: "black",
-        height: 33,
-        width: 33,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-      onPress={onPress}
-    >
-      <Text
-        style={{
-          fontSize: 20,
-          color: "white",
-        }}
-      >
-        ←︎
-      </Text>
-    </TouchableOpacity>
-  );
-};
-
 export const RootStack = () => {
   const { state, openSettings } = useAppState();
 
@@ -122,7 +65,9 @@ export const RootStack = () => {
       screenOptions={({ navigation }) => ({
         headerLeft: () => {
           if (Platform.OS === "ios")
-            return <BackButton onPress={() => navigation.goBack()} />;
+            return (
+              <SmallButton onPress={() => navigation.goBack()}>←</SmallButton>
+            );
         },
       })}
     >
@@ -170,7 +115,7 @@ export const RootStack = () => {
           headerLeft: () => null,
           headerRight: () =>
             route.name === "Compose" ? (
-              <HeaderRight onPress={() => openSettings()} />
+              <SmallButton onPress={() => openSettings()}>設</SmallButton>
             ) : null,
         })}
       />
@@ -186,7 +131,7 @@ export const RootStack = () => {
           headerTitle: () => <FiveSevenFive fontSize={27} marginTop={0} />,
           headerRight: () =>
             route.name === "Feed" ? (
-              <HeaderRight onPress={() => openSettings()} />
+              <SmallButton onPress={() => openSettings()}>設</SmallButton>
             ) : null,
           gestureEnabled: false,
         })}

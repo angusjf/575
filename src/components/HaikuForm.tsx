@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useReducer, useRef } from "react";
+import { FC, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { HaikuLineInput } from "./HaikuLineInput";
-import { Validity } from "../Validity";
+import { Validity } from "../validity";
 import { fonts } from "../font";
 import { Haiku } from "../types";
 import { Button } from "./Button";
@@ -20,6 +20,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParams } from "./RootStack";
 import { customSyllables } from "./syllable";
 import { nth } from "../utils/nth";
+import * as Location from "expo-location";
+import { SmallButton } from "./SmallButton";
+import { notableLocations } from "../utils/notableLocations";
 
 type State = {
   haiku: Haiku;
@@ -92,9 +95,13 @@ export const HaikuForm: FC<FeedParams> = ({ navigation }) => {
   // variables
   const snapPoints = useMemo(() => ["40%"], []);
 
+  const [location, setLocation] = useState<string>();
+
   return (
     <>
       <InputScreen
+        location={location}
+        setLocation={setLocation}
         streak={user?.streak}
         validity={state.validity}
         haiku={state.haiku}
@@ -163,7 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: fonts.PlexMonoItalic,
     marginTop: 15,
-    marginBottom: 15,
+    marginBottom: 25,
   },
   date: {
     fontFamily: fonts.PlexMonoItalic,
@@ -203,6 +210,22 @@ const DateToday = () => (
   </Text>
 );
 
+const getLocationName = async () => {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== "granted") {
+    throw new Error("Permission to access location was denied");
+  }
+
+  const location = await Location.getCurrentPositionAsync({});
+  const geocode = await Location.reverseGeocodeAsync(location.coords);
+
+  const name = geocode[0].name;
+  if (!name) {
+    throw new Error("location with no name");
+  }
+  return name;
+};
+
 const InputScreen = ({
   streak,
   haiku,
@@ -210,6 +233,8 @@ const InputScreen = ({
   done,
   signature,
   validity,
+  location,
+  setLocation,
 }: {
   haiku: Haiku;
   changed: (n: 0 | 1 | 2, l: string) => void;
@@ -217,6 +242,8 @@ const InputScreen = ({
   validity: Validity;
   signature: string;
   streak: number | undefined;
+  location: string | undefined;
+  setLocation: (location: string | undefined) => void;
 }) => {
   return (
     <KeyboardAvoidingView
@@ -224,7 +251,38 @@ const InputScreen = ({
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View>
-        <DateToday />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <DateToday />
+          {location ? (
+            <SmallButton
+              textStyle={{ fontFamily: fonts.PlexSansBoldItalic }}
+              onPress={() => setLocation(undefined)}
+            >
+              ❌
+            </SmallButton>
+          ) : (
+            <SmallButton
+              onPress={() =>
+                getLocationName().then((l) =>
+                  setLocation(notableLocations[l] ?? l)
+                )
+              }
+            >
+              置
+            </SmallButton>
+          )}
+        </View>
+        {location && (
+          <Text style={{ fontFamily: fonts.PlexMonoItalic, paddingTop: 7 }}>
+            {location}
+          </Text>
+        )}
         <Text style={styles.intro}>Compose today's haiku</Text>
         {streak && streak > 1 ? (
           <Text style={{ fontFamily: fonts.PlexMonoItalic, paddingBottom: 45 }}>
@@ -241,19 +299,21 @@ const InputScreen = ({
           onChangeText={(l) => changed(0, l)}
           validity={validity}
           autoFocus
+          length={5}
         />
         <HaikuLineInput
           placeholder="these brilliant-hued hibiscus -"
           value={haiku[1]}
           onChangeText={(l) => changed(1, l)}
           validity={validity}
-          long
+          length={7}
         />
         <HaikuLineInput
           placeholder="A lovely sunset."
           value={haiku[2]}
           validity={validity}
           onChangeText={(l) => changed(2, l)}
+          length={5}
         />
       </View>
       <View>
@@ -261,18 +321,8 @@ const InputScreen = ({
           title="check & share"
           isLoading={validity === "loading"}
           onPress={done}
-          style={{ marginTop: 30 }}
+          style={{ marginTop: 50 }}
         />
-        {__DEV__ && (
-          <Button
-            title="prefill"
-            onPress={() => {
-              changed(0, "one two three four five");
-              changed(1, "one two three four five six sev");
-              changed(2, "one two three four five");
-            }}
-          />
-        )}
       </View>
     </KeyboardAvoidingView>
   );

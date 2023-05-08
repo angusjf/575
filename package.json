@@ -40,8 +40,9 @@
     "react-native-screens": "~3.18.0",
     "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.9",
-    "swr": "^2.1.5",
-    "syllable": "^5.0.1"
+    "syllable": "^5.0.1",
+    "expo-network": "~5.0.0",
+    "expo-location": "~15.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

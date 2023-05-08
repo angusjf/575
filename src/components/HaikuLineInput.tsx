@@ -3,12 +3,11 @@ import {
   Text,
   TextInput,
   TextInputProps,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { Validity } from "../Validity";
+import { Validity } from "../validity";
 import { fonts } from "../font";
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 import { customSyllables } from "./syllable";
 
 const styles = StyleSheet.create({
@@ -22,17 +21,19 @@ const styles = StyleSheet.create({
   },
 });
 
-export const HaikuLineInput = (
-  props: TextInputProps & { long?: boolean; validity: Validity }
-) => {
+export const HaikuLineInput = forwardRef<
+  TextInput,
+  TextInputProps & { length?: number; validity: Validity }
+>((props, ref) => {
   const [focused, setIsFocused] = useState(false);
   const invalid =
     props.validity === "invalid" &&
-    customSyllables(props.value || "") !== (props.long ? 7 : 5);
+    customSyllables(props.value || "") !== props.length;
 
   return (
     <View style={{ flexDirection: "row" }}>
       <TextInput
+        ref={ref}
         multiline
         editable={props.validity !== "loading"}
         autoCapitalize="none"
@@ -47,7 +48,7 @@ export const HaikuLineInput = (
                   ? "red"
                   : "lightgrey",
               }),
-          width: props.long ? 330 : 250,
+          width: props.length == 7 ? 330 : 250,
         }}
         {...props}
         onFocus={() => setIsFocused(true)}
@@ -63,4 +64,6 @@ export const HaikuLineInput = (
       </Text>
     </View>
   );
-};
+});
+
+HaikuLineInput.displayName = "HaikuLineInput";
