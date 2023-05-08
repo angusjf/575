@@ -119,7 +119,7 @@ export const HaikuForm: FC<FeedParams> = ({ navigation }) => {
             ] as const;
 
             if (valid(syllables)) {
-              publish(state.haiku);
+              publish(state.haiku, location);
             } else {
               bottomSheetRef.current?.expand();
               dispatch({ type: "invalid" });

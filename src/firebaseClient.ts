@@ -28,7 +28,11 @@ import {
 import { dateDbKey, parseDateDbKey } from "./utils/date";
 import { firebaseUserToUser } from "./utils/user";
 
-export const post = async (user: User, haiku: Haiku) => {
+export const post = async (
+  user: User,
+  haiku: Haiku,
+  location: string | undefined
+) => {
   const db = getDatabase(firebaseApp);
 
   const post: Post = {
@@ -37,6 +41,8 @@ export const post = async (user: User, haiku: Haiku) => {
     author: user,
     signature: user.signature,
     comments: {},
+    location,
+    streak: user.streak,
   };
 
   const pastHaiku = {
@@ -179,13 +185,17 @@ export const getDays = async (user: User): Promise<Day[]> => {
       .map(([date, posts]) => ({
         date: parseDateDbKey(date),
         posts: Object.entries((posts as Record<string, Post> | undefined) ?? [])
-          .map(([userId, data]) => ({
-            author: data.author,
-            haiku: Object.values(data.haiku) as Haiku,
-            timestamp: data.timestamp,
-            signature: data.signature,
-            comments: data.comments ?? [],
-          }))
+          .map(
+            ([_userId, data]): Post => ({
+              author: data.author,
+              haiku: Object.values(data.haiku) as Haiku,
+              timestamp: data.timestamp,
+              signature: data.signature,
+              comments: data.comments ?? [],
+              location: data.location,
+              streak: data.streak,
+            })
+          )
           .filter(
             (post) =>
               !blockedUsers

@@ -55,7 +55,7 @@ type Msg =
   | { msg: "load_feed"; user: User }
   | { msg: "register"; user: User }
   | { msg: "logout" }
-  | { msg: "publish"; haiku: Haiku }
+  | { msg: "publish"; haiku: Haiku; location: string | undefined }
   | {
       msg: "block_user";
       blockedUserId: string;
@@ -200,6 +200,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
             effect: "post",
             haiku: msg.haiku,
             user: state.user!,
+            location: msg.location,
           },
           { effect: "navigate", route: "Feed" },
         ],
@@ -303,7 +304,7 @@ type Effect =
   | { effect: "get_days"; user: User }
   | { effect: "logout" }
   | { effect: "load_fonts" }
-  | { effect: "post"; user: User; haiku: Haiku }
+  | { effect: "post"; user: User; haiku: Haiku; location: string | undefined }
   | {
       effect: "block_user";
       user: User;
@@ -345,7 +346,7 @@ const runEffect =
         await loadFonts();
         return [{ msg: "fonts_loaded" }];
       case "post":
-        await post(effect.user, effect.haiku);
+        await post(effect.user, effect.haiku, effect.location);
         incStreak(effect.user.userId);
         return [{ msg: "load_feed", user: effect.user }];
       case "block_user":
@@ -407,7 +408,7 @@ type AppContextType = {
   state: State;
   register: (user: User) => void;
   logout: () => void;
-  publish: (haiku: Haiku) => void;
+  publish: (haiku: Haiku, location: string | undefined) => void;
   blockUser: (
     blockedUserId: string,
     blockedUserName: string,
@@ -477,7 +478,8 @@ export const AppStateProvider = (props: any) => {
     state,
     register: (user: User) => dispatch({ msg: "register", user }),
     logout: () => dispatch({ msg: "logout" }),
-    publish: (haiku: Haiku) => dispatch({ msg: "publish", haiku }),
+    publish: (haiku: Haiku, location: string | undefined) =>
+      dispatch({ msg: "publish", haiku, location }),
     blockUser: (
       blockedUserId: string,
       blockedUserName: string,

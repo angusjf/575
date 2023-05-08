@@ -161,6 +161,8 @@ export const Feed: FC<FeedParams> = ({ navigation }) => {
                 key={item.haiku.join("") + item.author}
                 author={item.author}
                 haiku={item.haiku}
+                streak={item.streak}
+                location={item.location}
                 comments={item.comments}
                 showOptions={showOptions}
                 timestamp={item.timestamp}
