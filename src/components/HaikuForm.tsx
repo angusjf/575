@@ -301,16 +301,6 @@ const InputScreen = ({
           onPress={() => getLocationName().then(setLocation)}
           style={{ marginTop: 30 }}
         />
-        {__DEV__ && (
-          <Button
-            title="prefill"
-            onPress={() => {
-              changed(0, "one two three four five");
-              changed(1, "one two three four five six sev");
-              changed(2, "one two three four five");
-            }}
-          />
-        )}
       </View>
     </KeyboardAvoidingView>
   );
