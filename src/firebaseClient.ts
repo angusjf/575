@@ -39,7 +39,18 @@ export const post = async (user: User, haiku: Haiku) => {
     comments: {},
   };
 
-  await set(ref(db, `days/${dateDbKey(new Date())}/${user.userId}`), post);
+  const pastHaiku = {
+    haiku,
+    username: user.username,
+  };
+
+  Promise.all([
+    await set(ref(db, `days/${dateDbKey(new Date())}/${user.userId}`), post),
+    await set(
+      ref(db, `users/${user.userId}/pastHaikus/${dateDbKey(new Date())}`),
+      pastHaiku
+    ),
+  ]);
 };
 
 /**
