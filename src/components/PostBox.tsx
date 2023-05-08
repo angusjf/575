@@ -94,6 +94,8 @@ const PostBoxNoMemo = ({
   signature,
   timestamp,
   open,
+  streak,
+  location,
   onPress,
   comments: initialComments,
 }: Post & {
@@ -143,7 +145,10 @@ const PostBoxNoMemo = ({
         </View>
         <View style={styles.headerInfo}>
           <Text style={styles.author}>{isMyPost ? "Me" : author.username}</Text>
-          <Text style={styles.postTime}>{timestampToRelative(timestamp)}</Text>
+          <Text style={styles.postTime}>
+            {timestampToRelative(timestamp)}
+            {location && ` @ ${location}`}
+          </Text>
         </View>
       </View>
       <TouchableOpacity
