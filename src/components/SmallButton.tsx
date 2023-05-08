@@ -1,14 +1,16 @@
-import { Text, ViewStyle } from "react-native";
+import { Text, TextStyle, ViewStyle } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 export const SmallButton = ({
   onPress,
   children,
-  style,
+  viewStyle,
+  textStyle,
 }: {
   onPress: () => void;
   children: string;
-  style: ViewStyle;
+  viewStyle?: ViewStyle;
+  textStyle?: TextStyle;
 }) => {
   return (
     <TouchableOpacity
@@ -25,15 +27,18 @@ export const SmallButton = ({
           justifyContent: "center",
           alignItems: "center",
         },
-        style,
+        viewStyle,
       ]}
       onPress={onPress}
     >
       <Text
-        style={{
-          fontSize: 20,
-          color: "white",
-        }}
+        style={[
+          {
+            fontSize: 20,
+            color: "white",
+          },
+          textStyle,
+        ]}
       >
         {children}
       </Text>
