@@ -2,6 +2,12 @@ export type Haiku = [string, string, string];
 
 export type Day = { date: Date; posts: Post[] };
 
+export type PastHaiku = {
+  haiku: Haiku;
+  date: string;
+  username: string;
+};
+
 export type Comment = { author: string; comment: string };
 
 export type Post = {
@@ -19,6 +25,7 @@ export type User = {
   avatar: string;
   signature: string;
   streak: number;
+  pastHaikus: PastHaiku[];
 };
 
 export type BlockedUser = {

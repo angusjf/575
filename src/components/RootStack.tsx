@@ -140,7 +140,9 @@ export const RootStack = () => {
         name="Settings"
         component={Settings}
         options={{
-          headerTitle: () => <ScreenTitle title="Settings" />,
+          headerTitle: () => (
+            <ScreenTitle title={state.user?.username ?? "Settings"} />
+          ),
           gestureEnabled: true,
         }}
       />

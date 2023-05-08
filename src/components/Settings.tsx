@@ -20,6 +20,7 @@ import {
 import { SIGNATURE_HEIGHT, SIGNATURE_WIDTH } from "../utils/consts";
 import { Button } from "./Button";
 import { BlockedUser as BlockedUserType } from "../types";
+import { Calendar } from "./Calendar";
 
 const styles = StyleSheet.create({
   root: {
@@ -51,12 +52,14 @@ const styles = StyleSheet.create({
 type SettingsItemProps = {
   title: string;
   onPress: () => void;
+  firstItem: boolean;
 };
 
-const SettingsItem = ({ title, onPress }: SettingsItemProps) => (
+const SettingsItem = ({ title, onPress, firstItem }: SettingsItemProps) => (
   <View
     style={{
       borderColor: "lightgrey",
+      borderTopWidth: firstItem ? 1 : 0,
       borderBottomWidth: 1,
       justifyContent: "center",
     }}
@@ -99,7 +102,7 @@ export const Settings = () => {
   const settings = useMemo(
     () => [
       {
-        title: `Edit username (${state.user?.username})`,
+        title: `Edit username`,
         onPress: () => {
           closeSheets();
           setIsUpdateUsernameDialogOpen(true);
@@ -120,7 +123,7 @@ export const Settings = () => {
         },
       },
       {
-        title: `Logout of ${state.user?.username}`,
+        title: `Logout`,
         onPress: () => {
           closeSheets();
           logout();
@@ -134,14 +137,17 @@ export const Settings = () => {
         },
       },
     ],
-    [logout, state.user?.username]
+    [logout]
   );
 
   return (
     <SafeAreaView style={styles.root}>
+      <Calendar pastHaikus={state.user?.pastHaikus ?? []} />
       <FlatList
         data={settings}
-        renderItem={({ item }) => <SettingsItem {...item} />}
+        renderItem={({ item, index }) => (
+          <SettingsItem firstItem={index === 0} {...item} />
+        )}
       />
       <EditUsernameDialog
         visible={isUpdateUsernameDialogOpen}
