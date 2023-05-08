@@ -234,7 +234,7 @@ function AddReaction({ postComment }: { postComment: (c: string) => void }) {
           onSubmitEditing={done}
         />
       </View>
-      <SmallButton viewStyle={{ marginTop: 5 }} onPress={done}>
+      <SmallButton viewStyle={{ marginTop: 10 }} onPress={done}>
         言
       </SmallButton>
     </View>
