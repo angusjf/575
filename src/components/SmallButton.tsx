@@ -8,7 +8,7 @@ export const SmallButton = ({
 }: {
   onPress: () => void;
   children: string;
-  style: ViewStyle;
+  style?: ViewStyle;
 }) => {
   return (
     <TouchableOpacity

@@ -21,6 +21,8 @@ import { RootStackParams } from "./RootStack";
 import { customSyllables } from "./syllable";
 import { nth } from "../utils/nth";
 import * as Location from "expo-location";
+import { SmallButton } from "./SmallButton";
+import { notableLocations } from "../utils/notableLocations";
 
 type State = {
   haiku: Haiku;
@@ -168,7 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: fonts.PlexMonoItalic,
     marginTop: 15,
-    marginBottom: 15,
+    marginBottom: 25,
   },
   date: {
     fontFamily: fonts.PlexMonoItalic,
@@ -241,7 +243,7 @@ const InputScreen = ({
   signature: string;
   streak: number | undefined;
   location: string | undefined;
-  setLocation: (location: string) => void;
+  setLocation: (location: string | undefined) => void;
 }) => {
   return (
     <KeyboardAvoidingView
@@ -249,7 +251,28 @@ const InputScreen = ({
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View>
-        <DateToday />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <DateToday />
+          {location ? (
+            <SmallButton onPress={() => setLocation(undefined)}>⨯</SmallButton>
+          ) : (
+            <SmallButton
+              onPress={() =>
+                getLocationName().then((l) =>
+                  setLocation(notableLocations[l] ?? l)
+                )
+              }
+            >
+              置
+            </SmallButton>
+          )}
+        </View>
         {location && (
           <Text style={{ fontFamily: fonts.PlexMonoItalic, paddingTop: 7 }}>
             {location}
@@ -293,12 +316,6 @@ const InputScreen = ({
           title="check & share"
           isLoading={validity === "loading"}
           onPress={done}
-          style={{ marginTop: 30 }}
-        />
-        <Button
-          title="置"
-          isLoading={validity === "loading"}
-          onPress={() => getLocationName().then(setLocation)}
           style={{ marginTop: 30 }}
         />
       </View>
