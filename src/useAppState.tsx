@@ -101,7 +101,7 @@ const reducer = (state: State, msg: Msg): [State, Effect[]] => {
               newState,
               [
                 { effect: "hide_splash" },
-                { effect: "navigate", route: "Compose" },
+                { effect: "navigate", route: "Feed" },
               ],
             ]
           : [
