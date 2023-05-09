@@ -31,7 +31,7 @@ import { firebaseUserToUser } from "./utils/user";
 export const post = async (
   user: User,
   haiku: Haiku,
-  location: string | undefined
+  location: string | null
 ) => {
   const db = getDatabase(firebaseApp);
 

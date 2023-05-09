@@ -346,7 +346,7 @@ const runEffect =
         await loadFonts();
         return [{ msg: "fonts_loaded" }];
       case "post":
-        await post(effect.user, effect.haiku, effect.location);
+        await post(effect.user, effect.haiku, effect.location ?? null);
         incStreak(effect.user.userId);
         return [{ msg: "load_feed", user: effect.user }];
       case "block_user":

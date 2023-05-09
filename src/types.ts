@@ -16,7 +16,7 @@ export type Post = {
   signature: string;
   timestamp: number;
   comments: Record<string, string>;
-  location: string | undefined;
+  location: string | null;
   streak: number | undefined;
 };
 
