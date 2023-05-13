@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "days": {
+    	".read": "auth != null",
+    	".write": "auth != null"
+    },
+    "users": {
+      ".read": "auth != null",
+    	".write": "auth != null"
+    },
+    "expoPushTokens": {
+      ".read": "auth.uid === 'AqdCavEpIxb954Hw9Vxi4OpdoKC3' || auth.uid === 'Tb90HtOCeFhvIpxI8CyN9s43QMJ3'",
+      ".write": "auth != null"
+    },
+    "blocks": {
+      ".read": "auth != null",
+    	".write": "auth != null"
+    },
+    "blocked": {
+      ".read": "auth != null",
+    	".write": "auth != null"
+    },
+    "reports": {
+      ".read": "auth != null",
+    	".write": "auth != null"
+    }
+  }
+}
