@@ -2,7 +2,7 @@ name: checks
 on: [push]
 defaults:
   run:
-    - working-directory: mobile
+    working-directory: mobile
 jobs:
   typecheck:
     runs-on: ubuntu-latest
